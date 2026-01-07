@@ -1,0 +1,80 @@
+import { ZodType } from 'zod'
+
+export namespace DataModel {
+  export interface BaseField<T extends string, E = undefined> {
+    type: T
+    name: string
+    apiName: string
+    label?: string
+    required?: boolean
+    isSystem?: boolean
+
+    extra?: E
+  }
+
+  export interface BooleanField extends BaseField<'boolean'> {}
+  export interface StringField extends BaseField<
+    'string',
+    { maxLength?: number; unique?: boolean }
+  > {}
+  export interface TextField extends BaseField<'text', { unique?: boolean }> {}
+  export interface NumberField extends BaseField<
+    'number',
+    { autoIncrement?: boolean; unique?: boolean }
+  > {}
+  export interface DoubleField extends BaseField<'double'> {}
+  export interface DateTimeField extends BaseField<
+    'datetime',
+    { unique?: boolean }
+  > {}
+  export interface DateField extends BaseField<'date', { unique?: boolean }> {}
+  export interface EnumField extends BaseField<
+    'enum',
+    {
+      groupName: string
+      multiple?: boolean
+    }
+  > {}
+  export interface LookupField extends BaseField<
+    'lookup',
+    {
+      modalName: string
+      multiple?: boolean
+      unique?: boolean
+    }
+  > {}
+  export interface JsonField extends BaseField<'json'> {}
+
+  export interface FieldMap {
+    boolean: BooleanField
+    string: StringField
+    text: TextField
+    number: NumberField
+    double: DoubleField
+    datetime: DateTimeField
+    date: DateField
+    enum: EnumField
+    lookup: LookupField
+    json: JsonField
+  }
+
+  export type Field = FieldMap[keyof FieldMap]
+
+  export type FieldType = Field['type']
+
+  export interface Define {
+    dataSourceName: string
+    name: string
+    apiName: string
+    label?: string
+    displayField: string
+    isSystem?: boolean
+    fields: Field[]
+  }
+
+  export interface FieldPlugin<T extends FieldType> {
+    readonly type: T
+
+    getZod(): ZodType<any, any>
+  }
+}

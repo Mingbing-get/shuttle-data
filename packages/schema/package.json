@@ -1,9 +1,9 @@
 {
-  "name": "@shuttle-data/type",
+  "name": "@shuttle-data/schema",
   "version": "0.0.0",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
-  "description": "数据模型类型定义",
+  "description": "数据模型表结构等相关操作",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
@@ -25,10 +25,18 @@
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "access": "public",
   "dependencies": {
+    "knex": "^3.1.0",
+    "@shuttle-data/type": "workspace:*",
     "zod": "^4.3.5"
   },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0",
+    "mysql2": "^3.9.1",
+    "dotenv": "^17.2.3"
+  },
+  "access": "public",
   "publishConfig": {
     "access": "public",
     "main": "dist/cjs/index.cjs",
