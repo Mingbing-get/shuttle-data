@@ -31,6 +31,7 @@ export namespace NDataModelSchema {
     ObjectKeyAppendField<DataModel.BaseField<any>>
   > {
     tableName: string
+    modelField?: string
     isDeleteField?: string
   }
 

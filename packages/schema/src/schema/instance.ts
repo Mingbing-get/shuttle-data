@@ -19,7 +19,12 @@ import {
 
 export default class Schema {
   readonly userDbName: string
-  private dataModelCache: Promise<DataModel.Define[]> | undefined
+  private dataModelCache:
+    | Promise<{
+        apiNameReflexName: Record<string, string>
+        modelMap: Record<string, DataModel.Define>
+      }>
+    | undefined
   private lockSchema: {
     id: string
     type: 'data' | 'schema'
@@ -44,7 +49,9 @@ export default class Schema {
 
   constructor(private options: NDataModelSchema.Options) {
     if (options.dataModels) {
-      this.dataModelCache = Promise.resolve(options.dataModels)
+      this.dataModelCache = Promise.resolve(
+        this.modelListToCache(options.dataModels),
+      )
     }
 
     this.userDbName = options.userDbName || '_user'
@@ -125,7 +132,7 @@ export default class Schema {
 
           await trx(tableConfig.fieldConfig.tableName).insert(
             model.fields.map((field) => ({
-              [fieldFields.tableName]: model.name,
+              [fieldFields.model]: model.name,
               [fieldFields.name]: field.name,
               [fieldFields.apiName]: field.apiName,
               [fieldFields.label]: field.label,
@@ -142,10 +149,18 @@ export default class Schema {
       }
 
       // 更新缓存
-      this.dataModelCache = Promise.resolve([
-        ...(await (this.dataModelCache || [])),
-        model,
-      ])
+      const allModels = await this.all()
+      const newModels = {
+        apiNameReflexName: {
+          ...allModels.apiNameReflexName,
+          [model.apiName]: model.name,
+        },
+        modelMap: {
+          ...allModels.modelMap,
+          [model.name]: model,
+        },
+      }
+      this.dataModelCache = Promise.resolve(newModels)
     } catch (error) {
       throw error
     } finally {
@@ -284,7 +299,7 @@ export default class Schema {
           if (willAddFields.length > 0) {
             await trx(tableConfig.fieldConfig.tableName).insert(
               willAddFields.map((field) => ({
-                [fieldFields.tableName]: model.name,
+                [fieldFields.model]: model.name,
                 [fieldFields.name]: field.name,
                 [fieldFields.apiName]: field.apiName,
                 [fieldFields.label]: field.label,
@@ -327,30 +342,54 @@ export default class Schema {
       }
 
       // 更新缓存
+      const newModel = {
+        ...oldModel,
+        fields: oldModel.fields
+          .reduce((total: DataModel.Field[], field) => {
+            const needDrop = willDropFields.find((f) => f.name === field.name)
+            if (needDrop) {
+              return total
+            }
+
+            const needUpdate = willUpdateFields.find(
+              (f) => f.name === field.name,
+            )
+            if (needUpdate) {
+              total.push({
+                ...field,
+                apiName: needUpdate.apiName,
+                label: needUpdate.label,
+                required: needUpdate.required,
+                extra: needUpdate.extra,
+              } as any)
+            } else {
+              total.push(field)
+            }
+
+            return total
+          }, [])
+          .concat(willAddFields),
+      }
       canUpdateModelKeys.forEach((key) => {
-        if (model[key] !== oldModel[key]) {
-          ;(oldModel as any)[key] = model[key]
+        if (model[key] !== newModel[key]) {
+          ;(newModel as any)[key] = model[key]
         }
       })
-      oldModel.fields = oldModel.fields
-        .reduce((total: DataModel.Field[], field) => {
-          const needDrop = willDropFields.find((f) => f.name === field.name)
-          if (needDrop) {
-            return total
-          }
-
-          const needUpdate = willUpdateFields.find((f) => f.name === field.name)
-          if (needUpdate) {
-            field.apiName = needUpdate.apiName
-            field.label = needUpdate.label
-            field.required = needUpdate.required
-            field.extra = needUpdate.extra
-          }
-          total.push(field)
-
-          return total
-        }, [])
-        .concat(willAddFields)
+      const allModels = await this.all()
+      const newModels = {
+        apiNameReflexName: {
+          ...allModels.apiNameReflexName,
+        },
+        modelMap: {
+          ...allModels.modelMap,
+          [newModel.name]: newModel,
+        },
+      }
+      if (newModel.apiName !== oldModel.apiName) {
+        newModels.apiNameReflexName[newModel.apiName] = newModel.name
+        delete newModels.apiNameReflexName[oldModel.apiName]
+      }
+      this.dataModelCache = Promise.resolve(newModels)
     } catch (error) {
       throw error
     } finally {
@@ -410,7 +449,7 @@ export default class Schema {
             })
 
           await trx(tableConfig.fieldConfig.tableName)
-            .where(fieldFields.tableName, '=', oldModel.name)
+            .where(fieldFields.model, '=', oldModel.name)
             .update({
               [fieldFields.isDelete]: true,
             })
@@ -419,9 +458,16 @@ export default class Schema {
 
       // 更新缓存
       const allModels = await this.all()
-      const newModels = allModels.filter(
-        (model) => model.name !== oldModel.name,
-      )
+      const newModels = {
+        apiNameReflexName: {
+          ...allModels.apiNameReflexName,
+        },
+        modelMap: {
+          ...allModels.modelMap,
+        },
+      }
+      delete newModels.apiNameReflexName[oldModel.apiName]
+      delete newModels.modelMap[oldModel.name]
       this.dataModelCache = Promise.resolve(newModels)
     } catch (error) {
       throw error
@@ -432,16 +478,21 @@ export default class Schema {
 
   async hasTable(tableName: string, useApiName: boolean = false) {
     const dataModels = await this.all()
-    return dataModels.some((model) => {
-      return (useApiName ? model.apiName : model.name) === tableName
-    })
+    if (useApiName) {
+      return !!dataModels.apiNameReflexName[tableName]
+    }
+
+    return !!dataModels.modelMap[tableName]
   }
 
   async getTable(tableName: string, useApiName: boolean = false) {
     const dataModels = await this.all()
-    return dataModels.find((model) => {
-      return (useApiName ? model.apiName : model.name) === tableName
-    })
+    if (useApiName) {
+      tableName = dataModels.apiNameReflexName[tableName]
+      if (!tableName) return
+    }
+
+    return dataModels.modelMap[tableName]
   }
 
   async addField(
@@ -497,7 +548,7 @@ export default class Schema {
         const fieldFields = this.getFieldTableFields()
 
         await tableKnex(tableConfig.fieldConfig.tableName).insert({
-          [fieldFields.tableName]: oldModel.name,
+          [fieldFields.model]: oldModel.name,
           [fieldFields.name]: field.name,
           [fieldFields.apiName]: field.apiName,
           [fieldFields.label]: field.label,
@@ -510,7 +561,17 @@ export default class Schema {
       }
 
       // 将字段加入到缓存中
-      oldModel.fields.push(field)
+      const allModels = await this.all()
+      this.dataModelCache = Promise.resolve({
+        apiNameReflexName: allModels.apiNameReflexName,
+        modelMap: {
+          ...allModels.modelMap,
+          [oldModel.name]: {
+            ...oldModel,
+            fields: [...oldModel.fields, field],
+          },
+        },
+      })
     } catch (error) {
       throw error
     } finally {
@@ -576,10 +637,27 @@ export default class Schema {
       }
 
       // 将字段在缓存中更新
-      oldField.apiName = field.apiName
-      oldField.label = field.label
-      oldField.required = field.required
-      oldField.extra = field.extra
+      const newField = {
+        ...oldField,
+        apiName: field.apiName,
+        label: field.label,
+        required: field.required,
+        extra: field.extra,
+      } as DataModel.Field
+      const allModels = await this.all()
+      this.dataModelCache = Promise.resolve({
+        apiNameReflexName: allModels.apiNameReflexName,
+        modelMap: {
+          ...allModels.modelMap,
+          [oldModel.name]: {
+            ...oldModel,
+            fields: [
+              ...oldModel.fields.filter((f) => f.name !== field.name),
+              newField,
+            ],
+          },
+        },
+      })
     } catch (error) {
       throw error
     } finally {
@@ -656,7 +734,17 @@ export default class Schema {
       }
 
       // 将字段从缓存中删除
-      oldModel.fields = oldModel.fields.filter((f) => f.name !== oldField.name)
+      const allModels = await this.all()
+      this.dataModelCache = Promise.resolve({
+        apiNameReflexName: allModels.apiNameReflexName,
+        modelMap: {
+          ...allModels.modelMap,
+          [oldModel.name]: {
+            ...oldModel,
+            fields: oldModel.fields.filter((f) => f.name !== oldField.name),
+          },
+        },
+      })
     } catch (error) {
       throw error
     } finally {
@@ -711,7 +799,7 @@ export default class Schema {
         )
 
         if (!hasModelTable) {
-          return []
+          return this.modelListToCache([])
         }
 
         const modelTables: Omit<DataModel.Define, 'fields'>[] = await tableKnex(
@@ -725,22 +813,31 @@ export default class Schema {
         )
 
         if (!hasFieldTable) {
-          return modelTables.map((model) => ({
-            ...model,
-            fields: [],
-          }))
+          return this.modelListToCache(
+            modelTables.map((model) => ({
+              ...model,
+              fields: [],
+            })),
+          )
         }
 
-        const modelFields: (DataModel.Field & { tableName: string })[] =
+        const modelFields: (DataModel.Field & { model: string })[] =
           await tableKnex(this.options.modelTableConfig.fieldConfig.tableName)
             .select(this.getFieldTableFields())
             .where('isDelete', '<>', true)
 
-        return modelTables.map((model) => ({
-          ...model,
-          fields: modelFields.filter((field) => field.tableName === model.name),
-        }))
+        return this.modelListToCache(
+          modelTables.map((model) => ({
+            ...model,
+            fields: modelFields.filter((field) => field.model === model.name),
+          })),
+        )
       })()
+
+      this.dataModelCache.catch((error) => {
+        this.dataModelCache = undefined
+        throw error
+      })
     }
 
     return this.dataModelCache
@@ -778,10 +875,10 @@ export default class Schema {
 
   private getFieldTableFields() {
     const fieldTableFieldMap: Record<
-      keyof DataModel.BaseField<any> | 'isDelete' | 'tableName',
+      keyof DataModel.BaseField<any> | 'isDelete' | 'model',
       string
     > = {
-      tableName: 'tableName',
+      model: 'model',
       type: 'type',
       name: 'name',
       apiName: 'apiName',
@@ -888,7 +985,7 @@ export default class Schema {
     const fieldTableFieldMap = this.getFieldTableFields()
 
     await knex.schema.createTable(fieldConfig.tableName, (table) => {
-      table.string(fieldTableFieldMap.tableName).notNullable()
+      table.string(fieldTableFieldMap.model).notNullable()
       table.string(fieldTableFieldMap.type, 20).notNullable()
       table.string(fieldTableFieldMap.name).primary()
       table.string(fieldTableFieldMap.apiName)
@@ -1090,5 +1187,18 @@ export default class Schema {
     ]
 
     return fields
+  }
+
+  private modelListToCache(models: DataModel.Define[]) {
+    return {
+      apiNameReflexName: models.reduce((prev: Record<string, string>, cur) => {
+        prev[cur.apiName] = cur.name
+        return prev
+      }, {}),
+      modelMap: models.reduce((prev: Record<string, DataModel.Define>, cur) => {
+        prev[cur.name] = cur
+        return prev
+      }, {}),
+    }
   }
 }

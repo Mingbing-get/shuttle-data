@@ -3,11 +3,14 @@ import { DataEnum } from './type'
 
 export default class DataEnumManager {
   getGroupZod() {
-    return z.object({
-      name: z.string(),
-      apiName: z.string(),
-      label: z.string().optional(),
-    })
+    return z
+      .object({
+        name: z.string(),
+        apiName: z.string(),
+        label: z.string().optional(),
+        isSystem: z.boolean().optional(),
+      })
+      .catchall(z.any())
   }
 
   getGroupZodWithItems() {
@@ -17,18 +20,22 @@ export default class DataEnumManager {
   }
 
   getItemZod() {
-    return z.object({
-      name: z.string(),
-      apiName: z.string(),
-      label: z.string().optional(),
-    })
+    return z
+      .object({
+        name: z.string(),
+        apiName: z.string(),
+        label: z.string().optional(),
+        isDisabled: z.boolean().optional(),
+      })
+      .catchall(z.any())
   }
 
   toTs(group: DataEnum.Group, useApiName?: boolean) {
     const enumTypeName = `${this.capitalizeFirstLetter(group.name)}Enum${useApiName ? 'Api' : ''}`
 
     const tipItems = group.items.map(
-      (item) => `* - ${useApiName ? item.apiName : item.name}: '${item.label}'`,
+      (item) =>
+        `* - ${useApiName ? item.apiName : item.name}: '${item.label}'${item.isDisabled ? ' (disabled)' : ''}`,
     )
 
     const items = group.items.map((item) =>

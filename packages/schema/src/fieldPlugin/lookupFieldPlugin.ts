@@ -31,9 +31,8 @@ export default class LookupFieldPlugin
 
     if (field.extra.modalName === schema.userDbName) return
 
-    const modals = await schema.all()
-    const modal = modals.find((modal) => modal.name === field.extra?.modalName)
-    if (!modal) {
+    const hasModel = await schema.hasTable(field.extra.modalName)
+    if (!hasModel) {
       throw new Error(
         `lookup field ${field.name} modalName ${field.extra.modalName} is not found`,
       )
