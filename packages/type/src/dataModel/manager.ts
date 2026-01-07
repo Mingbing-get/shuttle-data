@@ -65,4 +65,30 @@ export default class DataModelManager {
       fields: z.array(z.union(fieldZods)),
     })
   }
+
+  toTs(model: DataModel.Define, useApiName?: boolean) {
+    const fields = model.fields.map((field) => {
+      const plugin = this.getPlugin(field.type)
+      if (!plugin) {
+        throw new Error(`Field type ${field.type} not found`)
+      }
+      return plugin.getTs(field, useApiName)
+    })
+
+    const modelTypeName = `${this.capitalizeFirstLetter(model.name)}Model${useApiName ? 'Api' : ''}`
+
+    return `/**
+  * label: ${model.label}
+  * name: ${model.name}
+  * apiName: ${model.apiName}
+  */
+export interface ${modelTypeName} {
+  ${fields.join('\n')}
+}`
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    if (!str) return str // 处理空字符串
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 }
