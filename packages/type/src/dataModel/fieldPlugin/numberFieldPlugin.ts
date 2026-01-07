@@ -13,8 +13,22 @@ export default class NumberFieldPlugin implements DataModel.FieldPlugin<'number'
         .object({
           autoIncrement: z.boolean().optional(),
           unique: z.boolean().optional(),
+          min: z.number().optional(),
+          max: z.number().optional(),
         })
         .optional(),
     })
+  }
+
+  getTs(field: DataModel.NumberField, useApiName?: boolean) {
+    const key = useApiName ? field.apiName : field.name
+
+    return `/**
+ * label: ${field.label}
+ * type: ${field.type}
+ * name: ${field.name}
+ * apiName: ${field.apiName}
+ */
+${key}${field.required && !field.extra?.autoIncrement ? '' : '?'}: number`
   }
 }

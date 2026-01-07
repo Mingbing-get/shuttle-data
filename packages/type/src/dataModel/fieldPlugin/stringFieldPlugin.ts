@@ -17,4 +17,16 @@ export default class StringFieldPlugin implements DataModel.FieldPlugin<'string'
         .optional(),
     })
   }
+
+  getTs(field: DataModel.StringField, useApiName?: boolean) {
+    const key = useApiName ? field.apiName : field.name
+
+    return `/**
+ * label: ${field.label}
+ * type: ${field.type}
+ * name: ${field.name}
+ * apiName: ${field.apiName}
+ */
+${key}${field.required ? '' : '?'}: string`
+  }
 }

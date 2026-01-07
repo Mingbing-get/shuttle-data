@@ -15,4 +15,23 @@ export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
       }),
     })
   }
+
+  getTs(field: DataModel.EnumField, useApiName?: boolean) {
+    const key = useApiName ? field.apiName : field.name
+
+    const enumTypeName = `${this.capitalizeFirstLetter(field.extra?.groupName || '')}Enum${useApiName ? 'Api' : ''}`
+
+    return `/**
+ * label: ${field.label}
+ * type: ${field.type}
+ * name: ${field.name}
+ * apiName: ${field.apiName}
+ */
+${key}${field.required ? '' : '?'}: ${enumTypeName}${field.extra?.multiple ? '[]' : ''}`
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    if (!str) return str // 处理空字符串
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 }

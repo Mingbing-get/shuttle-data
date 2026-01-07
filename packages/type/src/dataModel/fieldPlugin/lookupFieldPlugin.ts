@@ -16,4 +16,23 @@ export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'
       }),
     })
   }
+
+  getTs(field: DataModel.LookupField, useApiName?: boolean) {
+    const key = useApiName ? field.apiName : field.name
+
+    const modalName = `${this.capitalizeFirstLetter(field.extra?.modalName || '')}Model${useApiName ? 'Api' : ''}`
+
+    return `/**
+ * label: ${field.label}
+ * type: ${field.type}
+ * name: ${field.name}
+ * apiName: ${field.apiName}
+ */
+${key}${field.required ? '' : '?'}: ${modalName}${field.extra?.multiple ? '[]' : ''}`
+  }
+
+  private capitalizeFirstLetter(str: string): string {
+    if (!str) return str // 处理空字符串
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 }

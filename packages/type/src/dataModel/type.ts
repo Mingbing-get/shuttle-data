@@ -12,7 +12,13 @@ export namespace DataModel {
     extra?: E
   }
 
-  export interface BooleanField extends BaseField<'boolean'> {}
+  export interface BooleanField extends BaseField<
+    'boolean',
+    {
+      trueText?: string
+      falseText?: string
+    }
+  > {}
   export interface StringField extends BaseField<
     'string',
     { maxLength?: number; unique?: boolean }
@@ -20,14 +26,20 @@ export namespace DataModel {
   export interface TextField extends BaseField<'text', { unique?: boolean }> {}
   export interface NumberField extends BaseField<
     'number',
-    { autoIncrement?: boolean; unique?: boolean }
+    { autoIncrement?: boolean; unique?: boolean; min?: number; max?: number }
   > {}
-  export interface DoubleField extends BaseField<'double'> {}
+  export interface DoubleField extends BaseField<
+    'double',
+    { min?: number; max?: number; decimal?: number }
+  > {}
   export interface DateTimeField extends BaseField<
     'datetime',
-    { unique?: boolean }
+    { unique?: boolean; format?: string }
   > {}
-  export interface DateField extends BaseField<'date', { unique?: boolean }> {}
+  export interface DateField extends BaseField<
+    'date',
+    { unique?: boolean; format?: string }
+  > {}
   export interface EnumField extends BaseField<
     'enum',
     {
@@ -76,5 +88,7 @@ export namespace DataModel {
     readonly type: T
 
     getZod(): ZodType<any, any>
+
+    getTs(field: Extract<Field, { type: T }>, useApiName?: boolean): string
   }
 }
