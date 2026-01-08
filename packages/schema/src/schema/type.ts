@@ -19,6 +19,11 @@ export namespace NDataModelSchema {
     tableName: string
   }
 
+  export interface CustomField<T> {
+    builder: (table: Knex.CreateTableBuilder) => void
+    onCreate: (model: T) => any
+  }
+
   export interface ModelTableConfig extends Partial<
     ObjectKeyAppendField<Omit<DataModel.Define, 'fields'>>
   > {
@@ -26,6 +31,7 @@ export namespace NDataModelSchema {
     tableName: string
     fieldConfig: ModelFieldConfig
     isDeleteField?: string
+    custom?: Record<keyof DataModel.Define, CustomField<DataModel.Define>>
   }
 
   export interface ModelFieldConfig extends Partial<
@@ -34,6 +40,10 @@ export namespace NDataModelSchema {
     tableName: string
     modelField?: string
     isDeleteField?: string
+    custom?: Record<
+      keyof DataModel.BaseField<any>,
+      CustomField<DataModel.BaseField<any>>
+    >
   }
 
   export interface Options {

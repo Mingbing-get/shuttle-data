@@ -130,6 +130,7 @@ export default class Schema {
             [modelFields.displayField]: model.displayField,
             [modelFields.isSystem]: model.isSystem,
             [modelFields.isDelete]: false,
+            ...this.createCustomRecord(tableConfig.custom || {}, model),
           })
 
           await trx(tableConfig.fieldConfig.tableName).insert(
@@ -145,6 +146,10 @@ export default class Schema {
               [fieldFields.extra]: field.extra
                 ? JSON.stringify(field.extra)
                 : null,
+              ...this.createCustomRecord(
+                tableConfig.fieldConfig.custom || {},
+                field as DataModel.BaseField<any>,
+              ),
             })),
           )
         })
@@ -312,6 +317,10 @@ export default class Schema {
                 [fieldFields.extra]: field.extra
                   ? JSON.stringify(field.extra)
                   : null,
+                ...this.createCustomRecord(
+                  tableConfig.fieldConfig.custom || {},
+                  field as DataModel.BaseField<any>,
+                ),
               })),
             )
           }
@@ -559,6 +568,10 @@ export default class Schema {
           [fieldFields.isSystem]: field.isSystem,
           [fieldFields.extra]: field.extra ? JSON.stringify(field.extra) : null,
           [fieldFields.isDelete]: false,
+          ...this.createCustomRecord(
+            tableConfig.fieldConfig.custom || {},
+            field as DataModel.BaseField<any>,
+          ),
         })
       }
 
@@ -807,7 +820,10 @@ export default class Schema {
         const modelTables: Omit<DataModel.Define, 'fields'>[] = await tableKnex(
           this.options.modelTableConfig.tableName,
         )
-          .select(this.getModelTableFields())
+          .select(
+            this.getModelTableFields(),
+            ...Object.keys(this.options.modelTableConfig.custom || {}),
+          )
           .where('isDelete', '<>', true)
 
         const hasFieldTable = await tableKnex.schema.hasTable(
@@ -825,7 +841,12 @@ export default class Schema {
 
         const modelFields: (DataModel.Field & { model: string })[] =
           await tableKnex(this.options.modelTableConfig.fieldConfig.tableName)
-            .select(this.getFieldTableFields())
+            .select(
+              this.getFieldTableFields(),
+              ...Object.keys(
+                this.options.modelTableConfig.fieldConfig.custom || {},
+              ),
+            )
             .where('isDelete', '<>', true)
 
         return this.modelListToCache(
@@ -974,6 +995,9 @@ export default class Schema {
       table.string(modelTableFieldMap.displayField).notNullable()
       table.boolean(modelTableFieldMap.isDelete).defaultTo(false)
       table.boolean(modelTableFieldMap.isSystem).defaultTo(false)
+      Object.values(modelTableConfig.custom || {}).forEach((customField) => {
+        customField.builder(table)
+      })
     })
   }
 
@@ -996,6 +1020,9 @@ export default class Schema {
       table.json(fieldTableFieldMap.extra)
       table.boolean(fieldTableFieldMap.isDelete).defaultTo(false)
       table.boolean(fieldTableFieldMap.isSystem).defaultTo(false)
+      Object.values(fieldConfig.custom || {}).forEach((customField) => {
+        customField.builder(table)
+      })
     })
   }
 
@@ -1226,5 +1253,16 @@ export default class Schema {
         return prev
       }, {}),
     }
+  }
+
+  private createCustomRecord<T>(
+    custom: Partial<Record<keyof T, NDataModelSchema.CustomField<T>>>,
+    v: T,
+  ) {
+    const customRecord: Record<keyof T, any> = {} as Record<keyof T, any>
+    for (const key in custom) {
+      customRecord[key] = (custom as any)[key].onCreate(v)
+    }
+    return customRecord
   }
 }

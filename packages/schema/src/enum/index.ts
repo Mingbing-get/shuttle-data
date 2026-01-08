@@ -2,7 +2,7 @@ import {
   DataEnumManager as _DataEnumManager,
   DataEnum,
 } from '@shuttle-data/type'
-import { DataEnumManagerOptions, GroupTableConfig } from './type'
+import { DataEnumManagerOptions, GroupTableConfig, CustomField } from './type'
 
 export default class DataEnumManager extends _DataEnumManager {
   private enumCache:
@@ -43,24 +43,34 @@ export default class DataEnumManager extends _DataEnumManager {
       await this.createItemTableIfNotExist(groupTableConfig)
 
       await groupTableConfig.knex.transaction(async (trx) => {
-        await trx(groupTableConfig.tableName).insert({
+        const dbGroup = {
           [groupFields.name]: group.name,
           [groupFields.apiName]: group.apiName,
           [groupFields.label]: group.label,
           [groupFields.isSystem]: group.isSystem,
           [groupFields.isDelete]: false,
-        })
+          ...this.createCustomRecord(groupTableConfig.custom || {}, group),
+        }
 
-        await trx(groupTableConfig.itemTableConfig.tableName).insert(
-          group.items.map((item) => ({
+        const dbItems = group.items.map((item) => {
+          const newItem = {
             [itemFields.group]: group.name,
             [itemFields.name]: item.name,
             [itemFields.apiName]: item.apiName,
             [itemFields.label]: item.label,
             [itemFields.isDelete]: false,
             [itemFields.isDisabled]: item.isDisabled,
-          })),
-        )
+            ...this.createCustomRecord(
+              groupTableConfig.itemTableConfig.custom || {},
+              item,
+            ),
+          }
+
+          return newItem
+        })
+
+        await trx(groupTableConfig.tableName).insert(dbGroup)
+        await trx(groupTableConfig.itemTableConfig.tableName).insert(dbItems)
       })
     }
 
@@ -149,14 +159,22 @@ export default class DataEnumManager extends _DataEnumManager {
         const itemFields = this.getItemTableFields()
         if (willAddItems.length > 0) {
           await trx(groupTableConfig.itemTableConfig.tableName).insert(
-            willAddItems.map((item) => ({
-              [itemFields.group]: group.name,
-              [itemFields.name]: item.name,
-              [itemFields.apiName]: item.apiName,
-              [itemFields.label]: item.label,
-              [itemFields.isDelete]: false,
-              [itemFields.isDisabled]: item.isDisabled,
-            })),
+            willAddItems.map((item) => {
+              const newItem = {
+                [itemFields.group]: group.name,
+                [itemFields.name]: item.name,
+                [itemFields.apiName]: item.apiName,
+                [itemFields.label]: item.label,
+                [itemFields.isDelete]: false,
+                [itemFields.isDisabled]: item.isDisabled,
+                ...this.createCustomRecord(
+                  groupTableConfig.itemTableConfig.custom || {},
+                  item,
+                ),
+              }
+
+              return newItem
+            }),
           )
         }
 
@@ -310,6 +328,10 @@ export default class DataEnumManager extends _DataEnumManager {
           [itemFields.label]: item.label,
           [itemFields.isDelete]: false,
           [itemFields.isDisabled]: item.isDisabled,
+          ...this.createCustomRecord(
+            groupTableConfig.itemTableConfig.custom || {},
+            item,
+          ),
         })
     }
 
@@ -506,7 +528,10 @@ export default class DataEnumManager extends _DataEnumManager {
 
         const groups: Omit<DataEnum.Group, 'items'>[] = await groupTableConfig
           .knex(groupTableConfig.tableName)
-          .select(this.getGroupTableFields())
+          .select(
+            this.getGroupTableFields(),
+            ...Object.keys(groupTableConfig.custom || {}),
+          )
           .where('isDelete', '<>', true)
 
         const hasItemTable = await groupTableConfig.knex.schema.hasTable(
@@ -525,7 +550,10 @@ export default class DataEnumManager extends _DataEnumManager {
         const enumItems: (DataEnum.Item & { group: string })[] =
           await groupTableConfig
             .knex(groupTableConfig.itemTableConfig.tableName)
-            .select(this.getItemTableFields())
+            .select(
+              this.getItemTableFields(),
+              ...Object.keys(groupTableConfig.itemTableConfig.custom || {}),
+            )
             .where('isDelete', '<>', true)
 
         return this.groupListToCache(
@@ -573,6 +601,9 @@ export default class DataEnumManager extends _DataEnumManager {
         table.string(groupTableFields.label)
         table.boolean(groupTableFields.isSystem).defaultTo(false)
         table.boolean(groupTableFields.isDelete).defaultTo(false)
+        Object.values(groupTableConfig.custom || {}).forEach((customField) => {
+          customField.builder(table)
+        })
       },
     )
   }
@@ -594,6 +625,11 @@ export default class DataEnumManager extends _DataEnumManager {
         table.string(itemTableFields.label)
         table.boolean(itemTableFields.isDisabled).defaultTo(false)
         table.boolean(itemTableFields.isDelete).defaultTo(false)
+        Object.values(groupTableConfig.itemTableConfig.custom || {}).forEach(
+          (customField) => {
+            customField.builder(table)
+          },
+        )
       },
     )
   }
@@ -663,5 +699,16 @@ export default class DataEnumManager extends _DataEnumManager {
         {},
       ),
     }
+  }
+
+  private createCustomRecord<T>(
+    custom: Partial<Record<keyof T, CustomField<T>>>,
+    v: T,
+  ) {
+    const customRecord: Record<keyof T, any> = {} as Record<keyof T, any>
+    for (const key in custom) {
+      customRecord[key] = (custom as any)[key].onCreate(v)
+    }
+    return customRecord
   }
 }

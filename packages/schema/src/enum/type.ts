@@ -18,10 +18,17 @@ export interface GroupTableConfig extends ObjectKeyAppendField<
   tableName: string
   isDeleteField?: string
   itemTableConfig: ItemTableConfig
+  custom?: Record<keyof DataEnum.Group, CustomField<DataEnum.Group>>
 }
 
 export interface ItemTableConfig extends ObjectKeyAppendField<DataEnum.Item> {
   tableName: string
   groupField?: string
   isDeleteField?: string
+  custom?: Partial<Record<keyof DataEnum.Item, CustomField<DataEnum.Item>>>
+}
+
+export interface CustomField<T> {
+  builder: (table: Knex.CreateTableBuilder) => void
+  onCreate: (model: T) => any
 }
