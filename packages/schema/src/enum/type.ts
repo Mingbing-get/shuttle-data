@@ -18,7 +18,7 @@ export interface GroupTableConfig extends Partial<
   tableName: string
   isDeleteField?: string
   itemTableConfig: ItemTableConfig
-  custom?: Record<keyof DataEnum.Group, CustomField<DataEnum.Group>>
+  custom?: Partial<Record<keyof DataEnum.Group, CustomField<DataEnum.Group>>>
 }
 
 export interface ItemTableConfig extends Partial<

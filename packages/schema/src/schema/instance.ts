@@ -1213,6 +1213,14 @@ export default class Schema {
           modalName: this.userDbName,
         },
       },
+      {
+        name: '_isDelete',
+        apiName: 'isDelete',
+        label: 'Is Delete',
+        type: 'boolean',
+        isSystem: true,
+        required: true,
+      },
     ]
 
     return fields

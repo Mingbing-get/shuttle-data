@@ -534,6 +534,10 @@ describe('schema', () => {
 
     await dataModelSchema.dropTable(complexModel.name)
     expect(await dataModelSchema.hasTable(complexModel.name)).toBe(false)
+
+    // 清空数据库中的 complex_model 表记录
+    await db('model_schema').where('name', complexModel.name).delete()
+    await db('model_schema_field').where('model', complexModel.name).delete()
   })
 
   it('should support updating table properties', async () => {

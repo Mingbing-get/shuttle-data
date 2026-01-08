@@ -31,7 +31,9 @@ export namespace NDataModelSchema {
     tableName: string
     fieldConfig: ModelFieldConfig
     isDeleteField?: string
-    custom?: Record<keyof DataModel.Define, CustomField<DataModel.Define>>
+    custom?: Partial<
+      Record<keyof DataModel.Define, CustomField<DataModel.Define>>
+    >
   }
 
   export interface ModelFieldConfig extends Partial<
@@ -40,9 +42,11 @@ export namespace NDataModelSchema {
     tableName: string
     modelField?: string
     isDeleteField?: string
-    custom?: Record<
-      keyof DataModel.BaseField<any>,
-      CustomField<DataModel.BaseField<any>>
+    custom?: Partial<
+      Record<
+        keyof DataModel.BaseField<any>,
+        CustomField<DataModel.BaseField<any>>
+      >
     >
   }
 
