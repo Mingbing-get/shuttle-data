@@ -3,6 +3,8 @@ import { DataModel, DataModelManager } from '@shuttle-data/type'
 import { randomUUID } from 'node:crypto'
 
 import { NDataModelSchema } from './type'
+import { DataEnumManagerOptions } from '../enum/type'
+import DataEnumManager from '../enum'
 
 import {
   StringFieldPlugin,
@@ -1187,6 +1189,30 @@ export default class Schema {
     ]
 
     return fields
+  }
+
+  getEnumManager() {
+    const enumManagerOptions = this.options.enumSourceConfig
+    if (!enumManagerOptions) {
+      return new DataEnumManager({})
+    }
+
+    const options = {
+      ...enumManagerOptions,
+    }
+
+    if (options.groupTableConfig && !options.groupTableConfig.knex) {
+      if (this.options.knex) {
+        options.groupTableConfig = {
+          ...options.groupTableConfig,
+          knex: this.options.knex,
+        }
+      } else {
+        delete options.groupTableConfig
+      }
+    }
+
+    return new DataEnumManager(options as DataEnumManagerOptions)
   }
 
   private modelListToCache(models: DataModel.Define[]) {

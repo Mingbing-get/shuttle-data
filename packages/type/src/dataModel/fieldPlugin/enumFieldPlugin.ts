@@ -19,7 +19,7 @@ export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
   getTs(field: DataModel.EnumField, useApiName?: boolean) {
     const key = useApiName ? field.apiName : field.name
 
-    const enumTypeName = `${this.capitalizeFirstLetter(field.extra?.groupName || '')}Enum${useApiName ? 'Api' : ''}`
+    const enumTypeName = `${this.capitalizeFirstLetter(field.extra?.groupName || '')}_enum${useApiName ? '_api' : ''}`
 
     return `/**
  * label: ${field.label}

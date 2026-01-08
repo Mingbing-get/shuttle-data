@@ -75,7 +75,7 @@ export default class DataModelManager {
       return plugin.getTs(field, useApiName)
     })
 
-    const modelTypeName = `${this.capitalizeFirstLetter(model.name)}Model${useApiName ? 'Api' : ''}`
+    const modelTypeName = `${this.capitalizeFirstLetter(model.name)}_model${useApiName ? '_api' : ''}`
 
     return `/**
   * label: ${model.label}

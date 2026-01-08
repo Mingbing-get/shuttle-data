@@ -20,7 +20,7 @@ export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'
   getTs(field: DataModel.LookupField, useApiName?: boolean) {
     const key = useApiName ? field.apiName : field.name
 
-    const modalName = `${this.capitalizeFirstLetter(field.extra?.modalName || '')}Model${useApiName ? 'Api' : ''}`
+    const modalName = `${this.capitalizeFirstLetter(field.extra?.modalName || '')}_model${useApiName ? '_api' : ''}`
 
     return `/**
  * label: ${field.label}

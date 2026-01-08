@@ -31,7 +31,7 @@ export default class DataEnumManager {
   }
 
   toTs(group: DataEnum.Group, useApiName?: boolean) {
-    const enumTypeName = `${this.capitalizeFirstLetter(group.name)}Enum${useApiName ? 'Api' : ''}`
+    const enumTypeName = `${this.capitalizeFirstLetter(group.name)}_enum${useApiName ? '_api' : ''}`
 
     const tipItems = group.items.map(
       (item) =>

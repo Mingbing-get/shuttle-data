@@ -1,6 +1,7 @@
 import { Knex } from 'knex'
 import { DataModel } from '@shuttle-data/type'
 import Schema from './instance'
+import { DataEnumManagerOptions, GroupTableConfig } from '../enum/type'
 
 export namespace NDataModelSchema {
   export interface DataHistory {
@@ -46,6 +47,12 @@ export namespace NDataModelSchema {
     modelTableConfig?: ModelTableConfig
     /** 数据模型定义, 自定义有哪些数据模型，后续将不会去数据库查询 */
     dataModels?: DataModel.Define[]
+    /** 枚举表配置，用于查询枚举相关信息 */
+    enumSourceConfig?: Omit<DataEnumManagerOptions, 'groupTableConfig'> & {
+      groupTableConfig?: Omit<GroupTableConfig, 'knex'> & {
+        knex?: Knex
+      }
+    }
   }
 
   export interface FieldPlugin<

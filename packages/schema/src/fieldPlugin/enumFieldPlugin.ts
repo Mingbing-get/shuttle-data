@@ -22,7 +22,19 @@ export default class EnumFieldPlugin
     }
   }
 
-  check(schema: DataModelSchema, field: DataModel.EnumField) {
+  async check(schema: DataModelSchema, field: DataModel.EnumField) {
     this.getZod().parse(field)
+
+    if (!field.extra?.groupName) {
+      throw new Error(`enum field ${field.name} must have groupName`)
+    }
+
+    const enumManager = schema.getEnumManager()
+    const hasGroup = await enumManager.hasGroup(field.extra.groupName)
+    if (!hasGroup) {
+      throw new Error(
+        `enum field ${field.name} group name ${field.extra.groupName} not found`,
+      )
+    }
   }
 }
