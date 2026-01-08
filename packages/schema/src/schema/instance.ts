@@ -716,7 +716,7 @@ export default class Schema {
     }
 
     const fieldInDb = await this.options.knex.schema.hasColumn(
-      oldField.name,
+      oldModel.name,
       oldField.name,
     )
     if (!fieldInDb) {
@@ -1013,7 +1013,7 @@ export default class Schema {
     await knex.schema.createTable(fieldConfig.tableName, (table) => {
       table.string(fieldTableFieldMap.model).notNullable()
       table.string(fieldTableFieldMap.type, 20).notNullable()
-      table.string(fieldTableFieldMap.name).primary()
+      table.string(fieldTableFieldMap.name)
       table.string(fieldTableFieldMap.apiName)
       table.string(fieldTableFieldMap.label)
       table.boolean(fieldTableFieldMap.required).defaultTo(false)

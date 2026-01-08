@@ -11,8 +11,8 @@ export interface DataEnumManagerOptions {
   enumGroup?: DataEnum.Group[]
 }
 
-export interface GroupTableConfig extends ObjectKeyAppendField<
-  Omit<DataEnum.Group, 'items'>
+export interface GroupTableConfig extends Partial<
+  ObjectKeyAppendField<Omit<DataEnum.Group, 'items'>>
 > {
   knex: Knex
   tableName: string
@@ -21,7 +21,9 @@ export interface GroupTableConfig extends ObjectKeyAppendField<
   custom?: Record<keyof DataEnum.Group, CustomField<DataEnum.Group>>
 }
 
-export interface ItemTableConfig extends ObjectKeyAppendField<DataEnum.Item> {
+export interface ItemTableConfig extends Partial<
+  ObjectKeyAppendField<DataEnum.Item>
+> {
   tableName: string
   groupField?: string
   isDeleteField?: string
