@@ -20,7 +20,10 @@ export default class NumberFieldPlugin
     if (field.extra?.autoIncrement) {
       table.increments(field.name)
     } else {
-      table.integer(field.name)
+      const builder = table.integer(field.name)
+      if (field.extra?.unique) {
+        builder.unique()
+      }
     }
   }
 

@@ -15,7 +15,10 @@ export default class DatetimeFieldPlugin
     table: Knex.CreateTableBuilder,
     field: DataModel.DateTimeField,
   ): void {
-    table.timestamp(field.name)
+    const builder = table.timestamp(field.name)
+    if (field.extra?.unique) {
+      builder.unique()
+    }
   }
 
   check(schema: DataModelSchema, field: DataModel.DateTimeField) {

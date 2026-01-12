@@ -1,0 +1,54 @@
+{
+  "name": "@shuttle-data/crud",
+  "version": "0.0.0",
+  "author": "Mingbing-get <1508850533@qq.com>",
+  "license": "MIT",
+  "description": "数据模型 CRUD 操作",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "knex": "^3.1.0",
+    "@shuttle-data/type": "workspace:*",
+    "@shuttle-data/schema": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.0",
+    "mysql2": "^3.9.1",
+    "dotenv": "^17.2.3"
+  },
+  "access": "public",
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/es/index.mjs",
+    "types": "dist/types/index.d.ts",
+    "type": "module",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/es/index.mjs",
+        "require": "./dist/cjs/index.cjs"
+      }
+    }
+  }
+}

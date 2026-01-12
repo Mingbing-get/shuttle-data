@@ -1,0 +1,67 @@
+import { DoubleFieldPlugin as _DoubleFieldPlugin } from '@shuttle-data/schema'
+
+import conditionPluginManager from '../conditionBuilder'
+import { NCRUD } from '../type'
+
+export default class DoubleFieldPlugin
+  extends _DoubleFieldPlugin
+  implements NCRUD.FieldPlugin<'double'>
+{
+  createCondition<M extends Record<string, any>>({
+    builder,
+    field,
+    condition,
+  }: NCRUD.FieldCreateConditionOption<'double', M>) {
+    conditionPluginManager.create(
+      builder,
+      {
+        ...condition,
+        key: field.name,
+      },
+      [
+        'isNull',
+        'isNotNull',
+        'eq',
+        'neq',
+        'gt',
+        'lt',
+        'gte',
+        'lte',
+        'in',
+        'notIn',
+      ],
+    )
+  }
+
+  toDb({ values, field }: NCRUD.FieldToDbOption<'double', number>) {
+    const min = field.extra?.min
+    const max = field.extra?.max
+    const decimal = field.extra?.decimal
+
+    if (min !== undefined || max !== undefined || decimal !== undefined) {
+      return values.map((v) => {
+        if (v !== undefined && v !== null) {
+          if (min !== undefined && v < min) {
+            throw new Error(
+              `Double field ${field.label || field.apiName} min value is ${min}`,
+            )
+          }
+
+          if (max !== undefined && v > max) {
+            throw new Error(
+              `Double field ${field.label || field.apiName} max value is ${max}`,
+            )
+          }
+
+          if (decimal !== undefined) {
+            v = Number(v.toFixed(decimal))
+          }
+        }
+
+        return v
+      })
+    }
+
+    return values
+  }
+}

@@ -1,4 +1,4 @@
 export * from './type'
 export * from './fieldPlugin'
 
-export { default as DataModelManager } from './manager'
+export { default as dataModelManager } from './manager'

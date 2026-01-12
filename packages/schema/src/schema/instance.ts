@@ -1,23 +1,12 @@
 import { Knex } from 'knex'
-import { DataModel, DataModelManager } from '@shuttle-data/type'
+import { DataModel, dataModelManager } from '@shuttle-data/type'
 import { randomUUID } from 'node:crypto'
 
 import { NDataModelSchema } from './type'
 import { DataEnumManagerOptions } from '../enum/type'
 import DataEnumManager from '../enum'
 
-import {
-  StringFieldPlugin,
-  TextFieldPlugin,
-  BooleanFieldPlugin,
-  NumberFieldPlugin,
-  DoubleFieldPlugin,
-  DatetimeFieldPlugin,
-  DateFieldPlugin,
-  EnumFieldPlugin,
-  LookupFieldPlugin,
-  JsonFieldPlugin,
-} from '../fieldPlugin'
+import schemaFieldPluginManager from '../fieldPlugin'
 
 export default class Schema {
   readonly userDbName: string
@@ -34,20 +23,6 @@ export default class Schema {
     promise: Promise<void>
     resolve: () => void
   }[] = []
-  private fieldPluginMap: Partial<
-    Record<DataModel.FieldType, NDataModelSchema.FieldPlugin<any>>
-  > = {
-    string: new StringFieldPlugin(),
-    boolean: new BooleanFieldPlugin(),
-    text: new TextFieldPlugin(),
-    number: new NumberFieldPlugin(),
-    double: new DoubleFieldPlugin(),
-    datetime: new DatetimeFieldPlugin(),
-    date: new DateFieldPlugin(),
-    enum: new EnumFieldPlugin(),
-    lookup: new LookupFieldPlugin(),
-    json: new JsonFieldPlugin(),
-  }
 
   constructor(private options: NDataModelSchema.Options) {
     if (options.dataModels) {
@@ -99,7 +74,7 @@ export default class Schema {
           if (field.name === '_id') {
             table.bigInteger('_id').primary()
           } else {
-            const plugin = this.fieldPluginMap[field.type]
+            const plugin = schemaFieldPluginManager.getPlugin(field.type)
             if (!plugin) {
               throw new Error(`field type ${field.type} plugin not found`)
             }
@@ -270,7 +245,7 @@ export default class Schema {
             if (field.name === '_id') {
               table.bigInteger('_id').primary()
             } else {
-              const plugin = this.fieldPluginMap[field.type]
+              const plugin = schemaFieldPluginManager.getPlugin(field.type)
               if (!plugin) {
                 throw new Error(`field type ${field.type} plugin not found`)
               }
@@ -545,7 +520,7 @@ export default class Schema {
     try {
       // 实际添加字段
       await this.options.knex.schema.alterTable(oldModel.name, (table) => {
-        const fieldPlugin = this.fieldPluginMap[field.type]
+        const fieldPlugin = schemaFieldPluginManager.getPlugin(field.type)
         if (!fieldPlugin) {
           throw new Error(`field type ${field.type} is not supported`)
         }
@@ -866,10 +841,6 @@ export default class Schema {
     return this.dataModelCache
   }
 
-  use(plugin: NDataModelSchema.FieldPlugin<DataModel.FieldType>) {
-    this.fieldPluginMap[plugin.type] = plugin
-  }
-
   private getModelTableFields() {
     const modelTableFieldMap: Record<
       keyof Omit<DataModel.Define, 'fields'> | 'isDelete',
@@ -1118,8 +1089,7 @@ export default class Schema {
   }
 
   async checkModel(model: DataModel.Define) {
-    const modelManager = new DataModelManager()
-    const modelZod = modelManager.getZod()
+    const modelZod = dataModelManager.getZod()
 
     modelZod.parse(model)
 
@@ -1131,7 +1101,9 @@ export default class Schema {
         `display field ${model.displayField} is not found in model ${model.name}`,
       )
     }
-    const displayFieldPlugin = this.fieldPluginMap[displayField.type]
+    const displayFieldPlugin = schemaFieldPluginManager.getPlugin(
+      displayField.type,
+    )
     if (!displayFieldPlugin?.canAsDisplay) {
       throw new Error(
         `field ${displayField.name} type ${displayField.type} is not supported as display field`,
@@ -1144,7 +1116,7 @@ export default class Schema {
   }
 
   async checkField(field: DataModel.Field) {
-    const fieldPlugin = this.fieldPluginMap[field.type]
+    const fieldPlugin = schemaFieldPluginManager.getPlugin(field.type)
     if (!fieldPlugin) {
       throw new Error(`field type ${field.type} is not supported`)
     }
@@ -1169,7 +1141,7 @@ export default class Schema {
     const fields: DataModel.Field[] = [
       {
         name: '_id',
-        apiName: 'id',
+        apiName: '_id',
         label: 'ID',
         type: 'string',
         isSystem: true,
@@ -1177,7 +1149,7 @@ export default class Schema {
       },
       {
         name: '_createdAt',
-        apiName: 'createdAt',
+        apiName: '_createdAt',
         label: 'Created At',
         type: 'datetime',
         isSystem: true,
@@ -1185,7 +1157,7 @@ export default class Schema {
       },
       {
         name: '_updatedAt',
-        apiName: 'updatedAt',
+        apiName: '_updatedAt',
         label: 'Updated At',
         type: 'datetime',
         isSystem: true,
@@ -1193,7 +1165,7 @@ export default class Schema {
       },
       {
         name: '_createdBy',
-        apiName: 'createdBy',
+        apiName: '_createdBy',
         label: 'Created By',
         type: 'lookup',
         isSystem: true,
@@ -1204,7 +1176,7 @@ export default class Schema {
       },
       {
         name: '_updatedBy',
-        apiName: 'updatedBy',
+        apiName: '_updatedBy',
         label: 'Updated By',
         type: 'lookup',
         isSystem: true,
@@ -1215,7 +1187,7 @@ export default class Schema {
       },
       {
         name: '_isDelete',
-        apiName: 'isDelete',
+        apiName: '_isDelete',
         label: 'Is Delete',
         type: 'boolean',
         isSystem: true,

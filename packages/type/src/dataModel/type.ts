@@ -26,7 +26,13 @@ export namespace DataModel {
   export interface TextField extends BaseField<'text', { unique?: boolean }> {}
   export interface NumberField extends BaseField<
     'number',
-    { autoIncrement?: boolean; unique?: boolean; min?: number; max?: number }
+    {
+      autoIncrement?: boolean
+      unique?: boolean
+      min?: number
+      max?: number
+      func?: 'floor' | 'round' | 'ceil'
+    }
   > {}
   export interface DoubleField extends BaseField<
     'double',

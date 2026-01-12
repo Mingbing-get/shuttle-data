@@ -17,7 +17,10 @@ export default class TextFieldPlugin
     table: Knex.CreateTableBuilder,
     field: DataModel.TextField,
   ): void {
-    table.text(field.name)
+    const builder = table.text(field.name)
+    if (field.extra?.unique) {
+      builder.unique()
+    }
   }
 
   check(schema: DataModelSchema, field: DataModel.TextField) {

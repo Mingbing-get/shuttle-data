@@ -15,7 +15,10 @@ export default class DateFieldPlugin
     table: Knex.CreateTableBuilder,
     field: DataModel.DateField,
   ): void {
-    table.date(field.name)
+    const builder = table.date(field.name)
+    if (field.extra?.unique) {
+      builder.unique()
+    }
   }
 
   check(schema: DataModelSchema, field: DataModel.DateField) {

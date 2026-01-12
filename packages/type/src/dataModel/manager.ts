@@ -13,7 +13,7 @@ import JsonFieldPlugin from './fieldPlugin/jsonFieldPlugin'
 
 import type { DataModel } from './type'
 
-export default class DataModelManager {
+class DataModelManager {
   private fieldPlugins: Partial<
     Record<DataModel.FieldType, DataModel.FieldPlugin<any>>
   > = {
@@ -92,3 +92,5 @@ export interface ${modelTypeName} {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 }
+
+export default new DataModelManager()

@@ -18,7 +18,10 @@ export default class LookupFieldPlugin
     if (field.extra?.multiple) {
       table.json(field.name)
     } else {
-      table.bigInteger(field.name)
+      const builder = table.bigInteger(field.name)
+      if (field.extra?.unique) {
+        builder.unique()
+      }
     }
   }
 

@@ -14,7 +14,10 @@ export default class StringFieldPlugin
   readonly canAsDisplay = true
 
   fieldBuilder(table: Knex.CreateTableBuilder, field: DataModel.StringField) {
-    table.string(field.name)
+    const builder = table.string(field.name)
+    if (field.extra?.unique) {
+      builder.unique()
+    }
   }
 
   check(schema: DataModelSchema, field: DataModel.StringField) {
