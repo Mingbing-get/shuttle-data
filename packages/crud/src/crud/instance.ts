@@ -21,6 +21,13 @@ export default class CRUD<M extends Record<string, any>> {
 
   constructor(private options: NCRUD.Options) {}
 
+  async findOne(
+    option: DataCRUD.FineOneOption<M> = {},
+  ): Promise<M | undefined> {
+    const records = await this.find({ ...option, limit: 1 })
+    return records[0]
+  }
+
   async find(option: DataCRUD.FindOption<M> = {}): Promise<M[]> {
     const lockId = await this.options.schema.addLockPromise(
       this.options.modelName,
@@ -30,7 +37,7 @@ export default class CRUD<M extends Record<string, any>> {
 
     try {
       const model = await this.getCurrentModel()
-      const selectFields = this.getSelectFields(model, option.fields)
+      const selectFields = await this.getSelectFields(option.fields)
 
       const knex = await this.options.getKnex(model.dataSourceName)
       const builder = knex(model.name)
@@ -55,7 +62,7 @@ export default class CRUD<M extends Record<string, any>> {
         this.createDisplaySelectField(model),
       )
 
-      return (await this.toOutput(model, records, selectFields)) as M[]
+      return (await this.toOutput(records, selectFields)) as M[]
     } catch (error) {
       throw error
     } finally {
@@ -63,18 +70,46 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
-  create(
-    data: DataCRUD.CreateInput<M>,
-    returnFields?: DataCRUD.SelectField<M>[],
-  ): Promise<M>
-  create(
-    data: DataCRUD.CreateInput<M>[],
-    returnFields?: DataCRUD.SelectField<M>[],
-  ): Promise<M[]>
-  async create(
-    data: DataCRUD.CreateInput<M> | DataCRUD.CreateInput<M>[],
-    returnFields?: DataCRUD.SelectField<M>[],
-  ): Promise<M | M[]> {
+  async count(option: DataCRUD.CountOption<M> = {}): Promise<number> {
+    const lockId = await this.options.schema.addLockPromise(
+      this.options.modelName,
+      this.options.useApiName,
+    )
+    const enumInfo = await this.options.schema.getEnumManager().all()
+
+    try {
+      const model = await this.getCurrentModel()
+      const knex = await this.options.getKnex(model.dataSourceName)
+      const builder = knex(model.name)
+      builder
+        .orWhere((builder) => {
+          builder.whereNull(CRUD.IS_DELETE).orWhere(CRUD.IS_DELETE, '=', false)
+        })
+        .andWhere((builder) => {
+          this.createCondition(builder, model, enumInfo, option.condition)
+        })
+
+      const res = await builder.count(CRUD.ID, { as: 'count' })
+      return Number(res[0].count) || 0
+    } catch (error) {
+      throw error
+    } finally {
+      this.options.schema.unlockPromise(lockId)
+    }
+  }
+
+  async create(option: DataCRUD.CreateOption<M>): Promise<M> {
+    const records = await this._create(option)
+    return records[0]
+  }
+
+  async batchCreate(option: DataCRUD.BatchCreateOption<M>): Promise<M[]> {
+    return this._create(option)
+  }
+
+  private async _create(
+    option: DataCRUD.CreateOption<M> | DataCRUD.BatchCreateOption<M>,
+  ): Promise<M[]> {
     const lockId = await this.options.schema.addLockPromise(
       this.options.modelName,
       this.options.useApiName,
@@ -83,8 +118,7 @@ export default class CRUD<M extends Record<string, any>> {
     try {
       const model = await this.getCurrentModel()
       const dbRecords = await this.toDb(
-        model,
-        Array.isArray(data) ? data : [data],
+        Array.isArray(option.data) ? option.data : [option.data],
         'create',
       )
 
@@ -95,9 +129,8 @@ export default class CRUD<M extends Record<string, any>> {
       const knex = await this.options.getKnex(model.dataSourceName)
       await knex(model.name).insert(dbRecords)
 
-      const selectFields = this.getSelectFields(model, returnFields)
+      const selectFields = await this.getSelectFields(option.returnFields)
       const outputRecords = (await this.toOutput(
-        model,
         this.pickValueFromRecords(
           dbRecords,
           selectFields,
@@ -106,14 +139,152 @@ export default class CRUD<M extends Record<string, any>> {
         selectFields,
       )) as M[]
 
-      if (Array.isArray(data)) {
-        return outputRecords
-      }
-      return outputRecords[0]
+      return outputRecords
     } catch (error) {
       throw error
     } finally {
       this.options.schema.unlockPromise(lockId)
+    }
+  }
+
+  async update(
+    option: DataCRUD.UpdateOption<M> | DataCRUD.UpdateWithIdOption<M>,
+  ): Promise<M[]> {
+    if (this.isWithIdUpdateOption(option) && option.data.length === 0) {
+      throw new Error('Update data can not be empty')
+    }
+
+    const lockId = await this.options.schema.addLockPromise(
+      this.options.modelName,
+      this.options.useApiName,
+    )
+
+    try {
+      const crud = new CRUD<M>(this.options)
+      const beforeUpdateRecords = await crud.find({
+        condition: this.isWithIdUpdateOption(option)
+          ? {
+              key: CRUD.ID,
+              op: 'in',
+              value: option.data.map((item) => item._id),
+            }
+          : option.condition,
+      })
+
+      const model = await this.getCurrentModel()
+      const knex = await this.options.getKnex(model.dataSourceName)
+      const willUpdateIds = beforeUpdateRecords.map((record) => record[CRUD.ID])
+      if (this.isWithIdUpdateOption(option)) {
+        const notUpdateRecords = option.data.filter(
+          (item) => !willUpdateIds.includes(item._id),
+        )
+        if (notUpdateRecords.length > 0) {
+          throw new Error(
+            `Can not update records with id ${notUpdateRecords.map(
+              (item) => item._id,
+            )}`,
+          )
+        }
+
+        const dbRecords = await this.toDb(option.data, 'update')
+        const { fieldCaseList, values } = await this.createUpdateCase(dbRecords)
+        if (fieldCaseList.length === 0) return []
+
+        await knex.raw(
+          `UPDATE \`${model.name}\` SET ${fieldCaseList.join(', ')}, \`${CRUD.UPDATED_AT}\` = NOW() WHERE ${CRUD.ID} IN (?)`,
+          [...values, willUpdateIds],
+        )
+      } else {
+        if (willUpdateIds.length === 0) return []
+
+        const dbRecords = await this.toDb([option.data], 'update')
+        await knex(model.name)
+          .whereIn(CRUD.ID, willUpdateIds)
+          .update(dbRecords[0])
+      }
+
+      return await crud.find({
+        condition: {
+          key: CRUD.ID,
+          op: 'in',
+          value: willUpdateIds,
+        },
+        fields: option.returnFields,
+      })
+    } catch (error) {
+      throw error
+    } finally {
+      this.options.schema.unlockPromise(lockId)
+    }
+  }
+
+  async del(option: DataCRUD.DelOption<M>): Promise<M[]> {
+    const lockId = await this.options.schema.addLockPromise(
+      this.options.modelName,
+      this.options.useApiName,
+    )
+
+    try {
+      const crud = new CRUD<M>(this.options)
+      const records = await crud.find({
+        condition: option.condition,
+      })
+
+      const model = await this.getCurrentModel()
+      const knex = await this.options.getKnex(model.dataSourceName)
+      await knex(model.name)
+        .whereIn(
+          CRUD.ID,
+          records.map((record) => record[CRUD.ID]),
+        )
+        .del()
+
+      return records
+    } catch (error) {
+      throw error
+    } finally {
+      this.options.schema.unlockPromise(lockId)
+    }
+  }
+
+  private isWithIdUpdateOption<T extends Record<string, any>>(
+    option: DataCRUD.UpdateOption<T> | DataCRUD.UpdateWithIdOption<T>,
+  ): option is DataCRUD.UpdateWithIdOption<T> {
+    return Array.isArray(option.data)
+  }
+
+  private async createUpdateCase(dbRecords: Record<string, any>[]) {
+    const fieldCaseList: string[] = []
+    const values: any[] = []
+
+    const model = await this.getCurrentModel()
+    const systemFieldNames = [
+      CRUD.ID,
+      CRUD.CREATED_AT,
+      CRUD.UPDATED_AT,
+      CRUD.CREATED_BY,
+      CRUD.UPDATED_BY,
+    ]
+    model.fields.forEach((field) => {
+      if (systemFieldNames.includes(field.name)) return
+
+      const currentFieldCase: string[] = []
+      dbRecords.forEach((record) => {
+        if (record[field.name] !== undefined) {
+          currentFieldCase.push(`WHEN ${record[CRUD.ID]} THEN ?`)
+          values.push(record[field.name])
+        }
+      })
+      if (currentFieldCase.length > 0) {
+        fieldCaseList.push(
+          `\`${field.name}\` = CASE ${CRUD.ID}\n${currentFieldCase.join('\n')} \n ELSE \`${field.name}\` END`,
+        )
+      }
+    })
+
+    return {
+      fieldCaseList,
+      values,
     }
   }
 
@@ -123,11 +294,9 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
-  private getSelectFields(
-    model: DataModel.Define,
-    fields?: DataCRUD.SelectField<M>[],
-  ) {
+  private async getSelectFields(fields?: DataCRUD.SelectField<M>[]) {
     const selectFieldReflex: Record<string, string> = {}
+    const model = await this.getCurrentModel()
 
     if (!fields?.length) {
       model.fields.forEach((field) => {
@@ -252,12 +421,13 @@ export default class CRUD<M extends Record<string, any>> {
     })
   }
 
-  private async toOutput(
-    model: DataModel.Define,
+  async toOutput(
     records: Record<string, any>[],
     selectFields: Record<string, string>,
   ) {
     if (records.length === 0) return []
+
+    const model = await this.getCurrentModel()
 
     const fieldWithPlugin: Record<
       string,
@@ -315,11 +485,12 @@ export default class CRUD<M extends Record<string, any>> {
   }
 
   private async toDb(
-    model: DataModel.Define,
     records: Record<string, any>[],
     action: 'create' | 'update',
   ) {
     if (records.length === 0) return []
+
+    const model = await this.getCurrentModel()
 
     const fieldWithPlugin: Record<
       string,

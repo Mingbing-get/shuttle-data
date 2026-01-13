@@ -3,7 +3,7 @@ import { DataCondition } from './condition'
 export namespace DataCRUD {
   export interface LookupInRecord {
     _id: string
-    _display: string
+    _display?: string
   }
 
   export interface BaseRecord {
@@ -88,12 +88,12 @@ export namespace DataCRUD {
 
   export interface CreateOption<M extends Record<string, any>> {
     returnFields?: SelectField<M>[]
-    data?: CreateInput<M>
+    data: CreateInput<M>
   }
 
   export interface BatchCreateOption<M extends Record<string, any>> {
     returnFields?: SelectField<M>[]
-    data?: CreateInput<M>[]
+    data: CreateInput<M>[]
   }
 
   export interface GroupByOption<

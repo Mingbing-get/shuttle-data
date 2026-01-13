@@ -49,6 +49,7 @@ describe('crud', () => {
       database: process.env.DB_NAME,
       supportBigNumbers: true,
       bigNumberStrings: true,
+      dateStrings: true,
       typeCast: function (field: any, next: any) {
         if (field.type === 'TINY' && field.length === 1) {
           return field.string() === '1'
@@ -663,6 +664,272 @@ describe('crud', () => {
     })
   })
 
+  describe('findOne', () => {
+    it('should find one record by id in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const record = await crud.findOne({
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: admin._id,
+        },
+      })
+
+      expect(record).toBeTruthy()
+      expect(record!._id).toEqual(admin._id)
+      expect(record!.name).toEqual(admin.name)
+    })
+
+    it('should find one record by where condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const record = await crud.findOne({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'admin',
+        },
+      })
+
+      expect(record).toBeTruthy()
+      expect(record!.name).toEqual('admin')
+    })
+
+    it('should find one record using api name in user model', async () => {
+      const crud = new CRUD<any>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.apiName,
+        context: {
+          user: admin,
+        },
+        useApiName: true,
+      })
+
+      const record = await crud.findOne({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'admin',
+        },
+      })
+
+      expect(record).toBeTruthy()
+      expect(record!.name).toEqual('admin')
+    })
+
+    it('should return undefined when no record found in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const record = await crud.findOne({
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: '1111222233333',
+        },
+      })
+
+      expect(record).toBeUndefined()
+    })
+
+    it('should find one record with select fields in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const record = await crud.findOne({
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: admin._id,
+        },
+        fields: ['name', 'email'],
+      })
+
+      expect(record).toBeTruthy()
+      expect(record!._id).toBeDefined()
+      expect(record!.name).toEqual(admin.name)
+      expect(record!.email).toEqual(admin.email)
+      expect(record!.phone).toBeUndefined()
+    })
+  })
+
+  describe('count', () => {
+    it('should count all records in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const count = await crud.count()
+      expect(typeof count).toBe('number')
+      expect(count).toBeGreaterThan(0)
+    })
+
+    it('should count records by where condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const count = await crud.count({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'admin',
+        },
+      })
+
+      expect(typeof count).toBe('number')
+      expect(count).toEqual(1)
+    })
+
+    it('should count records with like condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const count = await crud.count({
+        condition: {
+          key: 'name',
+          op: 'like',
+          value: 'test',
+        },
+      })
+
+      expect(typeof count).toBe('number')
+      expect(count).toBeGreaterThan(0)
+    })
+
+    it('should count records using api name in user model', async () => {
+      const crud = new CRUD<any>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.apiName,
+        context: {
+          user: admin,
+        },
+        useApiName: true,
+      })
+
+      const count = await crud.count({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'admin',
+        },
+      })
+
+      expect(typeof count).toBe('number')
+      expect(count).toEqual(1)
+    })
+
+    it('should return 0 when no records match condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const count = await crud.count({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'non_existent_user',
+        },
+      })
+
+      expect(typeof count).toBe('number')
+      expect(count).toEqual(0)
+    })
+
+    it('should count records with multiple conditions in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      const count = await crud.count({
+        condition: {
+          op: 'and',
+          subCondition: [
+            {
+              key: 'name',
+              op: 'like',
+              value: 'test',
+            },
+            {
+              key: 'email',
+              op: 'like',
+              value: 'example.com',
+            },
+          ],
+        },
+      })
+
+      expect(typeof count).toBe('number')
+      expect(count).toBeGreaterThan(0)
+    })
+  })
+
   describe('create', () => {
     it('insert a record to data model', async () => {
       const crud = new CRUD<TestDataModel>({
@@ -676,17 +943,19 @@ describe('crud', () => {
       })
 
       const record = await crud.create({
-        _yesOrNo: true,
-        _title: 'test',
-        _content: 'test content',
-        _num: 100,
-        _double: 100.2,
-        _datetime: new Date(),
-        _date: '2026-01-01',
-        _status: '_active',
-        _multiStatus: ['_active', '_inactive'],
-        _lookup: admin,
-        _multiLookup: [admin],
+        data: {
+          _yesOrNo: true,
+          _title: 'test',
+          _content: 'test content',
+          _num: 100,
+          _double: 100.2,
+          _datetime: new Date(),
+          _date: '2026-01-01',
+          _status: '_active',
+          _multiStatus: ['_active', '_inactive'],
+          _lookup: admin,
+          _multiLookup: [admin],
+        },
       })
 
       // 检查记录是否存在
@@ -707,34 +976,36 @@ describe('crud', () => {
         },
       })
 
-      const records = await crud.create([
-        {
-          _yesOrNo: true,
-          _title: 'test',
-          _content: 'test content',
-          _num: 100,
-          _double: 100.2,
-          _datetime: new Date(),
-          _date: '2026-01-01',
-          _status: '_active',
-          _multiStatus: ['_active', '_inactive'],
-          _lookup: admin,
-          _multiLookup: [admin],
-        },
-        {
-          _yesOrNo: false,
-          _title: 'test 2',
-          _content: 'test content 2',
-          _num: 200,
-          _double: 200.2,
-          _datetime: new Date(),
-          _date: '2026-01-02',
-          _status: '_inactive',
-          _multiStatus: ['_inactive'],
-          _lookup: admin,
-          _multiLookup: [admin],
-        },
-      ])
+      const records = await crud.batchCreate({
+        data: [
+          {
+            _yesOrNo: true,
+            _title: 'test',
+            _content: 'test content',
+            _num: 100,
+            _double: 100.2,
+            _datetime: new Date(),
+            _date: '2026-01-01',
+            _status: '_active',
+            _multiStatus: ['_active', '_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+          {
+            _yesOrNo: false,
+            _title: 'test 2',
+            _content: 'test content 2',
+            _num: 200,
+            _double: 200.2,
+            _datetime: new Date(),
+            _date: '2026-01-02',
+            _status: '_inactive',
+            _multiStatus: ['_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+        ],
+      })
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
@@ -756,17 +1027,19 @@ describe('crud', () => {
       })
 
       const record = await crud.create({
-        yesOrNo: true,
-        title: 'test',
-        content: 'test content',
-        num: 100,
-        double: 100.2,
-        datetime: new Date(),
-        date: '2026-01-01',
-        status: 'active',
-        multiStatus: ['active', 'inactive'],
-        lookup: admin,
-        multiLookup: [admin],
+        data: {
+          yesOrNo: true,
+          title: 'test',
+          content: 'test content',
+          num: 100,
+          double: 100.2,
+          datetime: new Date() as any,
+          date: '2026-01-01',
+          status: 'active',
+          multiStatus: ['active', 'inactive'],
+          lookup: admin,
+          multiLookup: [admin],
+        },
       })
 
       // 检查记录是否存在
@@ -788,34 +1061,36 @@ describe('crud', () => {
         useApiName: true,
       })
 
-      const records = await crud.create([
-        {
-          yesOrNo: true,
-          title: 'test',
-          content: 'test content',
-          num: 100,
-          double: 100.2,
-          datetime: new Date(),
-          date: '2026-01-01',
-          status: 'active',
-          multiStatus: ['active', 'inactive'],
-          lookup: admin,
-          multiLookup: [admin],
-        },
-        {
-          yesOrNo: false,
-          title: 'test 2',
-          content: 'test content 2',
-          num: 200,
-          double: 200.2,
-          datetime: new Date(),
-          date: '2026-01-02',
-          status: 'inactive',
-          multiStatus: ['inactive'],
-          lookup: admin,
-          multiLookup: [admin],
-        },
-      ])
+      const records = await crud.batchCreate({
+        data: [
+          {
+            yesOrNo: true,
+            title: 'test',
+            content: 'test content',
+            num: 100,
+            double: 100.2,
+            datetime: new Date() as any,
+            date: '2026-01-01',
+            status: 'active',
+            multiStatus: ['active', 'inactive'],
+            lookup: admin,
+            multiLookup: [admin],
+          },
+          {
+            yesOrNo: false,
+            title: 'test 2',
+            content: 'test content 2',
+            num: 200,
+            double: 200.2,
+            datetime: new Date() as any,
+            date: '2026-01-02',
+            status: 'inactive',
+            multiStatus: ['inactive'],
+            lookup: admin,
+            multiLookup: [admin],
+          },
+        ],
+      })
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
@@ -835,7 +1110,7 @@ describe('crud', () => {
         },
       })
 
-      await expect(crud.create([])).rejects.toThrow(
+      await expect(crud.batchCreate({ data: [] })).rejects.toThrow(
         'Create data can not be empty',
       )
     })
@@ -853,20 +1128,22 @@ describe('crud', () => {
 
       await expect(
         crud.create({
-          ...{
-            _yesOrNo: true,
-            _title: 'test',
-            _content: 'test content',
-            _num: 100,
-            _double: 100.2,
-            _datetime: new Date(),
-            _date: '2026-01-01',
-            _status: '_active',
-            _multiStatus: ['_active', '_inactive'],
-            _lookup: admin,
-            _multiLookup: [admin],
-          },
-          invalidField: 'invalid value',
+          data: {
+            ...{
+              _yesOrNo: true,
+              _title: 'test',
+              _content: 'test content',
+              _num: 100,
+              _double: 100.2,
+              _datetime: new Date(),
+              _date: '2026-01-01',
+              _status: '_active',
+              _multiStatus: ['_active', '_inactive'],
+              _lookup: admin,
+              _multiLookup: [admin],
+            },
+            invalidField: 'invalid value',
+          } as any,
         }),
       ).rejects.toThrow()
     })
@@ -884,17 +1161,19 @@ describe('crud', () => {
 
       await expect(
         crud.create({
-          _yesOrNo: true,
-          _title: 'test',
-          _content: 'test content',
-          _num: 100,
-          _double: 100.2,
-          _datetime: new Date(),
-          _date: '2026-01-01',
-          _status: 'invalid_enum_value',
-          _multiStatus: ['_active', '_inactive'],
-          _lookup: admin,
-          _multiLookup: [admin],
+          data: {
+            _yesOrNo: true,
+            _title: 'test',
+            _content: 'test content',
+            _num: 100,
+            _double: 100.2,
+            _datetime: new Date(),
+            _date: '2026-01-01',
+            _status: 'invalid_enum_value' as any,
+            _multiStatus: ['_active', '_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
         }),
       ).rejects.toThrow()
     })
@@ -912,17 +1191,19 @@ describe('crud', () => {
 
       await expect(
         crud.create({
-          _yesOrNo: true,
-          _title: 'test',
-          _content: 'test content',
-          _num: 100,
-          _double: 100.2,
-          _datetime: new Date(),
-          _date: '2026-01-01',
-          _status: '_active',
-          _multiStatus: ['_active', '_inactive'],
-          _lookup: { _id: 'invalid_user_id', name: 'invalid user' },
-          _multiLookup: [admin],
+          data: {
+            _yesOrNo: true,
+            _title: 'test',
+            _content: 'test content',
+            _num: 100,
+            _double: 100.2,
+            _datetime: new Date(),
+            _date: '2026-01-01',
+            _status: '_active',
+            _multiStatus: ['_active', '_inactive'],
+            _lookup: { _id: 'invalid_user_id' },
+            _multiLookup: [admin],
+          },
         }),
       ).rejects.toThrow()
     })
@@ -940,17 +1221,19 @@ describe('crud', () => {
 
       await expect(
         crud.create({
-          _yesOrNo: 'not_boolean',
-          _title: 'test',
-          _content: 'test content',
-          _num: 'not_number',
-          _double: 'not_double',
-          _datetime: 'not_datetime',
-          _date: '2026-01-01',
-          _status: '_active',
-          _multiStatus: ['_active', '_inactive'],
-          _lookup: admin,
-          _multiLookup: [admin],
+          data: {
+            _yesOrNo: 'not_boolean' as any,
+            _title: 'test',
+            _content: 'test content',
+            _num: 'not_number' as any,
+            _double: 'not_double' as any,
+            _datetime: 'not_datetime',
+            _date: '2026-01-01',
+            _status: '_active',
+            _multiStatus: ['_active', '_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
         }),
       ).rejects.toThrow()
     })
@@ -967,14 +1250,16 @@ describe('crud', () => {
       })
 
       const record = await crud.create({
-        _yesOrNo: true,
-        _title: 'test',
-        _content: 'test content',
-        _num: 100,
-        _double: 100.2,
-        _datetime: new Date(),
-        _date: '2026-01-01',
-        _status: '_active',
+        data: {
+          _yesOrNo: true,
+          _title: 'test',
+          _content: 'test content',
+          _num: 100,
+          _double: 100.2,
+          _datetime: new Date(),
+          _date: '2026-01-01',
+          _status: '_active',
+        } as any,
       })
 
       expect(record).toBeTruthy()
@@ -994,19 +1279,718 @@ describe('crud', () => {
 
       await expect(
         crud.create({
+          data: {
+            _yesOrNo: true,
+            _title: 'test',
+            _content: 'test content',
+            _num: 100,
+            _double: 100.2,
+            _datetime: 'invalid_date_format',
+            _date: 'invalid_date',
+            _status: '_active',
+            _multiStatus: ['_active', '_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+        }),
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('update', () => {
+    it('should update a record in data model', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条记录
+      const createResult = await crud.create({
+        data: {
           _yesOrNo: true,
-          _title: 'test',
+          _title: 'test update',
           _content: 'test content',
           _num: 100,
           _double: 100.2,
-          _datetime: 'invalid_date_format',
-          _date: 'invalid_date',
+          _datetime: new Date(),
+          _date: '2026-01-01',
           _status: '_active',
           _multiStatus: ['_active', '_inactive'],
           _lookup: admin,
           _multiLookup: [admin],
+        },
+      })
+
+      // 更新记录
+      const updateResult = await crud.update({
+        data: {
+          _yesOrNo: false,
+          _title: 'updated title',
+          _num: 200,
+        },
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: createResult._id,
+        },
+      })
+
+      expect(updateResult).toBeTruthy()
+
+      // 验证记录是否更新成功
+      const updatedRecord = await db(dataModel.name)
+        .where({ _id: createResult._id })
+        .first()
+      expect(updatedRecord).toBeTruthy()
+      expect(updatedRecord._yesOrNo).toBe(false)
+      expect(updatedRecord._title).toEqual('updated title')
+      expect(updatedRecord._num).toEqual(200)
+    })
+
+    it('should update a record using api name in data model', async () => {
+      const crud = new CRUD<TestDataModelWithApiName>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.apiName,
+        context: {
+          user: admin,
+        },
+        useApiName: true,
+      })
+
+      // 先创建一条记录
+      const createResult = await crud.create({
+        data: {
+          yesOrNo: true,
+          title: 'test update api',
+          content: 'test content',
+          num: 100,
+          double: 100.2,
+          datetime: new Date() as any,
+          date: '2026-01-01',
+          status: 'active',
+          multiStatus: ['active', 'inactive'],
+          lookup: admin,
+          multiLookup: [admin],
+        },
+      })
+
+      // 使用API名称更新记录
+      const updateResult = await crud.update({
+        data: {
+          yesOrNo: false,
+          title: 'updated api title',
+          num: 200,
+        },
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: createResult._id,
+        },
+      })
+
+      expect(updateResult).toBeTruthy()
+
+      // 验证记录是否更新成功
+      const updatedRecord = await db(dataModel.name)
+        .where({ _id: createResult._id })
+        .first()
+      expect(updatedRecord).toBeTruthy()
+      expect(updatedRecord._yesOrNo).toBe(false)
+      expect(updatedRecord._title).toEqual('updated api title')
+      expect(updatedRecord._num).toEqual(200)
+    })
+
+    it('should update a record with where condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条测试用户
+      const testUserId = snowFlake.next()
+      await db(userModel.name).insert({
+        _id: testUserId,
+        name: 'update test user',
+        email: 'update@example.com',
+        phone: '13800000008',
+        _createdAt: new Date(),
+        _updatedAt: new Date(),
+        _createdBy: admin._id,
+        _updatedBy: admin._id,
+      })
+
+      // 使用条件更新记录
+      await crud.update({
+        data: {
+          email: 'updated@example.com',
+          phone: '13800000009',
+        },
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: 'update test user',
+        },
+      })
+
+      // 验证更新结果
+      const updatedUser = await db(userModel.name)
+        .where({ _id: testUserId })
+        .first()
+      expect(updatedUser.email).toEqual('updated@example.com')
+      expect(updatedUser.phone).toEqual('13800000009')
+    })
+
+    it('should handle update when record not found', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 更新不存在的记录
+      const updateResult = await crud.update({
+        data: {
+          email: 'nonexistent@example.com',
+        },
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: '11122223333',
+        },
+      })
+
+      // 更新操作应该成功执行但不影响任何记录
+      expect(updateResult).toBeTruthy()
+    })
+
+    it('should throw error when update record with invalid field', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      await expect(
+        crud.update({
+          data: {
+            invalidField: 'invalid_value',
+          } as any,
+          condition: {
+            key: '_id',
+            op: 'eq',
+            value: admin._id,
+          },
         }),
       ).rejects.toThrow()
+    })
+
+    it('should update record with enum and lookup fields', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条记录
+      const createResult = await crud.create({
+        data: {
+          _yesOrNo: true,
+          _title: 'test enum update',
+          _content: 'test content',
+          _num: 100,
+          _double: 100.2,
+          _datetime: new Date(),
+          _date: '2026-01-01',
+          _status: '_active',
+          _multiStatus: ['_active', '_inactive'],
+          _lookup: admin,
+          _multiLookup: [admin],
+        },
+      })
+
+      // 更新枚举和关联字段
+      await crud.update({
+        data: {
+          _status: '_inactive',
+          _multiStatus: ['_inactive', '_unknown'],
+        },
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: createResult._id,
+        },
+      })
+
+      // 验证更新结果
+      const updatedRecord = await db(dataModel.name)
+        .where({ _id: createResult._id })
+        .first()
+      expect(updatedRecord._status).toEqual('_inactive')
+    })
+
+    it('should update record with date and datetime fields', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条记录
+      const createResult = await crud.create({
+        data: {
+          _yesOrNo: true,
+          _title: 'test date update',
+          _content: 'test content',
+          _num: 100,
+          _double: 100.2,
+          _datetime: new Date('2026-01-01'),
+          _date: '2026-01-01',
+          _status: '_active',
+          _multiStatus: ['_active'],
+          _lookup: admin,
+          _multiLookup: [admin],
+        },
+      })
+
+      // 更新日期字段
+      const newDate = '2026-12-31'
+      const newDateTime = new Date('2026-12-31 23:59:59')
+      await crud.update({
+        data: {
+          _date: newDate,
+          _datetime: newDateTime,
+        },
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: createResult._id,
+        },
+      })
+
+      // 验证更新结果
+      const updatedRecord = await db(dataModel.name)
+        .where({ _id: createResult._id })
+        .first()
+      expect(updatedRecord._date).toEqual(newDate)
+    })
+
+    it('should update record with multiple where conditions', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条测试用户
+      const testUserId = snowFlake.next()
+      await db(userModel.name).insert({
+        _id: testUserId,
+        name: 'multi condition test',
+        email: 'multi@example.com',
+        phone: '13800000010',
+        _createdAt: new Date(),
+        _updatedAt: new Date(),
+        _createdBy: admin._id,
+        _updatedBy: admin._id,
+      })
+
+      // 使用多个条件更新记录
+      await crud.update({
+        data: {
+          phone: '13800000011',
+        },
+        condition: {
+          op: 'and',
+          subCondition: [
+            {
+              key: 'name',
+              op: 'eq',
+              value: 'multi condition test',
+            },
+            {
+              key: 'email',
+              op: 'eq',
+              value: 'multi@example.com',
+            },
+          ],
+        },
+      })
+
+      // 验证更新结果
+      const updatedUser = await db(userModel.name)
+        .where({ _id: testUserId })
+        .first()
+      expect(updatedUser.phone).toEqual('13800000011')
+    })
+
+    it('should update record by id', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先创建一条记录
+      const createResult = await crud.batchCreate({
+        data: [
+          {
+            _yesOrNo: true,
+            _title: 'test update by id',
+            _content: 'test content',
+            _num: 100,
+            _double: 100.2,
+            _datetime: new Date(),
+            _date: '2026-01-01',
+            _status: '_active',
+            _multiStatus: ['_active'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+          {
+            _yesOrNo: false,
+            _title: 'test update by id 2',
+            _content: 'test content 2',
+            _num: 200,
+            _double: 200.2,
+            _datetime: new Date(),
+            _date: '2026-01-02',
+            _status: '_active',
+            _multiStatus: ['_active'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+        ],
+      })
+
+      // 更新记录
+      await crud.update({
+        data: [
+          {
+            _id: createResult[0]._id,
+            _title: 'updated title',
+            _num: 1000,
+          },
+          {
+            _id: createResult[1]._id,
+            _content: 'updated content 2',
+            _num: 2000,
+          },
+        ],
+      })
+
+      // 验证更新结果
+      const updatedRecord1 = await db(dataModel.name)
+        .where({ _id: createResult[0]._id })
+        .first()
+      expect(updatedRecord1._title).toEqual('updated title')
+      expect(updatedRecord1._num).toEqual(1000)
+
+      const updatedRecord2 = await db(dataModel.name)
+        .where({ _id: createResult[1]._id })
+        .first()
+      expect(updatedRecord2._content).toEqual('updated content 2')
+      expect(updatedRecord2._num).toEqual(2000)
+    })
+  })
+
+  describe('del', () => {
+    it('should delete a single record by id in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 插入测试数据
+      const testUser = {
+        name: 'delete_test_user',
+        email: 'delete_test_user@example.com',
+        phone: '13800000010',
+      }
+      const insertedId = snowFlake.next()
+      await db(userModel.name).insert({
+        ...testUser,
+        _id: insertedId,
+        _createdAt: new Date(),
+        _updatedAt: new Date(),
+        _createdBy: admin._id,
+        _updatedBy: admin._id,
+      })
+
+      // 删除记录
+      const deletedRecords = await crud.del({
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: insertedId,
+        },
+      })
+
+      // 验证删除结果
+      expect(deletedRecords).toBeInstanceOf(Array)
+      expect(deletedRecords.length).toBe(1)
+      expect(deletedRecords[0]._id).toEqual(insertedId)
+      expect(deletedRecords[0].name).toEqual(testUser.name)
+
+      // 验证记录已删除
+      const remainingRecords = await db(userModel.name)
+        .where({ _id: insertedId })
+        .select()
+      expect(remainingRecords.length).toBe(0)
+    })
+
+    it('should delete multiple records by condition in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 插入测试数据
+      const testUsers = [
+        {
+          name: 'multi_delete_test_1',
+          email: 'multi_delete_test_1@example.com',
+          phone: '13800000011',
+        },
+        {
+          name: 'multi_delete_test_2',
+          email: 'multi_delete_test_2@example.com',
+          phone: '13800000012',
+        },
+        {
+          name: 'multi_delete_test_3',
+          email: 'multi_delete_test_3@example.com',
+          phone: '13800000013',
+        },
+      ]
+
+      const insertedIds = testUsers.map(() => snowFlake.next())
+      await db(userModel.name).insert(
+        testUsers.map((user, index) => ({
+          ...user,
+          _id: insertedIds[index],
+          _createdAt: new Date(),
+          _updatedAt: new Date(),
+          _createdBy: admin._id,
+          _updatedBy: admin._id,
+        })),
+      )
+
+      // 删除记录
+      const deletedRecords = await crud.del({
+        condition: {
+          key: '_id',
+          op: 'in',
+          value: insertedIds,
+        },
+      })
+
+      // 验证删除结果
+      expect(deletedRecords).toBeInstanceOf(Array)
+      expect(deletedRecords.length).toBe(testUsers.length)
+
+      // 验证所有记录已删除
+      const remainingRecords = await db(userModel.name)
+        .whereIn('_id', insertedIds)
+        .select()
+      expect(remainingRecords.length).toBe(0)
+    })
+
+    it('should delete records using api name in user model', async () => {
+      const crud = new CRUD<any>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.apiName,
+        context: {
+          user: admin,
+        },
+        useApiName: true,
+      })
+
+      // 插入测试数据
+      const testUser = {
+        name: 'api_delete_test_user',
+        email: 'api_delete_test_user@example.com',
+        phone: '13800000014',
+      }
+      const insertedId = snowFlake.next()
+      await db(userModel.name).insert({
+        ...testUser,
+        _id: insertedId,
+        _createdAt: new Date(),
+        _updatedAt: new Date(),
+        _createdBy: admin._id,
+        _updatedBy: admin._id,
+      })
+
+      // 删除记录
+      const deletedRecords = await crud.del({
+        condition: {
+          key: 'name',
+          op: 'eq',
+          value: testUser.name,
+        },
+      })
+
+      // 验证删除结果
+      expect(deletedRecords).toBeInstanceOf(Array)
+      expect(deletedRecords.length).toBe(1)
+      expect(deletedRecords[0].name).toEqual(testUser.name)
+
+      // 验证记录已删除
+      const remainingRecords = await db(userModel.name)
+        .where({ _id: insertedId })
+        .select()
+      expect(remainingRecords.length).toBe(0)
+    })
+
+    it('should handle delete with non-existent records in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 尝试删除不存在的记录
+      const deletedRecords = await crud.del({
+        condition: {
+          key: '_id',
+          op: 'eq',
+          value: 'nonexistent_id_12345',
+        },
+      })
+
+      // 验证没有记录被删除
+      expect(deletedRecords).toBeInstanceOf(Array)
+      expect(deletedRecords.length).toBe(0)
+    })
+
+    it('should delete records by complex conditions in user model', async () => {
+      const crud = new CRUD<typeof admin>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: userModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 插入测试数据
+      const testUsers = [
+        {
+          name: 'complex_delete_test_1',
+          email: 'complex_delete_1@example.com',
+          phone: '13800000015',
+        },
+        {
+          name: 'complex_delete_test_2',
+          email: 'complex_delete_2@example.com',
+          phone: '13800000016',
+        },
+        {
+          name: 'keep_this_user',
+          email: 'keep_this@example.com',
+          phone: '13800000017',
+        },
+      ]
+
+      const insertedIds = testUsers.map(() => snowFlake.next())
+      await db(userModel.name).insert(
+        testUsers.map((user, index) => ({
+          ...user,
+          _id: insertedIds[index],
+          _createdAt: new Date(),
+          _updatedAt: new Date(),
+          _createdBy: admin._id,
+          _updatedBy: admin._id,
+        })),
+      )
+
+      // 删除符合复杂条件的记录
+      const deletedRecords = await crud.del({
+        condition: {
+          op: 'and',
+          subCondition: [
+            {
+              key: 'name',
+              op: 'like',
+              value: 'complex_delete',
+            },
+            {
+              key: 'email',
+              op: 'like',
+              value: '@example.com',
+            },
+          ],
+        },
+      })
+
+      // 验证删除结果
+      expect(deletedRecords).toBeInstanceOf(Array)
+      expect(deletedRecords.length).toBe(2)
+
+      // 验证被删除的记录符合条件
+      deletedRecords.forEach((record) => {
+        expect(record.name.toLowerCase()).toContain('complex_delete')
+        expect(record.email.toLowerCase()).toContain('@example.com')
+      })
+
+      // 验证剩余记录
+      const remainingRecords = await db(userModel.name)
+        .where({ name: 'keep_this_user' })
+        .select()
+      expect(remainingRecords.length).toBe(1)
     })
   })
 })
