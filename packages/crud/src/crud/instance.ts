@@ -162,12 +162,7 @@ export default class CRUD<M extends Record<string, any>> {
       const knex = await this.options.getKnex(model.dataSourceName)
       await knex(model.name).insert(dbRecords)
 
-      const selectFields = await this.getSelectFields()
-      const outputRecords = (await this.toOutput(
-        dbRecords,
-        selectFields,
-      )) as M[]
-
+      this.triggerCreate(dbRecords)
       return dbRecords.map((record) => record[CRUD.ID])
     } catch (error) {
       throw error
@@ -200,8 +195,11 @@ export default class CRUD<M extends Record<string, any>> {
         throw new Error('Update permission denied')
       }
 
+      const model = await this.getCurrentModel()
       const crud = new CRUD<M>({
         ...this.options,
+        modelName: model.name,
+        useApiName: false,
         onCheckPermission: undefined,
       })
       const beforeUpdateRecords = await crud.find({
@@ -217,7 +215,6 @@ export default class CRUD<M extends Record<string, any>> {
         ),
       })
 
-      const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
       const willUpdateIds: string[] = beforeUpdateRecords.map(
         (record) => record[CRUD.ID],
@@ -251,6 +248,7 @@ export default class CRUD<M extends Record<string, any>> {
           .update(dbRecords[0])
       }
 
+      this.triggerUpdate(beforeUpdateRecords)
       return willUpdateIds
     } catch (error) {
       throw error
@@ -271,8 +269,11 @@ export default class CRUD<M extends Record<string, any>> {
         throw new Error('Delete permission denied')
       }
 
+      const model = await this.getCurrentModel()
       const crud = new CRUD<M>({
         ...this.options,
+        modelName: model.name,
+        useApiName: false,
         onCheckPermission: undefined,
       })
       const records = await crud.find({
@@ -285,10 +286,10 @@ export default class CRUD<M extends Record<string, any>> {
       if (records.length === 0) return []
 
       const willDeleteIds = records.map((record) => record[CRUD.ID])
-      const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
       await knex(model.name).whereIn(CRUD.ID, willDeleteIds).del()
 
+      this.triggerDelete(records)
       return willDeleteIds
     } catch (error) {
       throw error
@@ -809,5 +810,82 @@ export default class CRUD<M extends Record<string, any>> {
       }
       return field.name
     })
+  }
+
+  private async triggerCreate(dbRecords: Record<string, any>[]) {
+    if (!this.options.onCreate || !dbRecords.length) return
+
+    const selectFields = await this.getSelectFields()
+    const outputRecords = await this.toOutput(dbRecords, selectFields)
+    this.options.onCreate(outputRecords)
+  }
+
+  private async triggerUpdate(beforeUpdateRecords: M[]) {
+    if (!this.options.onUpdate || !beforeUpdateRecords.length) return
+
+    const model = await this.getCurrentModel()
+    const updateIds = beforeUpdateRecords.map((record) => record[CRUD.ID])
+    const crud = new CRUD<M>({
+      ...this.options,
+      modelName: model.name,
+      useApiName: false,
+      onCheckPermission: undefined,
+    })
+    const newRecords = await crud.find({
+      condition: {
+        op: 'in',
+        key: CRUD.ID,
+        value: updateIds,
+      },
+    })
+
+    const updatedRecords: {
+      oldRecord: M
+      newRecord: M
+    }[] = []
+
+    for (const oldRecord of beforeUpdateRecords) {
+      const newRecord = newRecords.find(
+        (record) => record[CRUD.ID] === oldRecord[CRUD.ID],
+      )
+      if (!newRecord) continue
+
+      for (const field of model.fields) {
+        const plugin = crudFieldPluginManager.getPlugin(field.type)
+        if (!plugin?.compare) {
+          if (oldRecord[field.name] !== newRecord[field.name]) {
+            updatedRecords.push({
+              oldRecord,
+              newRecord,
+            })
+          }
+        } else {
+          const isChanged = await plugin.compare({
+            schema: this.options.schema,
+            field,
+            useApiName: false,
+            value1: oldRecord[field.name],
+            value2: newRecord[field.name],
+          })
+
+          if (isChanged) {
+            updatedRecords.push({
+              oldRecord,
+              newRecord,
+            })
+          }
+        }
+      }
+    }
+
+    if (updatedRecords.length === 0) return
+
+    this.options.onUpdate(updatedRecords)
+  }
+
+  private async triggerDelete(records: M[]) {
+    if (!this.options.onDelete || !records.length) return
+
+    this.options.onDelete(records)
   }
 }

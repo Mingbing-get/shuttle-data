@@ -34,6 +34,14 @@ export namespace NCRUD {
           condition?: DataCondition.Define<M>
         }
     >
+    onCreate?: <M extends Record<string, any>>(records: M[]) => void
+    onUpdate?: <M extends Record<string, any>>(
+      updatedRecords: {
+        oldRecord: M
+        newRecord: M
+      }[],
+    ) => void
+    onDelete?: <M extends Record<string, any>>(records: M[]) => void
   }
 
   export interface FieldPluginFnContext<T extends DataModel.FieldType> {
@@ -71,12 +79,23 @@ export namespace NCRUD {
     values: v[]
   }
 
+  export interface FieldCompareOption<
+    T extends DataModel.FieldType,
+    v,
+  > extends FieldPluginFnContext<T> {
+    value1?: v
+    value2?: v
+  }
+
   export interface FieldPlugin<
     T extends DataModel.FieldType,
   > extends NDataModelSchema.FieldPlugin<T> {
     createCondition<M extends Record<string, any>>(
       options: FieldCreateConditionOption<T, M>,
     ): void
+    compare?: (
+      options: FieldCompareOption<T, any>,
+    ) => boolean | Promise<boolean>
     toOutput?: (options: FieldToOutputOption<T, any>) => any[] | Promise<any[]>
     toDb?: (options: FieldToDbOption<T, any>) => any[] | Promise<any[]>
   }

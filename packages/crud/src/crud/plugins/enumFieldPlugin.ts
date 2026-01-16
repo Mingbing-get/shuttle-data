@@ -1,5 +1,5 @@
 import { EnumFieldPlugin as _EnumFieldPlugin } from '@shuttle-data/schema'
-import { DataCondition } from '@shuttle-data/type'
+import { DataCondition, DataCRUD } from '@shuttle-data/type'
 
 import conditionPluginManager from '../conditionBuilder'
 import { NCRUD } from '../type'
@@ -187,6 +187,24 @@ export default class EnumFieldPlugin
       }
       return enumItem.name
     })
+  }
+
+  compare({
+    field,
+    value1,
+    value2,
+  }: NCRUD.FieldCompareOption<'enum', undefined | string | string[]>) {
+    if (!field.extra?.multiple) {
+      return value1 === value2
+    }
+
+    const values1 = this.parseValue(value1 || [])
+    const values2 = this.parseValue(value2 || [])
+
+    return (
+      values1.length === values2.length &&
+      values1.every((v) => values2.includes(v))
+    )
   }
 
   private hasValueCondition<M extends Record<string, any>>(

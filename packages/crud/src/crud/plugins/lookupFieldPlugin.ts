@@ -4,7 +4,6 @@ import { DataCRUD } from '@shuttle-data/type'
 import CRUD from '../instance'
 import conditionPluginManager from '../conditionBuilder'
 import { NCRUD } from '../type'
-import { s } from 'vite/dist/node/chunks/moduleRunnerTransport'
 
 export default class LookupFieldPlugin
   extends _LookupFieldPlugin
@@ -123,6 +122,24 @@ export default class LookupFieldPlugin
 
     return (values as (DataCRUD.LookupInRecord | undefined)[]).map(
       (v) => v?._id,
+    )
+  }
+
+  compare({
+    field,
+    value1,
+    value2,
+  }: NCRUD.FieldCompareOption<'lookup', undefined | string | string[]>) {
+    if (!field.extra?.multiple) {
+      return value1 === value2
+    }
+
+    const values1 = this.parseValue(value1 || [])
+    const values2 = this.parseValue(value2 || [])
+
+    return (
+      values1.length === values2.length &&
+      values1.every((v) => values2.includes(v))
     )
   }
 

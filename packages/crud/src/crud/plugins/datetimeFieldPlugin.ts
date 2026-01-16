@@ -32,4 +32,10 @@ export default class DatetimeFieldPlugin
       ],
     )
   }
+
+  toDb({ values }: NCRUD.FieldToDbOption<'datetime', Date | string>) {
+    return values.map((value) =>
+      value instanceof Date ? value.toISOString() : value,
+    )
+  }
 }
