@@ -942,7 +942,7 @@ describe('crud', () => {
         },
       })
 
-      const record = await crud.create({
+      const recordId = await crud.create({
         data: {
           _yesOrNo: true,
           _title: 'test',
@@ -960,7 +960,7 @@ describe('crud', () => {
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
-        .where({ _id: record._id })
+        .where({ _id: recordId })
         .first()
       expect(recordInDb).toBeTruthy()
     })
@@ -976,7 +976,7 @@ describe('crud', () => {
         },
       })
 
-      const records = await crud.batchCreate({
+      const recordIds = await crud.batchCreate({
         data: [
           {
             _yesOrNo: true,
@@ -1009,7 +1009,7 @@ describe('crud', () => {
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
-        .where({ _id: records[0]._id })
+        .where({ _id: recordIds[0] })
         .first()
       expect(recordInDb).toBeTruthy()
     })
@@ -1026,7 +1026,7 @@ describe('crud', () => {
         useApiName: true,
       })
 
-      const record = await crud.create({
+      const recordId = await crud.create({
         data: {
           yesOrNo: true,
           title: 'test',
@@ -1044,7 +1044,7 @@ describe('crud', () => {
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
-        .where({ _id: record._id })
+        .where({ _id: recordId })
         .first()
       expect(recordInDb).toBeTruthy()
     })
@@ -1061,7 +1061,7 @@ describe('crud', () => {
         useApiName: true,
       })
 
-      const records = await crud.batchCreate({
+      const recordIds = await crud.batchCreate({
         data: [
           {
             yesOrNo: true,
@@ -1094,7 +1094,7 @@ describe('crud', () => {
 
       // 检查记录是否存在
       const recordInDb = await db(dataModel.name)
-        .where({ _id: records[0]._id })
+        .where({ _id: recordIds[0] })
         .first()
       expect(recordInDb).toBeTruthy()
     })
@@ -1249,7 +1249,7 @@ describe('crud', () => {
         },
       })
 
-      const record = await crud.create({
+      const recordId = await crud.create({
         data: {
           _yesOrNo: true,
           _title: 'test',
@@ -1262,8 +1262,7 @@ describe('crud', () => {
         } as any,
       })
 
-      expect(record).toBeTruthy()
-      expect(record._id).toBeTruthy()
+      expect(recordId).toBeTruthy()
     })
 
     it('should throw error when create record with invalid date format', async () => {
@@ -1310,7 +1309,7 @@ describe('crud', () => {
       })
 
       // 先创建一条记录
-      const createResult = await crud.create({
+      const recordId = await crud.create({
         data: {
           _yesOrNo: true,
           _title: 'test update',
@@ -1327,7 +1326,7 @@ describe('crud', () => {
       })
 
       // 更新记录
-      const updateResult = await crud.update({
+      await crud.update({
         data: {
           _yesOrNo: false,
           _title: 'updated title',
@@ -1336,15 +1335,13 @@ describe('crud', () => {
         condition: {
           key: '_id',
           op: 'eq',
-          value: createResult._id,
+          value: recordId,
         },
       })
 
-      expect(updateResult).toBeTruthy()
-
       // 验证记录是否更新成功
       const updatedRecord = await db(dataModel.name)
-        .where({ _id: createResult._id })
+        .where({ _id: recordId })
         .first()
       expect(updatedRecord).toBeTruthy()
       expect(updatedRecord._yesOrNo).toBe(false)
@@ -1365,7 +1362,7 @@ describe('crud', () => {
       })
 
       // 先创建一条记录
-      const createResult = await crud.create({
+      const recordId = await crud.create({
         data: {
           yesOrNo: true,
           title: 'test update api',
@@ -1382,7 +1379,7 @@ describe('crud', () => {
       })
 
       // 使用API名称更新记录
-      const updateResult = await crud.update({
+      await crud.update({
         data: {
           yesOrNo: false,
           title: 'updated api title',
@@ -1391,15 +1388,13 @@ describe('crud', () => {
         condition: {
           key: '_id',
           op: 'eq',
-          value: createResult._id,
+          value: recordId,
         },
       })
 
-      expect(updateResult).toBeTruthy()
-
       // 验证记录是否更新成功
       const updatedRecord = await db(dataModel.name)
-        .where({ _id: createResult._id })
+        .where({ _id: recordId })
         .first()
       expect(updatedRecord).toBeTruthy()
       expect(updatedRecord._yesOrNo).toBe(false)
@@ -1419,9 +1414,9 @@ describe('crud', () => {
       })
 
       // 先创建一条测试用户
-      const testUserId = snowFlake.next()
+      const recordId = snowFlake.next()
       await db(userModel.name).insert({
-        _id: testUserId,
+        _id: recordId,
         name: 'update test user',
         email: 'update@example.com',
         phone: '13800000008',
@@ -1446,7 +1441,7 @@ describe('crud', () => {
 
       // 验证更新结果
       const updatedUser = await db(userModel.name)
-        .where({ _id: testUserId })
+        .where({ _id: recordId })
         .first()
       expect(updatedUser.email).toEqual('updated@example.com')
       expect(updatedUser.phone).toEqual('13800000009')
@@ -1464,7 +1459,7 @@ describe('crud', () => {
       })
 
       // 更新不存在的记录
-      const updateResult = await crud.update({
+      const updatedIds = await crud.update({
         data: {
           email: 'nonexistent@example.com',
         },
@@ -1475,8 +1470,7 @@ describe('crud', () => {
         },
       })
 
-      // 更新操作应该成功执行但不影响任何记录
-      expect(updateResult).toBeTruthy()
+      expect(updatedIds.length).toEqual(0)
     })
 
     it('should throw error when update record with invalid field', async () => {
@@ -1516,7 +1510,7 @@ describe('crud', () => {
       })
 
       // 先创建一条记录
-      const createResult = await crud.create({
+      const recordId = await crud.create({
         data: {
           _yesOrNo: true,
           _title: 'test enum update',
@@ -1541,13 +1535,13 @@ describe('crud', () => {
         condition: {
           key: '_id',
           op: 'eq',
-          value: createResult._id,
+          value: recordId,
         },
       })
 
       // 验证更新结果
       const updatedRecord = await db(dataModel.name)
-        .where({ _id: createResult._id })
+        .where({ _id: recordId })
         .first()
       expect(updatedRecord._status).toEqual('_inactive')
     })
@@ -1564,7 +1558,7 @@ describe('crud', () => {
       })
 
       // 先创建一条记录
-      const createResult = await crud.create({
+      const recordId = await crud.create({
         data: {
           _yesOrNo: true,
           _title: 'test date update',
@@ -1591,13 +1585,13 @@ describe('crud', () => {
         condition: {
           key: '_id',
           op: 'eq',
-          value: createResult._id,
+          value: recordId,
         },
       })
 
       // 验证更新结果
       const updatedRecord = await db(dataModel.name)
-        .where({ _id: createResult._id })
+        .where({ _id: recordId })
         .first()
       expect(updatedRecord._date).toEqual(newDate)
     })
@@ -1667,7 +1661,7 @@ describe('crud', () => {
       })
 
       // 先创建一条记录
-      const createResult = await crud.batchCreate({
+      const recordIds = await crud.batchCreate({
         data: [
           {
             _yesOrNo: true,
@@ -1702,12 +1696,12 @@ describe('crud', () => {
       await crud.update({
         data: [
           {
-            _id: createResult[0]._id,
+            _id: recordIds[0],
             _title: 'updated title',
             _num: 1000,
           },
           {
-            _id: createResult[1]._id,
+            _id: recordIds[1],
             _content: 'updated content 2',
             _num: 2000,
           },
@@ -1716,13 +1710,13 @@ describe('crud', () => {
 
       // 验证更新结果
       const updatedRecord1 = await db(dataModel.name)
-        .where({ _id: createResult[0]._id })
+        .where({ _id: recordIds[0] })
         .first()
       expect(updatedRecord1._title).toEqual('updated title')
       expect(updatedRecord1._num).toEqual(1000)
 
       const updatedRecord2 = await db(dataModel.name)
-        .where({ _id: createResult[1]._id })
+        .where({ _id: recordIds[1] })
         .first()
       expect(updatedRecord2._content).toEqual('updated content 2')
       expect(updatedRecord2._num).toEqual(2000)
@@ -1758,7 +1752,7 @@ describe('crud', () => {
       })
 
       // 删除记录
-      const deletedRecords = await crud.del({
+      const deletedIds = await crud.del({
         condition: {
           key: '_id',
           op: 'eq',
@@ -1767,10 +1761,9 @@ describe('crud', () => {
       })
 
       // 验证删除结果
-      expect(deletedRecords).toBeInstanceOf(Array)
-      expect(deletedRecords.length).toBe(1)
-      expect(deletedRecords[0]._id).toEqual(insertedId)
-      expect(deletedRecords[0].name).toEqual(testUser.name)
+      expect(deletedIds).toBeInstanceOf(Array)
+      expect(deletedIds.length).toBe(1)
+      expect(deletedIds[0]).toEqual(insertedId)
 
       // 验证记录已删除
       const remainingRecords = await db(userModel.name)
@@ -1870,7 +1863,7 @@ describe('crud', () => {
       })
 
       // 删除记录
-      const deletedRecords = await crud.del({
+      const deletedIds = await crud.del({
         condition: {
           key: 'name',
           op: 'eq',
@@ -1879,9 +1872,9 @@ describe('crud', () => {
       })
 
       // 验证删除结果
-      expect(deletedRecords).toBeInstanceOf(Array)
-      expect(deletedRecords.length).toBe(1)
-      expect(deletedRecords[0].name).toEqual(testUser.name)
+      expect(deletedIds).toBeInstanceOf(Array)
+      expect(deletedIds.length).toBe(1)
+      expect(deletedIds[0]).toEqual(insertedId)
 
       // 验证记录已删除
       const remainingRecords = await db(userModel.name)
@@ -1958,7 +1951,7 @@ describe('crud', () => {
       )
 
       // 删除符合复杂条件的记录
-      const deletedRecords = await crud.del({
+      const deletedIds = await crud.del({
         condition: {
           op: 'and',
           subCondition: [
@@ -1977,13 +1970,12 @@ describe('crud', () => {
       })
 
       // 验证删除结果
-      expect(deletedRecords).toBeInstanceOf(Array)
-      expect(deletedRecords.length).toBe(2)
+      expect(deletedIds).toBeInstanceOf(Array)
+      expect(deletedIds.length).toBe(2)
 
       // 验证被删除的记录符合条件
-      deletedRecords.forEach((record) => {
-        expect(record.name.toLowerCase()).toContain('complex_delete')
-        expect(record.email.toLowerCase()).toContain('@example.com')
+      deletedIds.forEach((id) => {
+        expect(id).toBeDefined()
       })
 
       // 验证剩余记录
@@ -1995,6 +1987,19 @@ describe('crud', () => {
   })
 
   describe('queryGroupBy', () => {
+    beforeAll(async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+      await crud.del()
+    })
+
     it('should group by status and count records', async () => {
       const crud = new CRUD<TestDataModel>({
         schema: dataModelSchema,

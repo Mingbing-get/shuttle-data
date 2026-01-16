@@ -11,6 +11,13 @@ export namespace NCRUD {
     user: User
   }
 
+  export interface CheckPermissionOptions<M extends Record<string, any>> {
+    type: 'create' | 'read' | 'update' | 'delete'
+    context: Context
+    modelName: string
+    fieldNames?: (keyof M & string)[]
+  }
+
   export interface Options {
     generateId: () => string
     getKnex: (dataSourceName: string) => Promise<Knex> | Knex
@@ -18,6 +25,15 @@ export namespace NCRUD {
     modelName: string
     useApiName?: boolean
     context: Context
+    onCheckPermission?: <M extends Record<string, any>>(
+      options: CheckPermissionOptions<M>,
+    ) => Promise<
+      | false
+      | {
+          fieldNames?: (keyof M & string)[]
+          condition?: DataCondition.Define<M>
+        }
+    >
   }
 
   export interface FieldPluginFnContext<T extends DataModel.FieldType> {

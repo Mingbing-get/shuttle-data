@@ -33,20 +33,37 @@ export default class CRUD<M extends Record<string, any>> {
       this.options.modelName,
       this.options.useApiName,
     )
-    const enumInfo = await this.options.schema.getEnumManager().all()
 
     try {
+      const checkpermissionRes = await this.checkPermission(
+        'read',
+        option.fields,
+      )
+      if (!checkpermissionRes) return []
+
+      const enumInfo = await this.options.schema.getEnumManager().all()
       const model = await this.getCurrentModel()
-      const selectFields = await this.getSelectFields(option.fields)
+      const selectFields = this.omitFields(
+        await this.getSelectFields(option.fields),
+        checkpermissionRes.fieldNames,
+      )
 
       const knex = await this.options.getKnex(model.dataSourceName)
       const builder = knex(model.name)
       builder
-        .orWhere((builder) => {
+        .where((builder) => {
           builder.whereNull(CRUD.IS_DELETE).orWhere(CRUD.IS_DELETE, '=', false)
         })
         .andWhere((builder) => {
           this.createCondition(builder, model, enumInfo, option.condition)
+        })
+        .andWhere((builder) => {
+          this.createCondition(
+            builder,
+            model,
+            enumInfo,
+            checkpermissionRes.condition,
+          )
         })
       this.createOrder(builder, model, option.orders)
       if (option.limit !== undefined) {
@@ -75,9 +92,12 @@ export default class CRUD<M extends Record<string, any>> {
       this.options.modelName,
       this.options.useApiName,
     )
-    const enumInfo = await this.options.schema.getEnumManager().all()
 
     try {
+      const checkpermissionRes = await this.checkPermission('read')
+      if (!checkpermissionRes) return 0
+
+      const enumInfo = await this.options.schema.getEnumManager().all()
       const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
       const builder = knex(model.name)
@@ -87,6 +107,14 @@ export default class CRUD<M extends Record<string, any>> {
         })
         .andWhere((builder) => {
           this.createCondition(builder, model, enumInfo, option.condition)
+        })
+        .andWhere((builder) => {
+          this.createCondition(
+            builder,
+            model,
+            enumInfo,
+            checkpermissionRes.condition,
+          )
         })
 
       const res = await builder.count(CRUD.ID, { as: 'count' })
@@ -98,24 +126,29 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
-  async create(option: DataCRUD.CreateOption<M>): Promise<M> {
+  async create(option: DataCRUD.CreateOption<M>): Promise<string> {
     const records = await this._create(option)
     return records[0]
   }
 
-  async batchCreate(option: DataCRUD.BatchCreateOption<M>): Promise<M[]> {
+  async batchCreate(option: DataCRUD.BatchCreateOption<M>): Promise<string[]> {
     return this._create(option)
   }
 
   private async _create(
     option: DataCRUD.CreateOption<M> | DataCRUD.BatchCreateOption<M>,
-  ): Promise<M[]> {
+  ): Promise<string[]> {
     const lockId = await this.options.schema.addLockPromise(
       this.options.modelName,
       this.options.useApiName,
     )
 
     try {
+      const checkpermissionRes = await this.checkPermission('create')
+      if (!checkpermissionRes) {
+        throw new Error('Create permission denied')
+      }
+
       const model = await this.getCurrentModel()
       const dbRecords = await this.toDb(
         Array.isArray(option.data) ? option.data : [option.data],
@@ -129,17 +162,13 @@ export default class CRUD<M extends Record<string, any>> {
       const knex = await this.options.getKnex(model.dataSourceName)
       await knex(model.name).insert(dbRecords)
 
-      const selectFields = await this.getSelectFields(option.returnFields)
+      const selectFields = await this.getSelectFields()
       const outputRecords = (await this.toOutput(
-        this.pickValueFromRecords(
-          dbRecords,
-          selectFields,
-          model.displayField || CRUD.ID,
-        ),
+        dbRecords,
         selectFields,
       )) as M[]
 
-      return outputRecords
+      return dbRecords.map((record) => record[CRUD.ID])
     } catch (error) {
       throw error
     } finally {
@@ -149,7 +178,7 @@ export default class CRUD<M extends Record<string, any>> {
 
   async update(
     option: DataCRUD.UpdateOption<M> | DataCRUD.UpdateWithIdOption<M>,
-  ): Promise<M[]> {
+  ): Promise<string[]> {
     if (this.isWithIdUpdateOption(option) && option.data.length === 0) {
       throw new Error('Update data can not be empty')
     }
@@ -160,20 +189,39 @@ export default class CRUD<M extends Record<string, any>> {
     )
 
     try {
-      const crud = new CRUD<M>(this.options)
+      const updateFieldNames = await this.getFieldNamesFromUpdateData(
+        option.data,
+      )
+      const checkpermissionRes = await this.checkPermission(
+        'update',
+        updateFieldNames,
+      )
+      if (!checkpermissionRes) {
+        throw new Error('Update permission denied')
+      }
+
+      const crud = new CRUD<M>({
+        ...this.options,
+        onCheckPermission: undefined,
+      })
       const beforeUpdateRecords = await crud.find({
-        condition: this.isWithIdUpdateOption(option)
-          ? {
-              key: CRUD.ID,
-              op: 'in',
-              value: option.data.map((item) => item._id),
-            }
-          : option.condition,
+        condition: this.createAndCondition(
+          this.isWithIdUpdateOption(option)
+            ? {
+                key: CRUD.ID,
+                op: 'in',
+                value: option.data.map((item) => item._id),
+              }
+            : option.condition,
+          checkpermissionRes.condition,
+        ),
       })
 
       const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
-      const willUpdateIds = beforeUpdateRecords.map((record) => record[CRUD.ID])
+      const willUpdateIds: string[] = beforeUpdateRecords.map(
+        (record) => record[CRUD.ID],
+      )
       if (this.isWithIdUpdateOption(option)) {
         const notUpdateRecords = option.data.filter(
           (item) => !willUpdateIds.includes(item._id),
@@ -203,14 +251,7 @@ export default class CRUD<M extends Record<string, any>> {
           .update(dbRecords[0])
       }
 
-      return await crud.find({
-        condition: {
-          key: CRUD.ID,
-          op: 'in',
-          value: willUpdateIds,
-        },
-        fields: option.returnFields,
-      })
+      return willUpdateIds
     } catch (error) {
       throw error
     } finally {
@@ -218,28 +259,37 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
-  async del(option: DataCRUD.DelOption<M>): Promise<M[]> {
+  async del(option: DataCRUD.DelOption<M> = {}): Promise<string[]> {
     const lockId = await this.options.schema.addLockPromise(
       this.options.modelName,
       this.options.useApiName,
     )
 
     try {
-      const crud = new CRUD<M>(this.options)
+      const checkpermissionRes = await this.checkPermission('delete')
+      if (!checkpermissionRes) {
+        throw new Error('Delete permission denied')
+      }
+
+      const crud = new CRUD<M>({
+        ...this.options,
+        onCheckPermission: undefined,
+      })
       const records = await crud.find({
-        condition: option.condition,
+        condition: this.createAndCondition(
+          option.condition,
+          checkpermissionRes.condition,
+        ),
       })
 
+      if (records.length === 0) return []
+
+      const willDeleteIds = records.map((record) => record[CRUD.ID])
       const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
-      await knex(model.name)
-        .whereIn(
-          CRUD.ID,
-          records.map((record) => record[CRUD.ID]),
-        )
-        .del()
+      await knex(model.name).whereIn(CRUD.ID, willDeleteIds).del()
 
-      return records
+      return willDeleteIds
     } catch (error) {
       throw error
     } finally {
@@ -268,6 +318,12 @@ export default class CRUD<M extends Record<string, any>> {
     )
 
     try {
+      const checkpermissionRes = await this.checkPermission('read', [
+        aggField,
+        ...groupByFields,
+      ])
+      if (!checkpermissionRes) return []
+
       const enumInfo = await this.options.schema.getEnumManager().all()
       const aggFieldMap = await this.getSelectFields([aggField])
       const groupByFieldsMap = await this.getSelectFields(groupByFields)
@@ -487,23 +543,6 @@ export default class CRUD<M extends Record<string, any>> {
     })
   }
 
-  private pickValueFromRecords(
-    records: Record<string, any>[],
-    selectFields: Record<string, string>,
-    displayField: string,
-  ) {
-    return records.map((record) => {
-      const outputRecord: Record<string, any> = {
-        [CRUD.ID]: record[CRUD.ID],
-        [CRUD.DISPLAY]: record[displayField],
-      }
-      for (const key in selectFields) {
-        outputRecord[key] = record[key]
-      }
-      return outputRecord
-    })
-  }
-
   async toOutput(
     records: Record<string, any>[],
     selectFields: Record<string, string>,
@@ -669,5 +708,106 @@ export default class CRUD<M extends Record<string, any>> {
       throw new Error(`Model ${modelName} not found`)
     }
     return model
+  }
+
+  private async checkPermission(
+    type: NCRUD.CheckPermissionOptions<M>['type'],
+    fields?: DataCRUD.SelectField<M>[],
+  ) {
+    const { onCheckPermission } = this.options
+    if (!onCheckPermission) return {}
+
+    const model = await this.getCurrentModel()
+    let fieldNames: (keyof M & string)[] | undefined = undefined
+    if (type === 'read' && fields?.length) {
+      const selectFields = await this.getSelectFields(fields)
+      fieldNames = Object.keys(selectFields) as (keyof M & string)[]
+    }
+    if (type === 'update') {
+      fieldNames = fields as string[]
+    }
+
+    return await onCheckPermission({
+      type,
+      context: this.options.context,
+      modelName: model.name,
+      fieldNames,
+    })
+  }
+
+  private omitFields(
+    selectFields: Record<string, string>,
+    omitKeys?: string[],
+  ) {
+    if (!omitKeys?.length) return selectFields
+
+    const result: Record<string, string> = {}
+    for (const key in selectFields) {
+      if (!omitKeys.includes(key)) {
+        result[key] = selectFields[key]
+      }
+    }
+
+    return result
+  }
+
+  private createAndCondition(
+    ...conditions: (DataCondition.Define<M> | undefined)[]
+  ): DataCondition.Define<M> | undefined {
+    const subCondition = conditions.filter(Boolean) as DataCondition.Define<M>[]
+    if (subCondition.length < 2) return subCondition[0]
+
+    return {
+      op: 'and',
+      subCondition,
+    }
+  }
+
+  private async getFieldNamesFromUpdateData(
+    data: DataCRUD.UpdateInput<M> | DataCRUD.UpdateInputWithId<M>[],
+  ): Promise<(keyof M & string)[]> {
+    const systemFieldNames = [
+      CRUD.ID,
+      CRUD.DISPLAY,
+      CRUD.CREATED_AT,
+      CRUD.UPDATED_AT,
+      CRUD.CREATED_BY,
+      CRUD.UPDATED_BY,
+      CRUD.IS_DELETE,
+    ]
+
+    const allKeys: string[] = []
+
+    if (Array.isArray(data)) {
+      data.forEach((record) => {
+        for (const key in record) {
+          if (
+            record[key] !== undefined &&
+            !systemFieldNames.includes(key) &&
+            !allKeys.includes(key)
+          ) {
+            allKeys.push(key)
+          }
+        }
+      })
+    } else {
+      for (const key in data) {
+        if (data[key] !== undefined && !systemFieldNames.includes(key)) {
+          allKeys.push(key)
+        }
+      }
+    }
+
+    const model = await this.getCurrentModel()
+
+    return allKeys.map((key) => {
+      const field = model.fields.find((field) =>
+        this.options.useApiName ? field.apiName === key : field.name === key,
+      )
+      if (!field) {
+        throw new Error(`Field ${key} not found`)
+      }
+      return field.name
+    })
   }
 }

@@ -68,27 +68,22 @@ export namespace DataCRUD {
 
   export interface DelOption<M extends Record<string, any>> {
     condition?: DataCondition.Define<M>
-    returnFields?: SelectField<M>[]
   }
 
   export interface UpdateOption<M extends Record<string, any>> {
     condition?: DataCondition.Define<M>
-    returnFields?: SelectField<M>[]
     data: UpdateInput<M>
   }
 
   export interface UpdateWithIdOption<M extends Record<string, any>> {
-    returnFields?: SelectField<M>[]
     data: UpdateInputWithId<M>[]
   }
 
   export interface CreateOption<M extends Record<string, any>> {
-    returnFields?: SelectField<M>[]
     data: CreateInput<M>
   }
 
   export interface BatchCreateOption<M extends Record<string, any>> {
-    returnFields?: SelectField<M>[]
     data: CreateInput<M>[]
   }
 
