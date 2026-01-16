@@ -247,6 +247,89 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
+  async queryGroupBy<T extends DataCRUD.SelectField<M>>({
+    aggFunction,
+    aggField,
+    groupByFields,
+    condition,
+    orders,
+    limit,
+    offset,
+  }: DataCRUD.QueryGroupByOption<M, T>): Promise<
+    DataCRUD.StrOrObjKeyToNumber<T, M>[]
+  > {
+    if (groupByFields.length === 0) {
+      throw new Error(`Group by fields can not be empty`)
+    }
+
+    const lockId = await this.options.schema.addLockPromise(
+      this.options.modelName,
+      this.options.useApiName,
+    )
+
+    try {
+      const enumInfo = await this.options.schema.getEnumManager().all()
+      const aggFieldMap = await this.getSelectFields([aggField])
+      const groupByFieldsMap = await this.getSelectFields(groupByFields)
+
+      const aggFieldKey = Object.keys(aggFieldMap)[0]
+      const aggFieldAlias = aggFieldMap[aggFieldKey]
+      if (groupByFieldsMap[aggFieldKey]) {
+        throw new Error(`Agg field ${aggField} can not be group by field`)
+      }
+
+      const model = await this.getCurrentModel()
+      const knex = await this.options.getKnex(model.dataSourceName)
+      const builder = knex(model.name)
+
+      builder
+        .orWhere((builder) => {
+          builder.whereNull(CRUD.IS_DELETE).orWhere(CRUD.IS_DELETE, '=', false)
+        })
+        .andWhere((builder) => {
+          this.createCondition(builder, model, enumInfo, condition)
+        })
+      this.createOrder(builder, model, orders)
+      if (limit !== undefined) {
+        builder.limit(limit)
+      }
+      if (offset !== undefined) {
+        builder.offset(offset)
+      }
+
+      const groupByKeys = Object.keys(groupByFieldsMap)
+      builder.select(...groupByKeys).groupBy(...groupByKeys)
+
+      let records: any[] = []
+      if (aggFunction === 'count') {
+        records = await builder.count({ [aggFieldAlias]: aggFieldKey })
+      } else if (aggFunction === 'avg') {
+        records = await builder.avg({ [aggFieldAlias]: aggFieldKey })
+      } else if (aggFunction === 'min') {
+        records = await builder.min({ [aggFieldAlias]: aggFieldKey })
+      } else if (aggFunction === 'max') {
+        records = await builder.max({ [aggFieldAlias]: aggFieldKey })
+      } else if (aggFunction === 'sum') {
+        records = await builder.sum({ [aggFieldAlias]: aggFieldKey })
+      }
+
+      if (records.length === 0) return []
+
+      records.forEach((record) => {
+        record[aggFieldAlias] = Number(record[aggFieldAlias])
+      })
+
+      return (await this.toOutput(
+        records,
+        groupByFieldsMap,
+      )) as DataCRUD.StrOrObjKeyToNumber<T, M>[]
+    } catch (error) {
+      throw error
+    } finally {
+      this.options.schema.unlockPromise(lockId)
+    }
+  }
+
   private isWithIdUpdateOption<T extends Record<string, any>>(
     option: DataCRUD.UpdateOption<T> | DataCRUD.UpdateWithIdOption<T>,
   ): option is DataCRUD.UpdateWithIdOption<T> {

@@ -1993,4 +1993,410 @@ describe('crud', () => {
       expect(remainingRecords.length).toBe(1)
     })
   })
+
+  describe('queryGroupBy', () => {
+    it('should group by status and count records', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 先插入测试数据
+      await crud.batchCreate({
+        data: [
+          {
+            _yesOrNo: true,
+            _title: 'test1',
+            _content: 'test content 1',
+            _num: 100,
+            _double: 100.2,
+            _datetime: new Date(),
+            _date: '2026-01-01',
+            _status: '_active',
+            _multiStatus: ['_active'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+          {
+            _yesOrNo: false,
+            _title: 'test2',
+            _content: 'test content 2',
+            _num: 200,
+            _double: 200.2,
+            _datetime: new Date(),
+            _date: '2026-01-02',
+            _status: '_active',
+            _multiStatus: ['_active'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+          {
+            _yesOrNo: true,
+            _title: 'test3',
+            _content: 'test content 3',
+            _num: 300,
+            _double: 300.2,
+            _datetime: new Date(),
+            _date: '2026-01-03',
+            _status: '_inactive',
+            _multiStatus: ['_inactive'],
+            _lookup: admin,
+            _multiLookup: [admin],
+          },
+        ],
+      })
+
+      // 测试分组查询
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: {
+          _id: 'count',
+        },
+        groupByFields: ['_status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      // 验证结果
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?.count).toEqual(2)
+      expect(inactiveGroup?.count).toEqual(1)
+    })
+
+    it('should group by status with sum aggregation', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试sum聚合
+      const result = await crud.queryGroupBy({
+        aggFunction: 'sum',
+        aggField: '_num',
+        groupByFields: ['_status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._num).toEqual(300) // 100 + 200
+      expect(inactiveGroup?._num).toEqual(300)
+    })
+
+    it('should group by status with avg aggregation', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试avg聚合
+      const result = await crud.queryGroupBy({
+        aggFunction: 'avg',
+        aggField: '_double',
+        groupByFields: ['_status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._double).toEqual(150.2) // (100.2 + 200.2) / 2
+      expect(inactiveGroup?._double).toEqual(300.2)
+    })
+
+    it('should group by status with min aggregation', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试min聚合
+      const result = await crud.queryGroupBy({
+        aggFunction: 'min',
+        aggField: '_num',
+        groupByFields: ['_status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._num).toEqual(100)
+      expect(inactiveGroup?._num).toEqual(300)
+    })
+
+    it('should group by status with max aggregation', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试max聚合
+      const result = await crud.queryGroupBy({
+        aggFunction: 'max',
+        aggField: '_num',
+        groupByFields: ['_status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._num).toEqual(200)
+      expect(inactiveGroup?._num).toEqual(300)
+    })
+
+    it('should group by status with condition', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试带条件的分组查询
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: '_id',
+        groupByFields: ['_status'],
+        condition: {
+          key: '_num',
+          op: 'gte',
+          value: 200,
+        },
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      // 应该只有符合条件的记录被分组
+      const activeGroup = result.find((item) => item._status === '_active')
+      const inactiveGroup = result.find((item) => item._status === '_inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._id).toEqual(1) // 只有_num >= 200的active记录
+      expect(inactiveGroup?._id).toEqual(1) // 只有_num >= 200的inactive记录
+    })
+
+    it('should group by status with order', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试带排序的分组查询
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: '_id',
+        groupByFields: ['_status'],
+        orders: [
+          {
+            key: '_status',
+            desc: true,
+          },
+        ],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      // 验证排序是否正确
+      expect(result[0]._status).toEqual('_inactive')
+      expect(result[1]._status).toEqual('_active')
+    })
+
+    it('should group by status with limit and offset', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试带分页的分组查询
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: '_id',
+        groupByFields: ['_status'],
+        limit: 1,
+        offset: 1,
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toEqual(1)
+    })
+
+    it('should group by multiple fields', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试多字段分组
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: '_id',
+        groupByFields: ['_status', '_yesOrNo'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      // 验证多字段分组结果
+      const activeTrueGroup = result.find(
+        (item) => item._status === '_active' && item._yesOrNo === true,
+      )
+      const activeFalseGroup = result.find(
+        (item) => item._status === '_active' && item._yesOrNo === false,
+      )
+      const inactiveTrueGroup = result.find(
+        (item) => item._status === '_inactive' && item._yesOrNo === true,
+      )
+
+      expect(activeTrueGroup).toBeTruthy()
+      expect(activeFalseGroup).toBeTruthy()
+      expect(inactiveTrueGroup).toBeTruthy()
+
+      expect(activeTrueGroup?._id).toEqual(1)
+      expect(activeFalseGroup?._id).toEqual(1)
+      expect(inactiveTrueGroup?._id).toEqual(1)
+    })
+
+    it('should throw error when group by fields is empty', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试分组字段为空的情况
+      await expect(
+        crud.queryGroupBy({
+          aggFunction: 'count',
+          aggField: '_id',
+          groupByFields: [],
+        }),
+      ).rejects.toThrow('Group by fields can not be empty')
+    })
+
+    it('should throw error when agg field is also group by field', async () => {
+      const crud = new CRUD<TestDataModel>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.name,
+        context: {
+          user: admin,
+        },
+      })
+
+      // 测试聚合字段也是分组字段的情况
+      await expect(
+        crud.queryGroupBy({
+          aggFunction: 'count',
+          aggField: '_status',
+          groupByFields: ['_status'],
+        }),
+      ).rejects.toThrow('Agg field _status can not be group by field')
+    })
+
+    it('should group by using api name', async () => {
+      const crud = new CRUD<TestDataModelWithApiName>({
+        schema: dataModelSchema,
+        generateId: () => snowFlake.next(),
+        getKnex: () => db,
+        modelName: dataModel.apiName,
+        context: {
+          user: admin,
+        },
+        useApiName: true,
+      })
+
+      // 测试使用API名称的分组查询
+      const result = await crud.queryGroupBy({
+        aggFunction: 'count',
+        aggField: '_id',
+        groupByFields: ['status'],
+      })
+
+      expect(result).toBeInstanceOf(Array)
+      expect(result.length).toBeGreaterThan(0)
+
+      const activeGroup = result.find((item) => item.status === 'active')
+      const inactiveGroup = result.find((item) => item.status === 'inactive')
+
+      expect(activeGroup).toBeTruthy()
+      expect(inactiveGroup).toBeTruthy()
+      expect(activeGroup?._id).toEqual(2)
+      expect(inactiveGroup?._id).toEqual(1)
+    })
+  })
 })

@@ -45,11 +45,7 @@ export namespace DataCRUD {
     | 'del'
     | 'update'
     | 'create'
-    | 'countUseGroupBy'
-    | 'minUseGroupBy'
-    | 'maxUseGroupBy'
-    | 'avgUseGroupBy'
-    | 'sumUseGroupBy'
+    | 'queryGroupBy'
 
   export interface FindOption<M extends Record<string, any>> {
     fields?: SelectField<M>[]
@@ -96,16 +92,17 @@ export namespace DataCRUD {
     data: CreateInput<M>[]
   }
 
-  export interface GroupByOption<
+  export interface QueryGroupByOption<
     M extends Record<string, any>,
     AF extends SelectField<M> = keyof M & string,
   > {
+    aggFunction: 'count' | 'min' | 'max' | 'avg' | 'sum'
+    aggField: AF
+    groupByFields: SelectField<M>[]
     condition?: DataCondition.Define<M>
     orders?: OrderBy<M>[]
     limit?: number
     offset?: number
-    aggField: AF
-    groupByFields: SelectField<M>[]
   }
 
   export type Option<
@@ -120,5 +117,13 @@ export namespace DataCRUD {
     | UpdateWithIdOption<M>
     | CreateOption<M>
     | BatchCreateOption<M>
-    | GroupByOption<M, AF>
+    | QueryGroupByOption<M, AF>
+
+  type ObjectKeyType = string | number | symbol
+  export type StrOrObjKeyToNumber<
+    F extends ObjectKeyType | Record<ObjectKeyType, any>,
+    M extends Record<string, any>,
+  > = F extends string
+    ? Omit<M, F> & { [key in F]: number }
+    : Omit<M, keyof F> & { [key in F[keyof F] & string]: number }
 }
