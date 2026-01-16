@@ -33,9 +33,14 @@ export default class DatetimeFieldPlugin
     )
   }
 
-  toDb({ values }: NCRUD.FieldToDbOption<'datetime', Date | string>) {
-    return values.map((value) =>
-      value instanceof Date ? value.toISOString() : value,
-    )
+  compare({
+    value1,
+    value2,
+  }: NCRUD.FieldCompareOption<'datetime', Date | string>) {
+    const v1 = value1 instanceof Date ? value1.toISOString() : value1
+
+    const v2 = value2 instanceof Date ? value2.toISOString() : value2
+
+    return v1 === v2
   }
 }
