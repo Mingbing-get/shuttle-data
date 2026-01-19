@@ -398,13 +398,8 @@ export default class CRUD<M extends Record<string, any>> {
     const values: any[] = []
 
     const model = await this.getCurrentModel()
-    const systemFieldNames = [
-      CRUD.ID,
-      CRUD.CREATED_AT,
-      CRUD.UPDATED_AT,
-      CRUD.CREATED_BY,
-      CRUD.UPDATED_BY,
-    ]
+    const systemFieldNames = this.getSystemFields()
+
     model.fields.forEach((field) => {
       if (systemFieldNames.includes(field.name)) return
 
@@ -764,10 +759,8 @@ export default class CRUD<M extends Record<string, any>> {
     }
   }
 
-  private async getFieldNamesFromUpdateData(
-    data: DataCRUD.UpdateInput<M> | DataCRUD.UpdateInputWithId<M>[],
-  ): Promise<(keyof M & string)[]> {
-    const systemFieldNames = [
+  private getSystemFields() {
+    return [
       CRUD.ID,
       CRUD.DISPLAY,
       CRUD.CREATED_AT,
@@ -776,6 +769,12 @@ export default class CRUD<M extends Record<string, any>> {
       CRUD.UPDATED_BY,
       CRUD.IS_DELETE,
     ]
+  }
+
+  private async getFieldNamesFromUpdateData(
+    data: DataCRUD.UpdateInput<M> | DataCRUD.UpdateInputWithId<M>[],
+  ): Promise<(keyof M & string)[]> {
+    const systemFieldNames = this.getSystemFields()
 
     const allKeys: string[] = []
 
@@ -812,80 +811,89 @@ export default class CRUD<M extends Record<string, any>> {
     })
   }
 
-  private async triggerCreate(dbRecords: Record<string, any>[]) {
+  private triggerCreate(dbRecords: Record<string, any>[]) {
     if (!this.options.onCreate || !dbRecords.length) return
 
-    const selectFields = await this.getSelectFields()
-    const outputRecords = await this.toOutput(dbRecords, selectFields)
-    this.options.onCreate(outputRecords)
+    this.options.onCreate(async () => {
+      const selectFields = await this.getSelectFields()
+      const outputRecords = await this.toOutput(dbRecords, selectFields)
+      return outputRecords
+    })
   }
 
-  private async triggerUpdate(beforeUpdateRecords: M[]) {
+  private triggerUpdate(beforeUpdateRecords: M[]) {
     if (!this.options.onUpdate || !beforeUpdateRecords.length) return
 
-    const model = await this.getCurrentModel()
-    const updateIds = beforeUpdateRecords.map((record) => record[CRUD.ID])
-    const crud = new CRUD<M>({
-      ...this.options,
-      modelName: model.name,
-      useApiName: false,
-      onCheckPermission: undefined,
-    })
-    const newRecords = await crud.find({
-      condition: {
-        op: 'in',
-        key: CRUD.ID,
-        value: updateIds,
-      },
-    })
+    this.options.onUpdate(async () => {
+      const model = await this.getCurrentModel()
+      const updateIds = beforeUpdateRecords.map((record) => record[CRUD.ID])
+      const crud = new CRUD<M>({
+        ...this.options,
+        modelName: model.name,
+        useApiName: false,
+        onCheckPermission: undefined,
+      })
+      const newRecords = await crud.find({
+        condition: {
+          op: 'in',
+          key: CRUD.ID,
+          value: updateIds,
+        },
+      })
+      const systemFieldNames = this.getSystemFields()
 
-    const updatedRecords: {
-      oldRecord: M
-      newRecord: M
-    }[] = []
+      const updatedRecords: {
+        oldRecord: M
+        newRecord: M
+        updateFieldNames: (keyof M & string)[]
+      }[] = []
 
-    for (const oldRecord of beforeUpdateRecords) {
-      const newRecord = newRecords.find(
-        (record) => record[CRUD.ID] === oldRecord[CRUD.ID],
-      )
-      if (!newRecord) continue
+      for (const oldRecord of beforeUpdateRecords) {
+        const newRecord = newRecords.find(
+          (record) => record[CRUD.ID] === oldRecord[CRUD.ID],
+        )
+        if (!newRecord) continue
 
-      for (const field of model.fields) {
-        const plugin = crudFieldPluginManager.getPlugin(field.type)
-        if (!plugin?.compare) {
-          if (oldRecord[field.name] !== newRecord[field.name]) {
-            updatedRecords.push({
-              oldRecord,
-              newRecord,
+        const updateFieldNames: (keyof M & string)[] = []
+        for (const field of model.fields) {
+          if (systemFieldNames.includes(field.name)) continue
+
+          const plugin = crudFieldPluginManager.getPlugin(field.type)
+          if (!plugin?.compare) {
+            if (oldRecord[field.name] !== newRecord[field.name]) {
+              updateFieldNames.push(field.name)
+            }
+          } else {
+            const isChanged = await plugin.compare({
+              schema: this.options.schema,
+              field,
+              useApiName: false,
+              value1: oldRecord[field.name],
+              value2: newRecord[field.name],
             })
-          }
-        } else {
-          const isChanged = await plugin.compare({
-            schema: this.options.schema,
-            field,
-            useApiName: false,
-            value1: oldRecord[field.name],
-            value2: newRecord[field.name],
-          })
 
-          if (isChanged) {
-            updatedRecords.push({
-              oldRecord,
-              newRecord,
-            })
+            if (isChanged) {
+              updateFieldNames.push(field.name)
+            }
           }
         }
+
+        if (updateFieldNames.length) {
+          updatedRecords.push({
+            oldRecord,
+            newRecord,
+            updateFieldNames,
+          })
+        }
       }
-    }
 
-    if (updatedRecords.length === 0) return
-
-    this.options.onUpdate(updatedRecords)
+      return updatedRecords
+    })
   }
 
-  private async triggerDelete(records: M[]) {
+  private triggerDelete(records: M[]) {
     if (!this.options.onDelete || !records.length) return
 
-    this.options.onDelete(records)
+    this.options.onDelete(async () => records)
   }
 }

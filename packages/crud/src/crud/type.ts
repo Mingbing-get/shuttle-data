@@ -34,14 +34,21 @@ export namespace NCRUD {
           condition?: DataCondition.Define<M>
         }
     >
-    onCreate?: <M extends Record<string, any>>(records: M[]) => void
-    onUpdate?: <M extends Record<string, any>>(
-      updatedRecords: {
-        oldRecord: M
-        newRecord: M
-      }[],
+    onCreate?: <M extends Record<string, any>>(
+      getNewRecords: () => Promise<M[]>,
     ) => void
-    onDelete?: <M extends Record<string, any>>(records: M[]) => void
+    onUpdate?: <M extends Record<string, any>>(
+      getUpdatedRecords: () => Promise<
+        {
+          oldRecord: M
+          newRecord: M
+          updateFieldNames: (keyof M & string)[]
+        }[]
+      >,
+    ) => void
+    onDelete?: <M extends Record<string, any>>(
+      getDeletedRecords: () => Promise<M[]>,
+    ) => void
   }
 
   export interface FieldPluginFnContext<T extends DataModel.FieldType> {
