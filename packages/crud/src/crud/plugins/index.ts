@@ -1,4 +1,5 @@
 import { DataModel } from '@shuttle-data/type'
+import { schemaFieldPluginManager } from '@shuttle-data/schema'
 import { NCRUD } from '../type'
 
 import StringFieldPlugin from './stringFieldPlugin'
@@ -41,6 +42,7 @@ class CRUDFieldPluginManager {
 
   use(plugin: NCRUD.FieldPlugin<DataModel.FieldType>) {
     this.plugins[plugin.type] = plugin
+    schemaFieldPluginManager.use(plugin)
   }
 
   getPlugin(type: DataModel.FieldType) {

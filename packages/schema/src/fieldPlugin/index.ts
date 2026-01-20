@@ -1,4 +1,4 @@
-import { DataModel } from '@shuttle-data/type'
+import { DataModel, dataModelManager } from '@shuttle-data/type'
 
 import { NDataModelSchema } from '../schema/type'
 
@@ -45,6 +45,7 @@ class SchemaFieldPluginManager {
 
   use(plugin: NDataModelSchema.FieldPlugin<DataModel.FieldType>) {
     this.plugins[plugin.type] = plugin
+    dataModelManager.use(plugin)
   }
 
   getPlugin(type: DataModel.FieldType) {

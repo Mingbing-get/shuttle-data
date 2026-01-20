@@ -1,5 +1,5 @@
 import { EnumFieldPlugin as _EnumFieldPlugin } from '@shuttle-data/schema'
-import { DataCondition, DataCRUD } from '@shuttle-data/type'
+import { DataCondition } from '@shuttle-data/type'
 
 import conditionPluginManager from '../conditionBuilder'
 import { NCRUD } from '../type'
@@ -118,7 +118,7 @@ export default class EnumFieldPlugin
     schema,
     field,
     useApiName,
-  }: NCRUD.FieldToOutputOption<'enum', undefined | string | string[]>) {
+  }: NCRUD.FieldToDbOption<'enum', undefined | string | string[]>) {
     if (!field.extra) {
       throw new Error('enum field extra is required')
     }

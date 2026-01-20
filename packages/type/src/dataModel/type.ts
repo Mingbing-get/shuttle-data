@@ -1,4 +1,4 @@
-import { ZodType } from 'zod'
+import { ZodObject } from 'zod'
 
 export namespace DataModel {
   export interface BaseField<T extends string, E = undefined> {
@@ -93,7 +93,7 @@ export namespace DataModel {
   export interface FieldPlugin<T extends FieldType> {
     readonly type: T
 
-    getZod(): ZodType<any, any>
+    getZod(): ZodObject<any, any>
 
     getTs(field: Extract<Field, { type: T }>, useApiName?: boolean): string
   }
