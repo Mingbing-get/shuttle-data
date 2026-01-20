@@ -5,11 +5,11 @@ import {
   StringFieldPlugin as _StringFieldPlugin,
 } from '@shuttle-data/type'
 
-import { NDataModelSchema, DataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class StringFieldPlugin
   extends _StringFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'string'>
+  implements DataModel.Schema.ServerFieldPlugin<'string'>
 {
   readonly canAsDisplay = true
 

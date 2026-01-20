@@ -1,4 +1,5 @@
-export * from './type'
+import './type'
+
 export { default as CRUD } from './instance'
 export * from './conditionBuilder'
 export { default as conditionPluginManager } from './conditionBuilder'

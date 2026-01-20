@@ -5,11 +5,11 @@ import {
   LookupFieldPlugin as _LookupFieldPlugin,
 } from '@shuttle-data/type'
 
-import { DataModelSchema, NDataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class LookupFieldPlugin
   extends _LookupFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'lookup'>
+  implements DataModel.Schema.ServerFieldPlugin<'lookup'>
 {
   fieldBuilder(
     table: Knex.CreateTableBuilder,

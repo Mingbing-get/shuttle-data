@@ -1,17 +1,17 @@
+import { DataCRUD } from '@shuttle-data/type'
 import { JsonFieldPlugin as _JsonFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class JsonFieldPlugin
   extends _JsonFieldPlugin
-  implements NCRUD.FieldPlugin<'json'>
+  implements DataCRUD.Server.FieldPlugin<'json'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'json', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'json', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -22,7 +22,7 @@ export default class JsonFieldPlugin
     )
   }
 
-  toDb({ values }: NCRUD.FieldToDbOption<'json', any>) {
+  toDb({ values }: DataCRUD.Server.FieldToDbOption<'json', any>) {
     if (!values?.length) return values
 
     return values.map((value) => {
@@ -33,7 +33,7 @@ export default class JsonFieldPlugin
     })
   }
 
-  toOutput({ values }: NCRUD.FieldToOutputOption<'json', any>) {
+  toOutput({ values }: DataCRUD.Server.FieldToOutputOption<'json', any>) {
     if (!values?.length) return values
 
     return values.map((value) => {
@@ -48,7 +48,7 @@ export default class JsonFieldPlugin
     })
   }
 
-  compare({ value1, value2 }: NCRUD.FieldCompareOption<'json', any>) {
+  compare({ value1, value2 }: DataCRUD.Server.FieldCompareOption<'json', any>) {
     const v1 =
       !!value1 && typeof value1 !== 'string' ? JSON.stringify(value1) : value1
     const v2 =

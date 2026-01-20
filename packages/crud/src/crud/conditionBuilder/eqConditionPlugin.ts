@@ -1,9 +1,8 @@
 import { Knex } from 'knex'
 import { DataCondition } from '@shuttle-data/type'
 
-import { NCRUD } from '../type'
-
-export default class EqConditionPlugin implements NCRUD.ConditionPlugin<'eq'> {
+export default class EqConditionPlugin implements DataCondition.Server
+  .Plugin<'eq'> {
   readonly op = 'eq'
 
   create<M extends Record<string, any>>(

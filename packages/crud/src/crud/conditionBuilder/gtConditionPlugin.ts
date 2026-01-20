@@ -1,9 +1,8 @@
 import { Knex } from 'knex'
 import { DataCondition } from '@shuttle-data/type'
 
-import { NCRUD } from '../type'
-
-export default class GtConditionPlugin implements NCRUD.ConditionPlugin<'gt'> {
+export default class GtConditionPlugin implements DataCondition.Server
+  .Plugin<'gt'> {
   readonly op = 'gt'
 
   create<M extends Record<string, any>>(

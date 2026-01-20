@@ -1,6 +1,5 @@
-import { DataModel } from '@shuttle-data/type'
+import { DataModel, DataCRUD } from '@shuttle-data/type'
 import { schemaFieldPluginManager } from '@shuttle-data/schema'
-import { NCRUD } from '../type'
 
 import StringFieldPlugin from './stringFieldPlugin'
 import BooleanFieldPlugin from './booleanFieldPlugin'
@@ -27,7 +26,10 @@ export {
 }
 
 class CRUDFieldPluginManager {
-  private plugins: Record<DataModel.FieldType, NCRUD.FieldPlugin<any>> = {
+  private plugins: Record<
+    DataModel.FieldType,
+    DataCRUD.Server.FieldPlugin<any>
+  > = {
     boolean: new BooleanFieldPlugin(),
     string: new StringFieldPlugin(),
     text: new TextFieldPlugin(),
@@ -40,7 +42,7 @@ class CRUDFieldPluginManager {
     json: new JsonFieldPlugin(),
   }
 
-  use(plugin: NCRUD.FieldPlugin<DataModel.FieldType>) {
+  use(plugin: DataCRUD.Server.FieldPlugin<DataModel.FieldType>) {
     this.plugins[plugin.type] = plugin
     schemaFieldPluginManager.use(plugin)
   }

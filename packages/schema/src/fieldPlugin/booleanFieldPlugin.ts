@@ -5,11 +5,11 @@ import {
   BooleanFieldPlugin as _BooleanFieldPlugin,
 } from '@shuttle-data/type'
 
-import { NDataModelSchema, DataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class BooleanFieldPlugin
   extends _BooleanFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'boolean'>
+  implements DataModel.Schema.ServerFieldPlugin<'boolean'>
 {
   fieldBuilder(
     table: Knex.CreateTableBuilder,

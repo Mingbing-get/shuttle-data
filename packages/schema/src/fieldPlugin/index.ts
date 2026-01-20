@@ -1,7 +1,5 @@
 import { DataModel, dataModelManager } from '@shuttle-data/type'
 
-import { NDataModelSchema } from '../schema/type'
-
 import StringFieldPlugin from './stringFieldPlugin'
 import BooleanFieldPlugin from './booleanFieldPlugin'
 import TextFieldPlugin from './textFieldPlugin'
@@ -29,7 +27,7 @@ export {
 class SchemaFieldPluginManager {
   private plugins: Record<
     DataModel.FieldType,
-    NDataModelSchema.FieldPlugin<any>
+    DataModel.Schema.ServerFieldPlugin<any>
   > = {
     boolean: new BooleanFieldPlugin(),
     string: new StringFieldPlugin(),
@@ -43,7 +41,7 @@ class SchemaFieldPluginManager {
     json: new JsonFieldPlugin(),
   }
 
-  use(plugin: NDataModelSchema.FieldPlugin<DataModel.FieldType>) {
+  use(plugin: DataModel.Schema.ServerFieldPlugin<DataModel.FieldType>) {
     this.plugins[plugin.type] = plugin
     dataModelManager.use(plugin)
   }

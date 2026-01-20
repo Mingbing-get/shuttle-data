@@ -1,17 +1,17 @@
+import { DataCRUD } from '@shuttle-data/type'
 import { StringFieldPlugin as _StringFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class StringFieldPlugin
   extends _StringFieldPlugin
-  implements NCRUD.FieldPlugin<'string'>
+  implements DataCRUD.Server.FieldPlugin<'string'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'string', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'string', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -25,7 +25,7 @@ export default class StringFieldPlugin
   async toDb({
     values,
     field,
-  }: NCRUD.FieldToDbOption<'string', string | undefined>) {
+  }: DataCRUD.Server.FieldToDbOption<'string', string | undefined>) {
     const maxLength = field.extra?.maxLength
     if (maxLength) {
       values.forEach((v) => {

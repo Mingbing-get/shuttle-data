@@ -1,12 +1,11 @@
 import { EnumFieldPlugin as _EnumFieldPlugin } from '@shuttle-data/schema'
-import { DataCondition } from '@shuttle-data/type'
+import { DataCondition, DataCRUD } from '@shuttle-data/type'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class EnumFieldPlugin
   extends _EnumFieldPlugin
-  implements NCRUD.FieldPlugin<'enum'>
+  implements DataCRUD.Server.FieldPlugin<'enum'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
@@ -14,7 +13,7 @@ export default class EnumFieldPlugin
     enumInfo,
     condition,
     useApiName,
-  }: NCRUD.FieldCreateConditionOption<'enum', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'enum', M>) {
     const newCondition = { ...condition, key: field.name }
     if (this.hasValueCondition(newCondition)) {
       if (useApiName) {
@@ -65,7 +64,10 @@ export default class EnumFieldPlugin
     schema,
     field,
     useApiName,
-  }: NCRUD.FieldToOutputOption<'enum', undefined | string | string[]>) {
+  }: DataCRUD.Server.FieldToOutputOption<
+    'enum',
+    undefined | string | string[]
+  >) {
     if (values.length === 0) return values
 
     if (!field.extra) {
@@ -118,7 +120,7 @@ export default class EnumFieldPlugin
     schema,
     field,
     useApiName,
-  }: NCRUD.FieldToDbOption<'enum', undefined | string | string[]>) {
+  }: DataCRUD.Server.FieldToDbOption<'enum', undefined | string | string[]>) {
     if (!field.extra) {
       throw new Error('enum field extra is required')
     }
@@ -193,7 +195,10 @@ export default class EnumFieldPlugin
     field,
     value1,
     value2,
-  }: NCRUD.FieldCompareOption<'enum', undefined | string | string[]>) {
+  }: DataCRUD.Server.FieldCompareOption<
+    'enum',
+    undefined | string | string[]
+  >) {
     if (!field.extra?.multiple) {
       return value1 === value2
     }

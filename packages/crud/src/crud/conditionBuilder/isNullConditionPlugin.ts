@@ -1,9 +1,8 @@
 import { Knex } from 'knex'
 import { DataCondition } from '@shuttle-data/type'
 
-import { NCRUD } from '../type'
-
-export default class IsNullConditionPlugin implements NCRUD.ConditionPlugin<'isNull'> {
+export default class IsNullConditionPlugin implements DataCondition.Server
+  .Plugin<'isNull'> {
   readonly op = 'isNull'
 
   create<M extends Record<string, any>>(

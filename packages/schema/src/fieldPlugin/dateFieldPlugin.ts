@@ -5,11 +5,11 @@ import {
   DateFieldPlugin as _DateFieldPlugin,
 } from '@shuttle-data/type'
 
-import { NDataModelSchema, DataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class DateFieldPlugin
   extends _DateFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'date'>
+  implements DataModel.Schema.ServerFieldPlugin<'date'>
 {
   fieldBuilder(
     table: Knex.CreateTableBuilder,

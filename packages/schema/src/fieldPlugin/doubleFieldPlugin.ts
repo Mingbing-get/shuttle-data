@@ -5,11 +5,11 @@ import {
   DoubleFieldPlugin as _DoubleFieldPlugin,
 } from '@shuttle-data/type'
 
-import { DataModelSchema, NDataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class DoubleFieldPlugin
   extends _DoubleFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'double'>
+  implements DataModel.Schema.ServerFieldPlugin<'double'>
 {
   readonly canAsDisplay = true
 

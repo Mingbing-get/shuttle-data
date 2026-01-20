@@ -5,11 +5,11 @@ import {
   JsonFieldPlugin as _JsonFieldPlugin,
 } from '@shuttle-data/type'
 
-import { DataModelSchema, NDataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class JsonFieldPlugin
   extends _JsonFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'json'>
+  implements DataModel.Schema.ServerFieldPlugin<'json'>
 {
   fieldBuilder(
     table: Knex.CreateTableBuilder,

@@ -1,17 +1,17 @@
+import { DataCRUD } from '@shuttle-data/type'
 import { NumberFieldPlugin as _NumberFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class NumberFieldPlugin
   extends _NumberFieldPlugin
-  implements NCRUD.FieldPlugin<'number'>
+  implements DataCRUD.Server.FieldPlugin<'number'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'number', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'number', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -33,7 +33,10 @@ export default class NumberFieldPlugin
     )
   }
 
-  toDb({ values, field }: NCRUD.FieldToDbOption<'number', number | undefined>) {
+  toDb({
+    values,
+    field,
+  }: DataCRUD.Server.FieldToDbOption<'number', number | undefined>) {
     const min = field.extra?.min
     const max = field.extra?.max
     const func = field.extra?.func || 'round'

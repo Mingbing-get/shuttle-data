@@ -1,9 +1,7 @@
 import { Knex } from 'knex'
-import { DataModel, dataModelManager } from '@shuttle-data/type'
+import { DataModel, DataEnum, dataModelManager } from '@shuttle-data/type'
 import { randomUUID } from 'node:crypto'
 
-import { NDataModelSchema } from './type'
-import { DataEnumManagerOptions } from '../enum/type'
 import DataEnumManager from '../enum'
 
 import schemaFieldPluginManager from '../fieldPlugin'
@@ -24,7 +22,7 @@ export default class Schema {
     resolve: () => void
   }[] = []
 
-  constructor(private options: NDataModelSchema.Options) {
+  constructor(private options: DataModel.Schema.ServerOptions) {
     if (options.dataModels) {
       this.dataModelCache = Promise.resolve(
         this.modelListToCache(options.dataModels),
@@ -897,7 +895,7 @@ export default class Schema {
 
   private getHistoryTableFields() {
     const historyTableFieldMap: Record<
-      keyof NDataModelSchema.DataHistory,
+      keyof DataModel.Schema.DataHistory,
       string
     > = {
       tableName: 'tableName',
@@ -951,7 +949,7 @@ export default class Schema {
 
   private async createModelTableIfNotExist(
     knex: Knex,
-    modelTableConfig: NDataModelSchema.ModelTableConfig,
+    modelTableConfig: DataModel.Schema.ModelTableConfig,
   ) {
     const hasModelTable = await knex.schema.hasTable(modelTableConfig.tableName)
     if (hasModelTable) return
@@ -974,7 +972,7 @@ export default class Schema {
 
   private async createFieldTableIfNotExist(
     knex: Knex,
-    fieldConfig: NDataModelSchema.ModelFieldConfig,
+    fieldConfig: DataModel.Schema.ModelFieldConfig,
   ) {
     const hasFieldTable = await knex.schema.hasTable(fieldConfig.tableName)
     if (hasFieldTable) return
@@ -999,7 +997,7 @@ export default class Schema {
 
   private async createHistoryTableIfNotExist(
     knex: Knex,
-    historyConfig: NDataModelSchema.DataHistoryConfig,
+    historyConfig: DataModel.Schema.DataHistoryConfig,
   ) {
     const hasHistoryTable = await knex.schema.hasTable(historyConfig.tableName)
     if (hasHistoryTable) return
@@ -1219,7 +1217,7 @@ export default class Schema {
       }
     }
 
-    return new DataEnumManager(options as DataEnumManagerOptions)
+    return new DataEnumManager(options as DataEnum.ServerManagerOptions)
   }
 
   private modelListToCache(models: DataModel.Define[]) {
@@ -1236,7 +1234,7 @@ export default class Schema {
   }
 
   private createCustomRecord<T>(
-    custom: Partial<Record<keyof T, NDataModelSchema.CustomField<T>>>,
+    custom: Partial<Record<keyof T, DataModel.Schema.CustomField<T>>>,
     v: T,
   ) {
     const customRecord: Record<keyof T, any> = {} as Record<keyof T, any>

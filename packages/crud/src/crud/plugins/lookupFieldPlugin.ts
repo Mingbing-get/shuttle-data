@@ -3,17 +3,16 @@ import { DataCRUD } from '@shuttle-data/type'
 
 import CRUD from '../instance'
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class LookupFieldPlugin
   extends _LookupFieldPlugin
-  implements NCRUD.FieldPlugin<'lookup'>
+  implements DataCRUD.Server.FieldPlugin<'lookup'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'lookup', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'lookup', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -38,7 +37,10 @@ export default class LookupFieldPlugin
     schema,
     getKnex,
     field,
-  }: NCRUD.FieldToOutputOption<'lookup', undefined | string | string[]>) {
+  }: DataCRUD.Server.FieldToOutputOption<
+    'lookup',
+    undefined | string | string[]
+  >) {
     if (values.length === 0) return []
 
     if (!field.extra) {
@@ -102,7 +104,7 @@ export default class LookupFieldPlugin
   async toDb({
     values,
     field,
-  }: NCRUD.FieldToDbOption<
+  }: DataCRUD.Server.FieldToDbOption<
     'lookup',
     undefined | DataCRUD.LookupInRecord | DataCRUD.LookupInRecord[]
   >) {
@@ -129,7 +131,10 @@ export default class LookupFieldPlugin
     field,
     value1,
     value2,
-  }: NCRUD.FieldCompareOption<'lookup', undefined | string | string[]>) {
+  }: DataCRUD.Server.FieldCompareOption<
+    'lookup',
+    undefined | string | string[]
+  >) {
     if (!field.extra?.multiple) {
       return value1 === value2
     }

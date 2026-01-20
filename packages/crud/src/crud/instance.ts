@@ -8,8 +8,6 @@ import {
 
 import crudFieldPluginManager from './plugins'
 
-import type { NCRUD } from './type'
-
 export default class CRUD<M extends Record<string, any>> {
   static readonly ID = '_id'
   static readonly DISPLAY = '_display'
@@ -19,7 +17,7 @@ export default class CRUD<M extends Record<string, any>> {
   static readonly UPDATED_BY = '_updatedBy'
   static readonly IS_DELETE = '_isDelete'
 
-  constructor(private options: NCRUD.Options) {}
+  constructor(private options: DataCRUD.Server.Options) {}
 
   async findOne(
     option: DataCRUD.FineOneOption<M> = {},
@@ -551,7 +549,7 @@ export default class CRUD<M extends Record<string, any>> {
       string,
       {
         field: DataModel.Field
-        plugin: NCRUD.FieldPlugin<any>
+        plugin: DataCRUD.Server.FieldPlugin<any>
       }
     > = {}
     for (const key in selectFields) {
@@ -614,7 +612,7 @@ export default class CRUD<M extends Record<string, any>> {
       string,
       {
         field: DataModel.Field
-        plugin: NCRUD.FieldPlugin<any>
+        plugin: DataCRUD.Server.FieldPlugin<any>
       }
     > = {}
     const skipFieldNames = [
@@ -707,7 +705,7 @@ export default class CRUD<M extends Record<string, any>> {
   }
 
   private async checkPermission(
-    type: NCRUD.CheckPermissionOptions<M>['type'],
+    type: DataCRUD.Server.CheckPermissionOptions<M>['type'],
     fields?: DataCRUD.SelectField<M>[],
   ) {
     const { onCheckPermission } = this.options

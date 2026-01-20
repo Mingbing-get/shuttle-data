@@ -5,11 +5,11 @@ import {
   TextFieldPlugin as _TextFieldPlugin,
 } from '@shuttle-data/type'
 
-import { DataModelSchema, NDataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class TextFieldPlugin
   extends _TextFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'text'>
+  implements DataModel.Schema.ServerFieldPlugin<'text'>
 {
   readonly canAsDisplay = true
 

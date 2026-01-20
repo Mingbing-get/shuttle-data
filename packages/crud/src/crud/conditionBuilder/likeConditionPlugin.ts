@@ -1,9 +1,8 @@
 import { Knex } from 'knex'
 import { DataCondition } from '@shuttle-data/type'
 
-import { NCRUD } from '../type'
-
-export default class LikeConditionPlugin implements NCRUD.ConditionPlugin<'like'> {
+export default class LikeConditionPlugin implements DataCondition.Server
+  .Plugin<'like'> {
   readonly op = 'like'
 
   create<M extends Record<string, any>>(

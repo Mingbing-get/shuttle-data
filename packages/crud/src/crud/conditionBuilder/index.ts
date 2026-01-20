@@ -20,8 +20,6 @@ import NotAnyOfConditionPlugin from './notAnyOfConditionPlugin'
 import NotLikeConditionPlugin from './notLikeConditionPlugin'
 import NotContainsConditionPlugin from './notContainsConditionPlugin'
 
-import { NCRUD } from '../type'
-
 export {
   EqConditionPlugin,
   IsNullConditionPlugin,
@@ -46,7 +44,7 @@ export {
 class ConditionPliuginManager {
   private pluginMap: Record<
     Exclude<DataCondition.Op, 'and' | 'or'>,
-    NCRUD.ConditionPlugin<any>
+    DataCondition.Server.Plugin<any>
   > = {
     eq: new EqConditionPlugin(),
     neq: new NeqConditionPlugin(),
@@ -69,7 +67,7 @@ class ConditionPliuginManager {
   }
 
   use<T extends Exclude<DataCondition.Op, 'and' | 'or'>>(
-    plugin: NCRUD.ConditionPlugin<T>,
+    plugin: DataCondition.Server.Plugin<T>,
   ) {
     this.pluginMap[plugin.op] = plugin
   }

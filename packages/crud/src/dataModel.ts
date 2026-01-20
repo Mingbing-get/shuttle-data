@@ -1,10 +1,14 @@
-import { DataModelSchema, NDataModelSchema } from '@shuttle-data/schema'
-import { CRUD, NCRUD } from './crud'
+import { DataCRUD, DataModel as NDataModel } from '@shuttle-data/type'
+import { DataModelSchema } from '@shuttle-data/schema'
+import { CRUD } from './crud'
 
-type CRUDOptions = Pick<NCRUD.Options, 'modelName' | 'useApiName' | 'context'>
+type CRUDOptions = Pick<
+  DataCRUD.Server.Options,
+  'modelName' | 'useApiName' | 'context'
+>
 
 interface DataModelOptions extends Pick<
-  NCRUD.Options,
+  DataCRUD.Server.Options,
   'generateId' | 'getKnex' | 'onCheckPermission'
 > {
   onCreate?: <M extends Record<string, any>>(
@@ -38,7 +42,7 @@ export default class DataModel {
 
   constructor(
     private options: DataModelOptions,
-    schemaOptions: NDataModelSchema.Options,
+    schemaOptions: NDataModel.Schema.ServerOptions,
   ) {
     this.schema = new DataModelSchema(schemaOptions)
   }

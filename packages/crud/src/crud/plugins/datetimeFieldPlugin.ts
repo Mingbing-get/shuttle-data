@@ -1,17 +1,17 @@
+import { DataCRUD } from '@shuttle-data/type'
 import { DatetimeFieldPlugin as _DatetimeFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class DatetimeFieldPlugin
   extends _DatetimeFieldPlugin
-  implements NCRUD.FieldPlugin<'datetime'>
+  implements DataCRUD.Server.FieldPlugin<'datetime'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'datetime', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'datetime', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -36,7 +36,7 @@ export default class DatetimeFieldPlugin
   compare({
     value1,
     value2,
-  }: NCRUD.FieldCompareOption<'datetime', Date | string>) {
+  }: DataCRUD.Server.FieldCompareOption<'datetime', Date | string>) {
     const v1 = value1 instanceof Date ? value1.toISOString() : value1
 
     const v2 = value2 instanceof Date ? value2.toISOString() : value2

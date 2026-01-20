@@ -1,17 +1,17 @@
+import { DataCRUD } from '@shuttle-data/type'
 import { DoubleFieldPlugin as _DoubleFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
-import { NCRUD } from '../type'
 
 export default class DoubleFieldPlugin
   extends _DoubleFieldPlugin
-  implements NCRUD.FieldPlugin<'double'>
+  implements DataCRUD.Server.FieldPlugin<'double'>
 {
   createCondition<M extends Record<string, any>>({
     builder,
     field,
     condition,
-  }: NCRUD.FieldCreateConditionOption<'double', M>) {
+  }: DataCRUD.Server.FieldCreateConditionOption<'double', M>) {
     conditionPluginManager.create(
       builder,
       {
@@ -33,7 +33,7 @@ export default class DoubleFieldPlugin
     )
   }
 
-  toDb({ values, field }: NCRUD.FieldToDbOption<'double', number>) {
+  toDb({ values, field }: DataCRUD.Server.FieldToDbOption<'double', number>) {
     const min = field.extra?.min
     const max = field.extra?.max
     const decimal = field.extra?.decimal

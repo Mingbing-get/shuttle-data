@@ -5,11 +5,11 @@ import {
   NumberFieldPlugin as _NumberFieldPlugin,
 } from '@shuttle-data/type'
 
-import { NDataModelSchema, DataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class NumberFieldPlugin
   extends _NumberFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'number'>
+  implements DataModel.Schema.ServerFieldPlugin<'number'>
 {
   readonly canAsDisplay = true
 

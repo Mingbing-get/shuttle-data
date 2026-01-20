@@ -1,9 +1,8 @@
 import { Knex } from 'knex'
 import { DataCondition } from '@shuttle-data/type'
 
-import { NCRUD } from '../type'
-
-export default class NotInConditionPlugin implements NCRUD.ConditionPlugin<'notIn'> {
+export default class NotInConditionPlugin implements DataCondition.Server
+  .Plugin<'notIn'> {
   readonly op = 'notIn'
 
   create<M extends Record<string, any>>(

@@ -2,7 +2,7 @@ import {
   DataEnumManager as _DataEnumManager,
   DataEnum,
 } from '@shuttle-data/type'
-import { DataEnumManagerOptions, GroupTableConfig, CustomField } from './type'
+import './type'
 
 export default class DataEnumManager extends _DataEnumManager {
   private enumCache:
@@ -12,7 +12,7 @@ export default class DataEnumManager extends _DataEnumManager {
       }>
     | undefined
 
-  constructor(private options: DataEnumManagerOptions) {
+  constructor(private options: DataEnum.ServerManagerOptions) {
     super()
 
     if (options.enumGroup) {
@@ -585,7 +585,9 @@ export default class DataEnumManager extends _DataEnumManager {
     itemZod.parse(item)
   }
 
-  private async createGroupTableIfNotExist(groupTableConfig: GroupTableConfig) {
+  private async createGroupTableIfNotExist(
+    groupTableConfig: DataEnum.GroupTableConfig,
+  ) {
     const hasGroupTable = await groupTableConfig.knex.schema.hasTable(
       groupTableConfig.tableName,
     )
@@ -608,7 +610,9 @@ export default class DataEnumManager extends _DataEnumManager {
     )
   }
 
-  private async createItemTableIfNotExist(groupTableConfig: GroupTableConfig) {
+  private async createItemTableIfNotExist(
+    groupTableConfig: DataEnum.GroupTableConfig,
+  ) {
     const hasItemTable = await groupTableConfig.knex.schema.hasTable(
       groupTableConfig.itemTableConfig.tableName,
     )
@@ -702,7 +706,7 @@ export default class DataEnumManager extends _DataEnumManager {
   }
 
   private createCustomRecord<T>(
-    custom: Partial<Record<keyof T, CustomField<T>>>,
+    custom: Partial<Record<keyof T, DataEnum.CustomField<T>>>,
     v: T,
   ) {
     const customRecord: Record<keyof T, any> = {} as Record<keyof T, any>

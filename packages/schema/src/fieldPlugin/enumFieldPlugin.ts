@@ -5,11 +5,11 @@ import {
   EnumFieldPlugin as _EnumFieldPlugin,
 } from '@shuttle-data/type'
 
-import { DataModelSchema, NDataModelSchema } from '../schema'
+import { DataModelSchema } from '../schema'
 
 export default class EnumFieldPlugin
   extends _EnumFieldPlugin
-  implements NDataModelSchema.FieldPlugin<'enum'>
+  implements DataModel.Schema.ServerFieldPlugin<'enum'>
 {
   fieldBuilder(
     table: Knex.CreateTableBuilder,
