@@ -1,4 +1,4 @@
-import { AxiosHeaders, AxiosResponse, Method } from 'axios'
+import { NHttpTransporter } from '../transporter'
 
 declare module '@shuttle-data/type' {
   export namespace DataEnum {}
@@ -36,36 +36,32 @@ declare module '@shuttle-data/type' {
         tables?: DataModel.Define[]
       }
 
-      export interface MethodConfig<T> {
-        path?: string
-        method?: Method
-        beforeSend?: (data: T) => Promise<T>
-        afterSend?: (response: AxiosResponse) => Promise<void>
-      }
-
-      export interface HttpTransporterOptions {
-        baseUrl?: string
-        requestHeaders?: AxiosHeaders
-        afterSend?: (response: AxiosResponse) => Promise<void>
-        createTable?: MethodConfig<WithoutNameModel>
-        updateTable?: MethodConfig<WhenUpdateModel>
-        dropTable?: MethodConfig<{ name: string; useApiName?: boolean }>
-        addField?: MethodConfig<{
+      export interface HttpTransporterOptions extends NHttpTransporter.Options {
+        createTable?: NHttpTransporter.MethodConfig<WithoutNameModel>
+        updateTable?: NHttpTransporter.MethodConfig<WhenUpdateModel>
+        dropTable?: NHttpTransporter.MethodConfig<{
+          name: string
+          useApiName?: boolean
+        }>
+        addField?: NHttpTransporter.MethodConfig<{
           tableName: string
           field: WithoutNameField
           useApiName?: boolean
         }>
-        updateField?: MethodConfig<{
+        updateField?: NHttpTransporter.MethodConfig<{
           tableName: string
           field: DataModel.Field
           useApiName?: boolean
         }>
-        dropField?: MethodConfig<{
+        dropField?: NHttpTransporter.MethodConfig<{
           tableName: string
           fieldName: string
           useApiName?: boolean
         }>
-        getTable?: MethodConfig<{ tableName: string; useApiName?: boolean }>
+        getTable?: NHttpTransporter.MethodConfig<{
+          tableName: string
+          useApiName?: boolean
+        }>
       }
     }
 

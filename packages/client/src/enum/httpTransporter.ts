@@ -1,31 +1,24 @@
-import axios from 'axios'
 import { DataEnum } from '@shuttle-data/type'
+import { BaseHttpTransporter } from '../transporter'
 
-export default class HttpTransporter implements DataEnum.Transporter {
-  constructor(private options?: DataEnum.HttpTransporterOptions) {}
+export default class HttpTransporter
+  extends BaseHttpTransporter
+  implements DataEnum.Transporter
+{
+  constructor(private options?: DataEnum.HttpTransporterOptions) {
+    super(options)
+  }
 
   async addGroup(group: DataEnum.WithoutNameGroup): Promise<void> {
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.addGroup?.path || '/addGroup'}`,
-      method: this.options?.addGroup?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.addGroup?.beforeSend?.(group)) || group,
+    this.request(this.options?.addGroup, group, {
+      defaultPath: '/addGroup',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.addGroup?.afterSend?.(response)
   }
 
   async updateGroup(group: DataEnum.WhenUpdateGroup): Promise<void> {
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.updateGroup?.path || '/updateGroup'}`,
-      method: this.options?.updateGroup?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.updateGroup?.beforeSend?.(group)) || group,
+    this.request(this.options?.updateGroup, group, {
+      defaultPath: '/updateGroup',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.updateGroup?.afterSend?.(response)
   }
 
   async removeGroup(name: string, useApiName?: boolean): Promise<void> {
@@ -34,15 +27,9 @@ export default class HttpTransporter implements DataEnum.Transporter {
       useApiName,
     }
 
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.removeGroup?.path || '/removeGroup'}`,
-      method: this.options?.removeGroup?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.removeGroup?.beforeSend?.(data)) || data,
+    this.request(this.options?.removeGroup, data, {
+      defaultPath: '/removeGroup',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.removeGroup?.afterSend?.(response)
   }
 
   async addItem(
@@ -56,15 +43,9 @@ export default class HttpTransporter implements DataEnum.Transporter {
       useApiName,
     }
 
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.addItem?.path || '/addItem'}`,
-      method: this.options?.addItem?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.addItem?.beforeSend?.(data)) || data,
+    this.request(this.options?.addItem, data, {
+      defaultPath: '/addItem',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.addItem?.afterSend?.(response)
   }
 
   async updateItem(
@@ -78,15 +59,9 @@ export default class HttpTransporter implements DataEnum.Transporter {
       useApiName,
     }
 
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.updateItem?.path || '/updateItem'}`,
-      method: this.options?.updateItem?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.updateItem?.beforeSend?.(data)) || data,
+    this.request(this.options?.updateItem, data, {
+      defaultPath: '/updateItem',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.updateItem?.afterSend?.(response)
   }
 
   async updateItemDisable(
@@ -102,15 +77,9 @@ export default class HttpTransporter implements DataEnum.Transporter {
       disabled,
     }
 
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.updateItemDisable?.path || '/updateItemDisable'}`,
-      method: this.options?.updateItemDisable?.method || 'POST',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.updateItemDisable?.beforeSend?.(data)) || data,
+    this.request(this.options?.updateItemDisable, data, {
+      defaultPath: '/updateItemDisable',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.updateItemDisable?.afterSend?.(response)
   }
 
   async getGroup(
@@ -122,16 +91,9 @@ export default class HttpTransporter implements DataEnum.Transporter {
       useApiName,
     }
 
-    const response = await axios({
-      url: `${this.options?.baseUrl || ''}${this.options?.getGroup?.path || '/getGroup'}`,
-      method: this.options?.getGroup?.method || 'GET',
-      headers: this.options?.requestHeaders,
-      data: (await this.options?.getGroup?.beforeSend?.(data)) || data,
+    return this.request(this.options?.getGroup, data, {
+      defaultPath: '/getGroup',
+      defaultMethod: 'GET',
     })
-
-    await this.options?.afterSend?.(response)
-    await this.options?.getGroup?.afterSend?.(response)
-
-    return response.data
   }
 }

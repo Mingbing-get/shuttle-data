@@ -1,4 +1,4 @@
-import { AxiosHeaders, AxiosResponse, Method as AxiosMethod } from 'axios'
+import { NHttpTransporter } from '../transporter'
 
 declare module '@shuttle-data/type' {
   export namespace DataModel {}
@@ -44,28 +44,24 @@ declare module '@shuttle-data/type' {
         transporter: Transporter
       }
 
-      export interface MethodConfig<T> {
-        path?: string
-        method?: AxiosMethod
-        beforeSend?: (data: T) => Promise<T>
-        afterSend?: (response: AxiosResponse) => Promise<void>
-      }
-
-      export interface HttpTransporterOptions {
-        baseUrl?: string
-        requestHeaders?: AxiosHeaders
-        afterSend?: (response: AxiosResponse) => Promise<void>
-        findOne?: MethodConfig<FineOneOption<any> & ModelConfig>
-        find?: MethodConfig<FindOption<any> & ModelConfig>
-        count?: MethodConfig<CountOption<any> & ModelConfig>
-        create?: MethodConfig<CreateOption<any> & ModelConfig>
-        batchCreate?: MethodConfig<BatchCreateOption<any> & ModelConfig>
-        update?: MethodConfig<
+      export interface HttpTransporterOptions extends NHttpTransporter.Options {
+        findOne?: NHttpTransporter.MethodConfig<
+          FineOneOption<any> & ModelConfig
+        >
+        find?: NHttpTransporter.MethodConfig<FindOption<any> & ModelConfig>
+        count?: NHttpTransporter.MethodConfig<CountOption<any> & ModelConfig>
+        create?: NHttpTransporter.MethodConfig<CreateOption<any> & ModelConfig>
+        batchCreate?: NHttpTransporter.MethodConfig<
+          BatchCreateOption<any> & ModelConfig
+        >
+        update?: NHttpTransporter.MethodConfig<
           | (UpdateOption<any> & ModelConfig)
           | (UpdateWithIdOption<any> & ModelConfig)
         >
-        del?: MethodConfig<DelOption<any> & ModelConfig>
-        queryGroupBy?: MethodConfig<QueryGroupByOption<any, any> & ModelConfig>
+        del?: NHttpTransporter.MethodConfig<DelOption<any> & ModelConfig>
+        queryGroupBy?: NHttpTransporter.MethodConfig<
+          QueryGroupByOption<any, any> & ModelConfig
+        >
       }
     }
   }

@@ -1,4 +1,4 @@
-import { AxiosHeaders, AxiosResponse, Method } from 'axios'
+import { NHttpTransporter } from '../transporter'
 
 declare module '@shuttle-data/type' {
   export namespace DataModel {}
@@ -46,37 +46,33 @@ declare module '@shuttle-data/type' {
       items: (WithoutNameItem | DataEnum.Item)[]
     }
 
-    export interface MethodConfig<T> {
-      path?: string
-      method?: Method
-      beforeSend?: (data: T) => Promise<T>
-      afterSend?: (response: AxiosResponse) => Promise<void>
-    }
-
-    export interface HttpTransporterOptions {
-      baseUrl?: string
-      requestHeaders?: AxiosHeaders
-      afterSend?: (response: AxiosResponse) => Promise<void>
-      addGroup?: MethodConfig<WithoutNameGroup>
-      updateGroup?: MethodConfig<WhenUpdateGroup>
-      removeGroup?: MethodConfig<{ name: string; useApiName?: boolean }>
-      addItem?: MethodConfig<{
+    export interface HttpTransporterOptions extends NHttpTransporter.Options {
+      addGroup?: NHttpTransporter.MethodConfig<WithoutNameGroup>
+      updateGroup?: NHttpTransporter.MethodConfig<WhenUpdateGroup>
+      removeGroup?: NHttpTransporter.MethodConfig<{
+        name: string
+        useApiName?: boolean
+      }>
+      addItem?: NHttpTransporter.MethodConfig<{
         groupName: string
         item: WithoutNameItem
         useApiName?: boolean
       }>
-      updateItem?: MethodConfig<{
+      updateItem?: NHttpTransporter.MethodConfig<{
         groupName: string
         item: DataEnum.Item
         useApiName?: boolean
       }>
-      updateItemDisable?: MethodConfig<{
+      updateItemDisable?: NHttpTransporter.MethodConfig<{
         groupName: string
         itemName: string
         useApiName?: boolean
         disabled?: boolean
       }>
-      getGroup?: MethodConfig<{ groupName: string; useApiName?: boolean }>
+      getGroup?: NHttpTransporter.MethodConfig<{
+        groupName: string
+        useApiName?: boolean
+      }>
     }
   }
 }
