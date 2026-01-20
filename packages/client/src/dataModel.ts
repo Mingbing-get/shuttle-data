@@ -1,13 +1,11 @@
-import { DataModel as NDataModel, DataEnum } from '@shuttle-data/type'
+import { DataModel as NDataModel, DataEnum, DataCRUD } from '@shuttle-data/type'
 import { DataModelSchema } from './schema'
 import { DataEnumManager } from './enum'
-import { CRUD, NCRUD } from './crud'
-
-type CRUDOptions = Pick<NCRUD.Options, 'modelName' | 'useApiName' | 'context'>
+import { CRUD } from './crud'
 
 interface DataModelOptions extends Pick<
-  NCRUD.Options,
-  'generateId' | 'getKnex' | 'onCheckPermission'
+  DataCRUD.Client.Options,
+  'transporter'
 > {}
 
 export default class DataModel {
@@ -23,34 +21,10 @@ export default class DataModel {
     this.enumManager = new DataEnumManager(enumOptions)
   }
 
-  crud<M extends Record<string, any>>(options: CRUDOptions) {
+  crud<M extends Record<string, any>>(options: DataCRUD.Client.ModelConfig) {
     return new CRUD<M>({
       ...options,
-      schema: this.schema,
-      generateId: this.options.generateId,
-      getKnex: this.options.getKnex,
-      onCheckPermission: this.options.onCheckPermission,
-      onCreate: (getNewRecords) => {
-        this.options.onCreate?.({
-          ...options,
-          getNewRecords,
-          dataModel: this,
-        })
-      },
-      onUpdate: (getUpdatedRecords) => {
-        this.options.onUpdate?.({
-          ...options,
-          getUpdatedRecords,
-          dataModel: this,
-        })
-      },
-      onDelete: (getDeletedRecords) => {
-        this.options.onDelete?.({
-          ...options,
-          getDeletedRecords,
-          dataModel: this,
-        })
-      },
+      transporter: this.options.transporter,
     })
   }
 }
