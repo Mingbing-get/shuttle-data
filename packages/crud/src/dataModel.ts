@@ -1,11 +1,7 @@
 import { DataCRUD, DataModel as NDataModel } from '@shuttle-data/type'
 import { DataModelSchema } from '@shuttle-data/schema'
 import { CRUD } from './crud'
-
-type CRUDOptions = Pick<
-  DataCRUD.Server.Options,
-  'modelName' | 'useApiName' | 'context'
->
+import { Transtion, CRUDOptions } from './transtion'
 
 interface DataModelOptions extends Pick<
   DataCRUD.Server.Options,
@@ -47,34 +43,53 @@ export default class DataModel {
     this.schema = new DataModelSchema(schemaOptions)
   }
 
+  async transtion(dataSourceName: string) {
+    const knex = await this.options.getKnex(dataSourceName)
+
+    const trx = await knex.transaction()
+
+    return new Transtion(trx, (modelInfo) => this.createCrudOptions(modelInfo))
+  }
+
   crud<M extends Record<string, any>>(options: CRUDOptions) {
     return new CRUD<M>({
       ...options,
+      getKnex: this.options.getKnex,
+      ...this.createCrudOptions(options),
+    })
+  }
+
+  private createCrudOptions(modelInfo: CRUDOptions) {
+    const crudOptions: Omit<
+      DataCRUD.Server.Options,
+      keyof CRUDOptions | 'getKnex'
+    > = {
       schema: this.schema,
       generateId: this.options.generateId,
-      getKnex: this.options.getKnex,
       onCheckPermission: this.options.onCheckPermission,
       onCreate: (getNewRecords) => {
         this.options.onCreate?.({
-          ...options,
+          ...modelInfo,
           getNewRecords,
           dataModel: this,
         })
       },
       onUpdate: (getUpdatedRecords) => {
         this.options.onUpdate?.({
-          ...options,
+          ...modelInfo,
           getUpdatedRecords,
           dataModel: this,
         })
       },
       onDelete: (getDeletedRecords) => {
         this.options.onDelete?.({
-          ...options,
+          ...modelInfo,
           getDeletedRecords,
           dataModel: this,
         })
       },
-    })
+    }
+
+    return crudOptions
   }
 }
