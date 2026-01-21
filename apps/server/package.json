@@ -32,7 +32,9 @@
     "knex": "^3.1.0",
     "mysql2": "^3.9.1",
     "koa-mount": "^4.2.0",
-    "@shuttle-data/crud": "workspace:*"
+    "string-random": "^1.0.0",
+    "@shuttle-data/crud": "workspace:*",
+    "@shuttle-data/type": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.7.1",

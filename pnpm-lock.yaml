@@ -98,6 +98,9 @@ importers:
       '@shuttle-data/crud':
         specifier: workspace:*
         version: link:../../packages/crud
+      '@shuttle-data/type':
+        specifier: workspace:*
+        version: link:../../packages/type
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -116,6 +119,9 @@ importers:
       mysql2:
         specifier: ^3.9.1
         version: 3.16.0
+      string-random:
+        specifier: ^1.0.0
+        version: 1.0.0
     devDependencies:
       '@types/koa':
         specifier: ^3.0.1
@@ -7345,6 +7351,10 @@ packages:
       char-regex: 1.0.2
       strip-ansi: 6.0.1
     dev: true
+
+  /string-random@1.0.0:
+    resolution: {integrity: sha512-LDgy8PDqsWJasulM3UYKWJQjamjHc3MPjrRpBm3SfoQdTFL5FPRA7KZ0A10hIhqCmtgPx7AxWrAX94Q7ipQIWg==}
+    dev: false
 
   /string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}

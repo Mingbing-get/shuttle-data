@@ -3,7 +3,11 @@ import cors from '@koa/cors'
 import koaBody from 'koa-body'
 import mount from 'koa-mount'
 
+import errorHandle from './middleware/errorHandle'
+import { jwtVerify } from './middleware/jwt'
 import dataModelRouter from './router/dataModel'
+
+import './global.d.ts'
 
 main()
 
@@ -16,6 +20,12 @@ async function main() {
 
   // 配置koa-body中间件
   app.use(koaBody())
+
+  // 配置错误处理中间件
+  app.use(errorHandle)
+
+  // 配置JWT验证中间件
+  app.use(jwtVerify)
 
   app.use(mount('/dataModel', dataModelRouter.routes()))
 

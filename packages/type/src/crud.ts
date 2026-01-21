@@ -45,6 +45,7 @@ export namespace DataCRUD {
     | 'del'
     | 'update'
     | 'create'
+    | 'batchCreate'
     | 'queryGroupBy'
 
   export interface FindOption<M extends Record<string, any>> {
