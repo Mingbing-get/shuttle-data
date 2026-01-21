@@ -10,6 +10,20 @@ const dataModel = new DataModel(
   },
   {
     knex: db,
+    modelTableConfig: {
+      tableName: '_model',
+      fieldConfig: {
+        tableName: '_field',
+      },
+    },
+    enumSourceConfig: {
+      groupTableConfig: {
+        tableName: '_group',
+        itemTableConfig: {
+          tableName: '_item',
+        },
+      },
+    },
   },
 )
 
