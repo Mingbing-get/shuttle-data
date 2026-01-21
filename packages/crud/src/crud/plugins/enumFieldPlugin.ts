@@ -74,8 +74,7 @@ export default class EnumFieldPlugin
       throw new Error('enum field extra is required')
     }
 
-    const enumManager = schema.getEnumManager()
-    const group = await enumManager.getGroup(field.extra.groupName)
+    const group = await schema.enumManager.getGroup(field.extra.groupName)
     if (!group) {
       throw new Error(`enum group ${field.extra.groupName} not found`)
     }
@@ -125,8 +124,7 @@ export default class EnumFieldPlugin
       throw new Error('enum field extra is required')
     }
 
-    const enumManager = schema.getEnumManager()
-    const group = await enumManager.getGroup(field.extra.groupName)
+    const group = await schema.enumManager.getGroup(field.extra.groupName)
     if (!group) {
       throw new Error(`enum group ${field.extra.groupName} not found`)
     }

@@ -29,8 +29,7 @@ export default class EnumFieldPlugin
       throw new Error(`enum field ${field.name} must have groupName`)
     }
 
-    const enumManager = schema.getEnumManager()
-    const hasGroup = await enumManager.hasGroup(field.extra.groupName)
+    const hasGroup = await schema.enumManager.hasGroup(field.extra.groupName)
     if (!hasGroup) {
       throw new Error(
         `enum field ${field.name} group name ${field.extra.groupName} not found`,

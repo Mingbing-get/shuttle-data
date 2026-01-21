@@ -6,6 +6,7 @@ import mount from 'koa-mount'
 import errorHandle from './middleware/errorHandle'
 import { jwtVerify } from './middleware/jwt'
 import dataModelRouter from './router/dataModel'
+import dataEnumRouter from './router/dataEnum'
 
 import './global.d.ts'
 
@@ -28,6 +29,7 @@ async function main() {
   app.use(jwtVerify)
 
   app.use(mount('/dataModel', dataModelRouter.routes()))
+  app.use(mount('/dataEnum', dataEnumRouter.routes()))
 
   // 错误处理中间件
   app.use(async (ctx, next) => {

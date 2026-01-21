@@ -39,7 +39,7 @@ export default class CRUD<M extends Record<string, any>> {
       )
       if (!checkpermissionRes) return []
 
-      const enumInfo = await this.options.schema.getEnumManager().all()
+      const enumInfo = await this.options.schema.enumManager.all()
       const model = await this.getCurrentModel()
       const selectFields = this.omitFields(
         await this.getSelectFields(option.fields),
@@ -95,7 +95,7 @@ export default class CRUD<M extends Record<string, any>> {
       const checkpermissionRes = await this.checkPermission('read')
       if (!checkpermissionRes) return 0
 
-      const enumInfo = await this.options.schema.getEnumManager().all()
+      const enumInfo = await this.options.schema.enumManager.all()
       const model = await this.getCurrentModel()
       const knex = await this.options.getKnex(model.dataSourceName)
       const builder = knex(model.name)
@@ -323,7 +323,7 @@ export default class CRUD<M extends Record<string, any>> {
       ])
       if (!checkpermissionRes) return []
 
-      const enumInfo = await this.options.schema.getEnumManager().all()
+      const enumInfo = await this.options.schema.enumManager.all()
       const aggFieldMap = await this.getSelectFields([aggField])
       const groupByFieldsMap = await this.getSelectFields(groupByFields)
 

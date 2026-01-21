@@ -8,6 +8,8 @@ import schemaFieldPluginManager from '../fieldPlugin'
 
 export default class Schema {
   readonly userDbName: string
+  readonly enumManager: DataEnumManager
+
   private dataModelCache:
     | Promise<{
         apiNameReflexName: Record<string, string>
@@ -30,6 +32,7 @@ export default class Schema {
     }
 
     this.userDbName = options.userDbName || '_user'
+    this.enumManager = this.getEnumManager()
   }
 
   /**
@@ -1196,7 +1199,7 @@ export default class Schema {
     return fields
   }
 
-  getEnumManager() {
+  private getEnumManager() {
     const enumManagerOptions = this.options.enumSourceConfig
     if (!enumManagerOptions) {
       return new DataEnumManager({})
