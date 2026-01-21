@@ -43,12 +43,31 @@ export default class DataModel {
     this.schema = new DataModelSchema(schemaOptions)
   }
 
-  async transtion(dataSourceName: string) {
+  async transtion(
+    dataSourceName: string,
+    cb: (trx: Transtion) => Promise<void>,
+  ): Promise<void>
+  async transtion(dataSourceName: string): Promise<Transtion>
+  async transtion(
+    dataSourceName: string,
+    cb?: (trx: Transtion) => Promise<void>,
+  ): Promise<void | Transtion> {
     const knex = await this.options.getKnex(dataSourceName)
 
-    const trx = await knex.transaction()
+    if (!cb) {
+      const trx = await knex.transaction()
 
-    return new Transtion(trx, (modelInfo) => this.createCrudOptions(modelInfo))
+      return new Transtion(trx, (modelInfo) =>
+        this.createCrudOptions(modelInfo),
+      )
+    }
+
+    await knex.transaction(async (trx) => {
+      const transtion = new Transtion(trx, (modelInfo) =>
+        this.createCrudOptions(modelInfo),
+      )
+      await cb(transtion)
+    })
   }
 
   crud<M extends Record<string, any>>(options: CRUDOptions) {
