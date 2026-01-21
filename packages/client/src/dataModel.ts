@@ -21,13 +21,17 @@ export default class DataModel {
     this.enumManager = new DataEnumManager(enumOptions)
   }
 
-  async transaction(cb: (trx: Transaction) => Promise<void>): Promise<void>
-  async transaction(): Promise<Transaction>
   async transaction(
+    dataSourceName: string,
+    cb: (trx: Transaction) => Promise<void>,
+  ): Promise<void>
+  async transaction(dataSourceName: string): Promise<Transaction>
+  async transaction(
+    dataSourceName: string,
     cb?: (trx: Transaction) => Promise<void>,
   ): Promise<void | Transaction> {
     const transaction = new Transaction(this.options.transporter)
-    await transaction.start()
+    await transaction.start(dataSourceName)
 
     if (!cb) {
       return transaction

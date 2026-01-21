@@ -33,7 +33,7 @@ declare module '@shuttle-data/type' {
         queryGroupBy: <M extends Record<string, any>, T extends SelectField<M>>(
           option: QueryGroupByOption<M, T> & ModelConfig,
         ) => Promise<StrOrObjKeyToNumber<T, M>[]>
-        startTransaction: () => Promise<string>
+        startTransaction: (dataSourceName: string) => Promise<string>
         commitTransaction: (transactionId: string) => Promise<void>
         rollbackTransaction: (transactionId: string) => Promise<void>
       }
@@ -66,7 +66,9 @@ declare module '@shuttle-data/type' {
         queryGroupBy?: NHttpTransporter.MethodConfig<
           QueryGroupByOption<any, any> & ModelConfig
         >
-        startTransaction?: NHttpTransporter.MethodConfig<{}>
+        startTransaction?: NHttpTransporter.MethodConfig<{
+          dataSourceName: string
+        }>
         commitTransaction?: NHttpTransporter.MethodConfig<{
           transactionId: string
         }>

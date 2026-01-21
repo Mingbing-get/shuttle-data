@@ -77,10 +77,10 @@ export default class HttpTransporter
     })
   }
 
-  async startTransaction() {
+  async startTransaction(dataSourceName: string) {
     return this.request(
       this.options.startTransaction,
-      {},
+      { dataSourceName },
       {
         defaultPath: 'startTransaction',
       },

@@ -7,8 +7,8 @@ export default class Transaction {
 
   constructor(private transporter: DataCRUD.Client.Transporter) {}
 
-  async start() {
-    this.transactionId = await this.transporter.startTransaction()
+  async start(dataSourceName: string) {
+    this.transactionId = await this.transporter.startTransaction(dataSourceName)
   }
 
   async commit() {

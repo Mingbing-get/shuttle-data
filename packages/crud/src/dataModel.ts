@@ -54,6 +54,10 @@ export default class DataModel {
   ): Promise<void | Transaction> {
     const knex = await this.options.getKnex(dataSourceName)
 
+    if (!knex) {
+      throw new Error(`DataSource ${dataSourceName} not found`)
+    }
+
     if (!cb) {
       const trx = await knex.transaction()
 
