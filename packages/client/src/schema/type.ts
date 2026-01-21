@@ -29,12 +29,19 @@ declare module '@shuttle-data/type' {
           tableName: string,
           useApiName?: boolean,
         ): Promise<DataModel.Define>
+        getTableList(): Promise<Omit<DataModel.Define, 'fields'>[]>
       }
 
       export interface Options {
         transporter: Transporter
         tables?: DataModel.Define[]
       }
+
+      export type ObserverCallback = (model?: DataModel.Define) => void
+
+      export type ObserverTableListCallback = (
+        tableList?: Omit<DataModel.Define, 'fields'>[],
+      ) => void
 
       export interface HttpTransporterOptions extends NHttpTransporter.Options {
         createTable?: NHttpTransporter.MethodConfig<WithoutNameModel>
@@ -62,6 +69,7 @@ declare module '@shuttle-data/type' {
           tableName: string
           useApiName?: boolean
         }>
+        getTableList?: NHttpTransporter.MethodConfig<{}>
       }
     }
 

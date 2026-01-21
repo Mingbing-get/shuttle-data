@@ -13,6 +13,15 @@ export default class DataEnumManager extends _DataEnumManager {
     groupApiNameMap: {},
     groupMap: {},
   }
+  private groupListCache: Promise<Omit<DataEnum.Group, 'items'>[]> | undefined
+
+  private observerGroupList: DataEnum.ObserverGroupListCallback[] = []
+
+  private observerList: {
+    groupName: string
+    useApiName: boolean
+    callbacks: DataEnum.OberverCallback[]
+  }[] = []
 
   constructor(private options: DataEnum.ManagerOptions) {
     super()
@@ -21,12 +30,16 @@ export default class DataEnumManager extends _DataEnumManager {
       this.enumCache.groupMap[group.name] = Promise.resolve(group)
       this.enumCache.groupApiNameMap[group.apiName] = Promise.resolve(group)
     })
+    if (options.enumGroup) {
+      this.groupListCache = Promise.resolve(options.enumGroup)
+    }
   }
 
   async addGroup(group: DataEnum.WithoutNameGroup) {
     await this.checkWithOutNameGroup(group)
 
     await this.options.transporter.addGroup(group)
+    this.clearGroupList()
   }
 
   async updateGroup(group: DataEnum.WhenUpdateGroup) {
@@ -35,12 +48,14 @@ export default class DataEnumManager extends _DataEnumManager {
     await this.options.transporter.updateGroup(group)
 
     await this.removeGroupFromCache(group.name)
+    this.clearGroupList()
   }
 
   async removeGroup(name: string, useApiName?: boolean) {
     await this.options.transporter.removeGroup(name, useApiName)
 
     await this.removeGroupFromCache(name, useApiName)
+    this.clearGroupList()
   }
 
   async hasGroup(name: string, useApiName?: boolean) {
@@ -71,9 +86,24 @@ export default class DataEnumManager extends _DataEnumManager {
           this.enumCache.groupApiNameMap[group.apiName] = groupPromise
         })
       }
+
+      groupPromise.then((group) => {
+        this.trigger(group)
+      })
     }
 
     return groupPromise
+  }
+
+  async getGroupList() {
+    if (!this.groupListCache) {
+      this.groupListCache = this.options.transporter.getGroupList()
+      this.groupListCache.then((groupList) => {
+        this.triggerGroupList(groupList)
+      })
+    }
+
+    return this.groupListCache
   }
 
   async addItem(
@@ -246,11 +276,43 @@ export default class DataEnumManager extends _DataEnumManager {
     itemZod.parse(item)
   }
 
-  clear() {
-    this.enumCache = {
-      groupApiNameMap: {},
-      groupMap: {},
+  observe(
+    callback: DataEnum.OberverCallback,
+    groupName: string,
+    useApiName: boolean = false,
+  ) {
+    let observe = this.observerList.find(
+      (o) => o.useApiName === useApiName && o.groupName === groupName,
+    )
+    if (!observe) {
+      observe = {
+        groupName,
+        useApiName,
+        callbacks: [callback],
+      }
+      this.observerList.push(observe)
+    } else {
+      observe.callbacks.push(callback)
     }
+
+    return () => {
+      observe.callbacks = observe.callbacks.filter((c) => c !== callback)
+    }
+  }
+
+  observeGroupList(callback: DataEnum.ObserverGroupListCallback) {
+    this.observerGroupList.push(callback)
+
+    return () => {
+      this.observerGroupList = this.observerGroupList.filter(
+        (o) => o !== callback,
+      )
+    }
+  }
+
+  private clearGroupList() {
+    this.groupListCache = undefined
+    this.triggerGroupList()
   }
 
   private async removeGroupFromCache(groupName: string, useApiName?: boolean) {
@@ -263,5 +325,22 @@ export default class DataEnumManager extends _DataEnumManager {
     const group = await groupPromise
     delete this.enumCache.groupApiNameMap[group.apiName]
     delete this.enumCache.groupMap[group.name]
+    this.trigger(group, true)
+  }
+
+  private trigger(group: DataEnum.Group, remove: boolean = false) {
+    const observers = this.observerList.filter(
+      (o) =>
+        (o.groupName === group.name && !o.useApiName) ||
+        (o.groupName === group.apiName && o.useApiName),
+    )
+
+    observers.forEach((o) => {
+      o.callbacks.forEach((c) => c(remove ? undefined : group))
+    })
+  }
+
+  private triggerGroupList(groupList?: Omit<DataEnum.Group, 'items'>[]) {
+    this.observerGroupList.forEach((o) => o(groupList))
   }
 }

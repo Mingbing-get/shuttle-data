@@ -8,13 +8,35 @@ export default class Schema {
     apiNameModelMap: {},
     modelMap: {},
   }
+  private tableListCache:
+    | Promise<Omit<DataModel.Define, 'fields'>[]>
+    | undefined
 
-  constructor(private options: DataModel.Schema.Options) {}
+  private observerTableList: DataModel.Schema.ObserverTableListCallback[] = []
+
+  private observerList: {
+    tableName: string
+    useApiName: boolean
+    callbacks: DataModel.Schema.ObserverCallback[]
+  }[] = []
+
+  constructor(private options: DataModel.Schema.Options) {
+    this.options.tables?.forEach((model) => {
+      this.dataModelCache.apiNameModelMap[model.apiName] =
+        Promise.resolve(model)
+      this.dataModelCache.modelMap[model.name] = Promise.resolve(model)
+    })
+
+    if (this.options.tables) {
+      this.tableListCache = Promise.resolve(this.options.tables)
+    }
+  }
 
   async createTable(model: DataModel.WithoutNameModel) {
     this.checkWithOutNameModel(model)
 
     await this.options.transporter.createTable(model)
+    this.clearTableList()
   }
 
   async updateTable(model: DataModel.WhenUpdateModel) {
@@ -22,12 +44,14 @@ export default class Schema {
 
     await this.options.transporter.updateTable(model)
     await this.removeModelFromCache(model.name)
+    this.clearTableList()
   }
 
   async dropTable(tableName: string, useApiName: boolean = false) {
     await this.options.transporter.dropTable(tableName, useApiName)
 
     await this.removeModelFromCache(tableName, useApiName)
+    this.clearTableList()
   }
 
   async hasTable(tableName: string, useApiName: boolean = false) {
@@ -54,9 +78,23 @@ export default class Schema {
           this.dataModelCache.apiNameModelMap[model.apiName] = modelPromise
         })
       }
+      modelPromise.then((model) => {
+        this.trigger(model)
+      })
     }
 
     return modelPromise
+  }
+
+  async getTableList() {
+    if (!this.tableListCache) {
+      this.tableListCache = this.options.transporter.getTableList()
+      this.tableListCache.then((tableList) => {
+        this.triggerTableList(tableList)
+      })
+    }
+
+    return this.tableListCache
   }
 
   async addField(
@@ -178,6 +216,48 @@ export default class Schema {
     }
   }
 
+  observe(
+    callback: DataModel.Schema.ObserverCallback,
+    tableName: string,
+    useApiName: boolean = false,
+  ) {
+    let observer = this.observerList.find((item) => {
+      return item.tableName === tableName && item.useApiName === useApiName
+    })
+
+    if (observer) {
+      observer.callbacks.push(callback)
+    } else {
+      observer = {
+        tableName,
+        useApiName,
+        callbacks: [callback],
+      }
+      this.observerList.push(observer)
+    }
+
+    return () => {
+      observer.callbacks = observer.callbacks.filter(
+        (item) => item !== callback,
+      )
+    }
+  }
+
+  observeTableList(callback: DataModel.Schema.ObserverTableListCallback) {
+    this.observerTableList.push(callback)
+
+    return () => {
+      this.observerTableList = this.observerTableList.filter(
+        (item) => item !== callback,
+      )
+    }
+  }
+
+  private clearTableList() {
+    this.tableListCache = undefined
+    this.triggerTableList()
+  }
+
   private async removeModelFromCache(modelName: string, useApiName?: boolean) {
     const modelPromise = useApiName
       ? this.dataModelCache.apiNameModelMap[modelName]
@@ -188,5 +268,27 @@ export default class Schema {
     const model = await modelPromise
     delete this.dataModelCache.apiNameModelMap[model.apiName]
     delete this.dataModelCache.modelMap[model.name]
+    this.trigger(model, true)
+  }
+
+  private trigger(model: DataModel.Define, remove: boolean = false) {
+    const observers = this.observerList.filter((item) => {
+      return (
+        (item.tableName === model.name && !item.useApiName) ||
+        (item.tableName === model.apiName && item.useApiName)
+      )
+    })
+
+    observers.forEach((observer) => {
+      observer.callbacks.forEach((callback) => {
+        callback(remove ? undefined : model)
+      })
+    })
+  }
+
+  private triggerTableList(tableList?: Omit<DataModel.Define, 'fields'>[]) {
+    this.observerTableList.forEach((callback) => {
+      callback(tableList)
+    })
   }
 }

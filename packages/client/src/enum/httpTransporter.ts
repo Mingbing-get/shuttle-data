@@ -96,4 +96,15 @@ export default class HttpTransporter
       defaultMethod: 'GET',
     })
   }
+
+  async getGroupList(): Promise<Omit<DataEnum.Group, 'items'>[]> {
+    return this.request(
+      this.options?.getGroupList,
+      {},
+      {
+        defaultPath: '/getGroupList',
+        defaultMethod: 'GET',
+      },
+    )
+  }
 }

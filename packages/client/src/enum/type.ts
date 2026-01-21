@@ -26,12 +26,19 @@ declare module '@shuttle-data/type' {
         disabled?: boolean,
       ): Promise<void>
       getGroup(groupName: string, useApiName?: boolean): Promise<DataEnum.Group>
+      getGroupList(): Promise<Omit<DataEnum.Group, 'items'>[]>
     }
 
     export interface ManagerOptions {
       transporter: Transporter
       enumGroup?: DataEnum.Group[]
     }
+
+    export type OberverCallback = (group?: DataEnum.Group) => void
+
+    export type ObserverGroupListCallback = (
+      groupList?: Omit<DataEnum.Group, 'items'>[],
+    ) => void
 
     export interface WithoutNameItem extends Omit<DataEnum.Item, 'name'> {}
 
@@ -73,6 +80,7 @@ declare module '@shuttle-data/type' {
         groupName: string
         useApiName?: boolean
       }>
+      getGroupList?: NHttpTransporter.MethodConfig<{}>
     }
   }
 }

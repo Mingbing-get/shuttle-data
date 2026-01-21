@@ -15,8 +15,13 @@ export default class BaseHttpTransporter {
       defaultMethod?: Method
     },
   ) {
+    let path = methodConfig?.path || defaultPath
+    if (!path.startsWith('/')) {
+      path = `/${path}`
+    }
+
     const response = await axios({
-      url: `${this._options?.baseUrl || ''}${methodConfig?.path || `/${defaultPath}`}`,
+      url: `${this._options?.baseUrl || ''}${path}`,
       method: methodConfig?.method || defaultMethod,
       headers: this._options?.requestHeaders,
       data: (await methodConfig?.beforeSend?.(data)) || data,

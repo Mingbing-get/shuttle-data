@@ -94,4 +94,15 @@ export default class HttpTransporter
       defaultMethod: 'GET',
     })
   }
+
+  async getTableList(): Promise<Omit<DataModel.Define, 'fields'>[]> {
+    return await this.request(
+      this.options?.getTableList,
+      {},
+      {
+        defaultPath: 'getTableList',
+        defaultMethod: 'GET',
+      },
+    )
+  }
 }
