@@ -1,7 +1,7 @@
 import { DataCRUD, DataModel as NDataModel } from '@shuttle-data/type'
 import { DataModelSchema } from '@shuttle-data/schema'
 import { CRUD } from './crud'
-import { Transtion, CRUDOptions } from './transtion'
+import { Transaction, CRUDOptions } from './transaction'
 
 interface DataModelOptions extends Pick<
   DataCRUD.Server.Options,
@@ -43,30 +43,30 @@ export default class DataModel {
     this.schema = new DataModelSchema(schemaOptions)
   }
 
-  async transtion(
+  async transaction(
     dataSourceName: string,
-    cb: (trx: Transtion) => Promise<void>,
+    cb: (trx: Transaction) => Promise<void>,
   ): Promise<void>
-  async transtion(dataSourceName: string): Promise<Transtion>
-  async transtion(
+  async transaction(dataSourceName: string): Promise<Transaction>
+  async transaction(
     dataSourceName: string,
-    cb?: (trx: Transtion) => Promise<void>,
-  ): Promise<void | Transtion> {
+    cb?: (trx: Transaction) => Promise<void>,
+  ): Promise<void | Transaction> {
     const knex = await this.options.getKnex(dataSourceName)
 
     if (!cb) {
       const trx = await knex.transaction()
 
-      return new Transtion(trx, (modelInfo) =>
+      return new Transaction(trx, (modelInfo) =>
         this.createCrudOptions(modelInfo),
       )
     }
 
     await knex.transaction(async (trx) => {
-      const transtion = new Transtion(trx, (modelInfo) =>
+      const transaction = new Transaction(trx, (modelInfo) =>
         this.createCrudOptions(modelInfo),
       )
-      await cb(transtion)
+      await cb(transaction)
     })
   }
 

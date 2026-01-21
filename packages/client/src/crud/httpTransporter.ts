@@ -76,4 +76,34 @@ export default class HttpTransporter
       defaultPath: 'queryGroupBy',
     })
   }
+
+  async startTransaction() {
+    return this.request(
+      this.options.startTransaction,
+      {},
+      {
+        defaultPath: 'startTransaction',
+      },
+    )
+  }
+
+  async commitTransaction(transactionId: string) {
+    return this.request(
+      this.options.commitTransaction,
+      { transactionId },
+      {
+        defaultPath: 'commitTransaction',
+      },
+    )
+  }
+
+  async rollbackTransaction(transactionId: string) {
+    return this.request(
+      this.options.rollbackTransaction,
+      { transactionId },
+      {
+        defaultPath: 'rollbackTransaction',
+      },
+    )
+  }
 }

@@ -7,7 +7,7 @@ export type CRUDOptions = Pick<
   'modelName' | 'useApiName' | 'context'
 >
 
-export class Transtion {
+export class Transaction {
   private isCommitted = false
   private isRollbacked = false
 
