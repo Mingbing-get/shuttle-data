@@ -12,7 +12,7 @@ export default class HttpTransporter
   async findOne<M extends Record<string, any>>(
     option: DataCRUD.FineOneOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<M | undefined> {
-    return this.request(this.options.findOne, option, {
+    return await this.request(this.options.findOne, option, {
       defaultPath: 'findOne',
     })
   }
@@ -20,7 +20,7 @@ export default class HttpTransporter
   async find<M extends Record<string, any>>(
     option: DataCRUD.FindOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<M[]> {
-    return this.request(this.options.find, option, {
+    return await this.request(this.options.find, option, {
       defaultPath: 'find',
     })
   }
@@ -28,7 +28,7 @@ export default class HttpTransporter
   async count<M extends Record<string, any>>(
     option: DataCRUD.CountOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<number> {
-    return this.request(this.options.count, option, {
+    return await this.request(this.options.count, option, {
       defaultPath: 'count',
     })
   }
@@ -36,7 +36,7 @@ export default class HttpTransporter
   async create<M extends Record<string, any>>(
     option: DataCRUD.CreateOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<string> {
-    return this.request(this.options.create, option, {
+    return await this.request(this.options.create, option, {
       defaultPath: 'create',
     })
   }
@@ -44,7 +44,7 @@ export default class HttpTransporter
   async batchCreate<M extends Record<string, any>>(
     option: DataCRUD.BatchCreateOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<string[]> {
-    return this.request(this.options.batchCreate, option, {
+    return await this.request(this.options.batchCreate, option, {
       defaultPath: 'batchCreate',
     })
   }
@@ -53,7 +53,7 @@ export default class HttpTransporter
     option: (DataCRUD.UpdateOption<M> | DataCRUD.UpdateWithIdOption<M>) &
       DataCRUD.Client.ModelConfig,
   ): Promise<string[]> {
-    return this.request(this.options.update, option, {
+    return await this.request(this.options.update, option, {
       defaultPath: 'update',
     })
   }
@@ -61,7 +61,7 @@ export default class HttpTransporter
   async del<M extends Record<string, any>>(
     option: DataCRUD.DelOption<M> & DataCRUD.Client.ModelConfig,
   ): Promise<string[]> {
-    return this.request(this.options.del, option, {
+    return await this.request(this.options.del, option, {
       defaultPath: 'del',
     })
   }
@@ -72,13 +72,13 @@ export default class HttpTransporter
   >(
     option: DataCRUD.QueryGroupByOption<M, T> & DataCRUD.Client.ModelConfig,
   ): Promise<DataCRUD.StrOrObjKeyToNumber<T, M>[]> {
-    return this.request(this.options.queryGroupBy, option, {
+    return await this.request(this.options.queryGroupBy, option, {
       defaultPath: 'queryGroupBy',
     })
   }
 
   async startTransaction(dataSourceName: string) {
-    return this.request(
+    return await this.request(
       this.options.startTransaction,
       { dataSourceName },
       {
@@ -88,7 +88,7 @@ export default class HttpTransporter
   }
 
   async commitTransaction(transactionId: string) {
-    return this.request(
+    return await this.request(
       this.options.commitTransaction,
       { transactionId },
       {
@@ -98,7 +98,7 @@ export default class HttpTransporter
   }
 
   async rollbackTransaction(transactionId: string) {
-    return this.request(
+    return await this.request(
       this.options.rollbackTransaction,
       { transactionId },
       {

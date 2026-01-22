@@ -9,6 +9,7 @@
   "scripts": {
     "test": "jest",
     "dev:server": "pnpm --filter @shuttle-data/server dev",
+    "dev:front": "pnpm --filter @shuttle-data/front dev",
     "build": "pnpm --filter './packages/**' build",
     "commit": "cz",
     "prepare": "husky install",

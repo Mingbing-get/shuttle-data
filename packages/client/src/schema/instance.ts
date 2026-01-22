@@ -79,7 +79,9 @@ export default class Schema {
         })
       }
       modelPromise.then((model) => {
-        this.trigger(model)
+        if (model) {
+          this.trigger(model)
+        }
       })
     }
 

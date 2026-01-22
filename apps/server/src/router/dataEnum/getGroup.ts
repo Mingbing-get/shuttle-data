@@ -9,12 +9,12 @@ const getGroup: Middleware = async (ctx) => {
 
   const { groupName, useApiName } = ctx.request.query as any as {
     groupName: string
-    useApiName?: boolean
+    useApiName?: boolean | string | number
   }
 
   const group = await dataModel.schema.enumManager.getGroup(
     groupName,
-    useApiName,
+    useApiName === 'true' || useApiName === true || useApiName === 1,
   )
 
   if (!group) {

@@ -10,24 +10,24 @@ export default class HttpTransporter
   }
 
   async addGroup(group: DataEnum.WithoutNameGroup): Promise<void> {
-    this.request(this.options?.addGroup, group, {
+    await this.request(this.options?.addGroup, group, {
       defaultPath: '/addGroup',
     })
   }
 
   async updateGroup(group: DataEnum.WhenUpdateGroup): Promise<void> {
-    this.request(this.options?.updateGroup, group, {
+    await this.request(this.options?.updateGroup, group, {
       defaultPath: '/updateGroup',
     })
   }
 
-  async removeGroup(name: string, useApiName?: boolean): Promise<void> {
+  async removeGroup(groupName: string, useApiName?: boolean): Promise<void> {
     const data = {
-      name,
+      groupName,
       useApiName,
     }
 
-    this.request(this.options?.removeGroup, data, {
+    await this.request(this.options?.removeGroup, data, {
       defaultPath: '/removeGroup',
     })
   }
@@ -43,7 +43,7 @@ export default class HttpTransporter
       useApiName,
     }
 
-    this.request(this.options?.addItem, data, {
+    await this.request(this.options?.addItem, data, {
       defaultPath: '/addItem',
     })
   }
@@ -59,7 +59,7 @@ export default class HttpTransporter
       useApiName,
     }
 
-    this.request(this.options?.updateItem, data, {
+    await this.request(this.options?.updateItem, data, {
       defaultPath: '/updateItem',
     })
   }
@@ -77,7 +77,7 @@ export default class HttpTransporter
       disabled,
     }
 
-    this.request(this.options?.updateItemDisable, data, {
+    await this.request(this.options?.updateItemDisable, data, {
       defaultPath: '/updateItemDisable',
     })
   }
@@ -91,14 +91,14 @@ export default class HttpTransporter
       useApiName,
     }
 
-    return this.request(this.options?.getGroup, data, {
+    return await this.request(this.options?.getGroup, data, {
       defaultPath: '/getGroup',
       defaultMethod: 'GET',
     })
   }
 
   async getGroupList(): Promise<Omit<DataEnum.Group, 'items'>[]> {
-    return this.request(
+    return await this.request(
       this.options?.getGroupList,
       {},
       {

@@ -8,7 +8,7 @@ declare module '@shuttle-data/type' {
     export interface Transporter {
       addGroup(group: WithoutNameGroup): Promise<void>
       updateGroup(group: WhenUpdateGroup): Promise<void>
-      removeGroup(name: string, useApiName?: boolean): Promise<void>
+      removeGroup(groupName: string, useApiName?: boolean): Promise<void>
       addItem(
         groupName: string,
         item: WithoutNameItem,
@@ -57,7 +57,7 @@ declare module '@shuttle-data/type' {
       addGroup?: NHttpTransporter.MethodConfig<WithoutNameGroup>
       updateGroup?: NHttpTransporter.MethodConfig<WhenUpdateGroup>
       removeGroup?: NHttpTransporter.MethodConfig<{
-        name: string
+        groupName: string
         useApiName?: boolean
       }>
       addItem?: NHttpTransporter.MethodConfig<{

@@ -70,7 +70,9 @@ export default class DataEnumManager extends _DataEnumManager {
         })
 
         await trx(groupTableConfig.tableName).insert(dbGroup)
-        await trx(groupTableConfig.itemTableConfig.tableName).insert(dbItems)
+        if (dbItems.length > 0) {
+          await trx(groupTableConfig.itemTableConfig.tableName).insert(dbItems)
+        }
       })
     }
 

@@ -1,0 +1,14 @@
+.data-enum-group-editor {
+  .table-header-required {
+    &::before {
+      content: '*';
+      color: red;
+      margin-right: 4px;
+    }
+  }
+  .ant-table-tbody {
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+  }
+}

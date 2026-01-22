@@ -20,11 +20,13 @@ export default class BaseHttpTransporter {
       path = `/${path}`
     }
 
+    const method = methodConfig?.method || defaultMethod
     const response = await axios({
       url: `${this._options?.baseUrl || ''}${path}`,
-      method: methodConfig?.method || defaultMethod,
+      method,
       headers: this._options?.requestHeaders,
-      data: (await methodConfig?.beforeSend?.(data)) || data,
+      [method === 'GET' ? 'params' : 'data']:
+        (await methodConfig?.beforeSend?.(data)) || data,
     })
 
     await this._options?.afterSend?.(response)

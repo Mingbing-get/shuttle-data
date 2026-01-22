@@ -51,44 +51,46 @@ export default class DataEnumManager extends _DataEnumManager {
     this.clearGroupList()
   }
 
-  async removeGroup(name: string, useApiName?: boolean) {
-    await this.options.transporter.removeGroup(name, useApiName)
+  async removeGroup(groupName: string, useApiName?: boolean) {
+    await this.options.transporter.removeGroup(groupName, useApiName)
 
-    await this.removeGroupFromCache(name, useApiName)
+    await this.removeGroupFromCache(groupName, useApiName)
     this.clearGroupList()
   }
 
-  async hasGroup(name: string, useApiName?: boolean) {
-    const group = await this.getGroup(name, useApiName)
+  async hasGroup(groupName: string, useApiName?: boolean) {
+    const group = await this.getGroup(groupName, useApiName)
 
     return !!group
   }
 
   async getGroup(
-    name: string,
+    groupName: string,
     useApiName?: boolean,
   ): Promise<DataEnum.Group | undefined> {
     let groupPromise = useApiName
-      ? this.enumCache.groupApiNameMap[name]
-      : this.enumCache.groupMap[name]
+      ? this.enumCache.groupApiNameMap[groupName]
+      : this.enumCache.groupMap[groupName]
 
     if (!groupPromise) {
-      groupPromise = this.options.transporter.getGroup(name, useApiName)
+      groupPromise = this.options.transporter.getGroup(groupName, useApiName)
 
       if (useApiName) {
-        this.enumCache.groupApiNameMap[name] = groupPromise
+        this.enumCache.groupApiNameMap[groupName] = groupPromise
         groupPromise.then((group) => {
           this.enumCache.groupMap[group.name] = groupPromise
         })
       } else {
-        this.enumCache.groupMap[name] = groupPromise
+        this.enumCache.groupMap[groupName] = groupPromise
         groupPromise.then((group) => {
           this.enumCache.groupApiNameMap[group.apiName] = groupPromise
         })
       }
 
       groupPromise.then((group) => {
-        this.trigger(group)
+        if (group) {
+          this.trigger(group)
+        }
       })
     }
 
