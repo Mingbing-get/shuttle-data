@@ -11,8 +11,6 @@ export default class NumberFieldPlugin
   extends _NumberFieldPlugin
   implements DataModel.Schema.ServerFieldPlugin<'number'>
 {
-  readonly canAsDisplay = true
-
   fieldBuilder(
     table: Knex.CreateTableBuilder,
     field: DataModel.NumberField,

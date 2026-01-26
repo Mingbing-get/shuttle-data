@@ -5,13 +5,14 @@ import baseFieldZod from './baseFieldZod'
 
 export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
   readonly type = 'enum'
+  readonly label = '枚举'
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('enum'),
       extra: z.object({
         groupName: z.string(),
-        multiple: z.boolean().optional(),
+        multiple: z.boolean().optional().nullable(),
       }),
     })
   }

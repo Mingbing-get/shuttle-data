@@ -36,6 +36,10 @@ export default function PrefixInput({
     [onChange, prefix],
   )
 
+  if (!prefix) {
+    return <Input {...rest} value={value} onChange={onChange} />
+  }
+
   return (
     <Space.Compact style={{ width: '100%' }}>
       <Space.Addon>{prefix}</Space.Addon>

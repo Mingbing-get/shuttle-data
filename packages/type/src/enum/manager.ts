@@ -7,8 +7,8 @@ export default class DataEnumManager {
       .object({
         name: z.string(),
         apiName: z.string(),
-        label: z.string().optional(),
-        isSystem: z.boolean().optional(),
+        label: z.string().optional().nullable(),
+        isSystem: z.boolean().optional().nullable(),
       })
       .catchall(z.any())
   }
@@ -24,8 +24,8 @@ export default class DataEnumManager {
       .object({
         name: z.string(),
         apiName: z.string(),
-        label: z.string().optional(),
-        isDisabled: z.boolean().optional(),
+        label: z.string().optional().nullable(),
+        isDisabled: z.boolean().optional().nullable(),
       })
       .catchall(z.any())
   }

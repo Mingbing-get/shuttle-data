@@ -1,5 +1,6 @@
 import { Knex } from 'knex'
 import { DataModelSchema } from '@shuttle-data/schema'
+import '@shuttle-data/type'
 
 declare module '@shuttle-data/type' {
   export namespace DataModel {}

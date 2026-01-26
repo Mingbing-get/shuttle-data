@@ -92,6 +92,8 @@ export namespace DataModel {
 
   export interface FieldPlugin<T extends FieldType> {
     readonly type: T
+    readonly label: string
+    readonly canAsDisplay?: boolean
 
     getZod(): ZodObject<any, any>
 

@@ -47,16 +47,17 @@ function GroupEditor(
     layout = 'vertical',
     className,
     prefix,
+    disabled,
     ...formProps
   }: DataEnumGroupEditorProps,
   ref?: ForwardedRef<DataEnumGroupEditorInstance>,
 ) {
   const [form] = Form.useForm<DataEnum.Group>()
-  const [showName, setShowName] = useState(false)
+  const [initGroup, setInitGroup] = useState<DataEnum.Group>()
 
   useEffect(() => {
     if (!groupName) {
-      setShowName(false)
+      setInitGroup(undefined)
       form.resetFields()
       return
     }
@@ -64,10 +65,10 @@ function GroupEditor(
     manager.getGroup(groupName, useApiName).then((group) => {
       if (group) {
         form.setFieldsValue(group)
-        setShowName(true)
+        setInitGroup(group)
       } else {
         form.resetFields()
-        setShowName(false)
+        setInitGroup(undefined)
       }
     })
   }, [groupName, useApiName])
@@ -159,8 +160,9 @@ function GroupEditor(
       form={form}
       layout={layout}
       className={classNames(className, 'data-enum-group-editor')}
+      disabled={disabled || initGroup?.isSystem}
     >
-      {showName && (
+      {initGroup && (
         <Row gutter={24}>
           <Col span={12}>
             <Form.Item name="name" label="唯一值">
@@ -201,11 +203,15 @@ function GroupEditor(
               dataSource={fields}
               columns={createTableColumns(remove)}
               pagination={false}
-              footer={() => (
-                <Button type="primary" block onClick={() => add()}>
-                  添加枚举项
-                </Button>
-              )}
+              footer={
+                initGroup?.isSystem
+                  ? undefined
+                  : () => (
+                      <Button type="primary" block onClick={() => add()}>
+                        添加枚举项
+                      </Button>
+                    )
+              }
             />
           )}
         </Form.List>

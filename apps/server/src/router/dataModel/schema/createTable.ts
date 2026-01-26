@@ -11,9 +11,18 @@ const createTable: Middleware = async (ctx) => {
 
   const dataModelDefine = ctx.request.body as any as DataModel.Define
 
+  const systemFields = dataModel.schema.getSystemFields()
   dataModelDefine.dataSourceName = 'main'
   dataModelDefine.name = generateName('model')
-  dataModelDefine.fields.forEach((field) => {
+  dataModelDefine.fields.reduce((total: DataModel.Field[], field) => {
+    const innerSystemField = systemFields.find(
+      (systemField) => systemField.name === field.name,
+    )
+
+    if (innerSystemField) {
+      return [...total, innerSystemField]
+    }
+
     const fieldName = generateName('field')
 
     if (dataModelDefine.displayField === field.name) {
@@ -21,7 +30,9 @@ const createTable: Middleware = async (ctx) => {
     }
 
     field.name = fieldName
-  })
+
+    return [...total, field]
+  }, [])
 
   await dataModel.schema.createTable(dataModelDefine)
 }

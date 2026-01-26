@@ -1,3 +1,5 @@
+import 'koa'
+
 interface InJwtUser {
   _id: string
 }

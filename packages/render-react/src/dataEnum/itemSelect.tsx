@@ -5,22 +5,29 @@ import { DataEnumManager } from '@shuttle-data/client'
 
 import { useGroup } from './hooks'
 
-export interface ItemSelectProps {
+export interface ItemSelectProps extends Omit<
+  SelectProps,
+  'options' | 'loading'
+> {
   manager: DataEnumManager
   groupName: string
   useApiName?: boolean
-  selectProps?: Omit<SelectProps, 'options' | 'loading'>
-  radioGroupProps?: Omit<RadioGroupProps, 'options'>
-  checkboxGroupProps?: Omit<CheckboxGroupProps, 'options'>
+  radioGroupProps?: Omit<RadioGroupProps, keyof SelectProps>
+  checkboxGroupProps?: Omit<CheckboxGroupProps, keyof SelectProps>
+  showAs?: 'radio' | 'checkbox' | 'select'
 }
 
 export default function ItemSelect({
   manager,
   groupName,
   useApiName,
-  selectProps,
   radioGroupProps,
   checkboxGroupProps,
+  showAs = 'select',
+  value,
+  onChange,
+  mode,
+  ...extraProps
 }: ItemSelectProps) {
   const { loading, group } = useGroup(manager, groupName, useApiName)
   const [options, setOptions] = useState<{ value: string; label: string }[]>([])
@@ -34,13 +41,38 @@ export default function ItemSelect({
     )
   }, [group, useApiName])
 
-  if (radioGroupProps) {
-    return <Radio.Group {...radioGroupProps} options={options} />
+  if (mode !== 'multiple' && showAs === 'radio') {
+    return (
+      <Radio.Group
+        {...radioGroupProps}
+        {...extraProps}
+        options={options}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+      />
+    )
   }
 
-  if (checkboxGroupProps) {
-    return <Checkbox.Group {...checkboxGroupProps} options={options} />
+  if (mode === 'multiple' && showAs === 'checkbox') {
+    return (
+      <Checkbox.Group
+        {...checkboxGroupProps}
+        {...extraProps}
+        options={options}
+        value={value}
+        onChange={onChange}
+      />
+    )
   }
 
-  return <Select {...selectProps} loading={loading} options={options} />
+  return (
+    <Select
+      {...extraProps}
+      mode={mode}
+      loading={loading}
+      options={options}
+      value={value}
+      onChange={onChange}
+    />
+  )
 }

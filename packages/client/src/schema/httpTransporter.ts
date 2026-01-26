@@ -21,9 +21,9 @@ export default class HttpTransporter
     })
   }
 
-  async dropTable(name: string, useApiName?: boolean): Promise<void> {
+  async dropTable(tableName: string, useApiName?: boolean): Promise<void> {
     const data = {
-      name,
+      tableName,
       useApiName,
     }
 

@@ -5,6 +5,7 @@ import baseFieldZod from './baseFieldZod'
 
 export default class JsonFieldPlugin implements DataModel.FieldPlugin<'json'> {
   readonly type = 'json'
+  readonly label = 'JSON'
 
   getZod() {
     return baseFieldZod.extend({

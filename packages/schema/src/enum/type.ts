@@ -1,4 +1,5 @@
 import { Knex } from 'knex'
+import '@shuttle-data/type'
 
 declare module '@shuttle-data/type' {
   export namespace DataCRUD {}

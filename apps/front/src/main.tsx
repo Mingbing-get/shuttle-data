@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Tabs } from 'antd'
 
-import dataModel from './dataModel'
+import dataModel from './config'
 import DataEnumRender from './dataEnum'
+import DataModelRender from './dataModel'
 
 export default function Main() {
   const [activeTab, setActiveTab] = useState('enum')
@@ -13,8 +14,10 @@ export default function Main() {
         <DataEnumRender manager={dataModel.enumManager} />
       </Tabs.TabPane>
       <Tabs.TabPane tab="数据模型" key="model">
-        <span>数据模型</span>
-        {/* <DataModelRender manager={dataModel.modelManager} /> */}
+        <DataModelRender
+          schema={dataModel.schema}
+          enumManager={dataModel.enumManager}
+        />
       </Tabs.TabPane>
     </Tabs>
   )

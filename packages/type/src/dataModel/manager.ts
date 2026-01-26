@@ -41,15 +41,19 @@ class DataModelManager {
     return this.fieldPlugins[type]
   }
 
+  getPlugins() {
+    return Object.values(this.fieldPlugins)
+  }
+
   getZod() {
     return z
       .object({
         dataSourceName: z.string(),
         name: z.string(),
         apiName: z.string(),
-        label: z.string().optional(),
+        label: z.string().optional().nullable(),
         displayField: z.string(),
-        isSystem: z.boolean().optional(),
+        isSystem: z.boolean().optional().nullable(),
       })
       .catchall(z.any())
   }

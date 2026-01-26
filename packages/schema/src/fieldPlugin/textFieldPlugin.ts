@@ -11,8 +11,6 @@ export default class TextFieldPlugin
   extends _TextFieldPlugin
   implements DataModel.Schema.ServerFieldPlugin<'text'>
 {
-  readonly canAsDisplay = true
-
   fieldBuilder(
     table: Knex.CreateTableBuilder,
     field: DataModel.TextField,

@@ -1,0 +1,40 @@
+.data-schema-editor {
+  display: flex;
+
+  .table-header-required {
+    &::before {
+      content: '*';
+      color: red;
+      margin-right: 4px;
+    }
+  }
+  .ant-table-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .ant-table-tbody {
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+  }
+  .table-row-focused {
+    .ant-table-cell {
+      background-color: var(--ant-blue-1) !important;
+    }
+  }
+
+  .data-schema-editor-fields {
+    flex: 1;
+    width: 0;
+    overflow-y: auto;
+  }
+
+  .data-schema-editor-detail {
+    width: 30%;
+    min-width: 300px;
+    border-left: 1px solid var(--ant-color-border);
+    padding: 0 1rem;
+    overflow-y: auto;
+  }
+}

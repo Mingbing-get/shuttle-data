@@ -5,14 +5,15 @@ import baseFieldZod from './baseFieldZod'
 
 export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'> {
   readonly type = 'lookup'
+  readonly label = '关联对象'
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('lookup'),
       extra: z.object({
         modalName: z.string(),
-        multiple: z.boolean().optional(),
-        unique: z.boolean().optional(),
+        multiple: z.boolean().optional().nullable(),
+        unique: z.boolean().optional().nullable(),
       }),
     })
   }

@@ -1,4 +1,5 @@
 import { Knex } from 'knex'
+import '@shuttle-data/type'
 import Schema from './instance'
 
 declare module '@shuttle-data/type' {
@@ -78,7 +79,6 @@ declare module '@shuttle-data/type' {
       export interface ServerFieldPlugin<
         T extends DataModel.FieldType,
       > extends DataModel.FieldPlugin<T> {
-        readonly canAsDisplay?: boolean
         fieldBuilder(
           table: Knex.CreateTableBuilder,
           field: Extract<DataModel.Field, { type: T }>,

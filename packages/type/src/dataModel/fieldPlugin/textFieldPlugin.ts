@@ -5,15 +5,18 @@ import baseFieldZod from './baseFieldZod'
 
 export default class TextFieldPlugin implements DataModel.FieldPlugin<'text'> {
   readonly type = 'text'
+  readonly label = '文本'
+  readonly canAsDisplay = true
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('text'),
       extra: z
         .object({
-          unique: z.boolean().optional(),
+          unique: z.boolean().optional().nullable(),
         })
-        .optional(),
+        .optional()
+        .nullable(),
     })
   }
 

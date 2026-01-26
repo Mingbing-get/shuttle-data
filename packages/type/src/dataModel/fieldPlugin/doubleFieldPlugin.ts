@@ -5,17 +5,20 @@ import baseFieldZod from './baseFieldZod'
 
 export default class DoubleFieldPlugin implements DataModel.FieldPlugin<'double'> {
   readonly type = 'double'
+  readonly label = '浮点数'
+  readonly canAsDisplay = true
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('double'),
       extra: z
         .object({
-          min: z.number().optional(),
-          max: z.number().optional(),
-          decimal: z.number().optional(),
+          min: z.number().optional().nullable(),
+          max: z.number().optional().nullable(),
+          decimal: z.number().optional().nullable(),
         })
-        .optional(),
+        .optional()
+        .nullable(),
     })
   }
 

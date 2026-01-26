@@ -9,10 +9,13 @@ const getTable: Middleware = async (ctx) => {
 
   const { tableName, useApiName } = ctx.request.query as any as {
     tableName: string
-    useApiName?: boolean
+    useApiName?: boolean | string | number
   }
 
-  const model = await dataModel.schema.getTable(tableName, useApiName)
+  const model = await dataModel.schema.getTable(
+    tableName,
+    useApiName === 'true' || useApiName === true || useApiName === 1,
+  )
 
   if (!model) {
     resModel.setError(

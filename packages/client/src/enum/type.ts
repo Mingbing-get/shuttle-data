@@ -1,3 +1,4 @@
+import '@shuttle-data/type'
 import { NHttpTransporter } from '../transporter'
 
 declare module '@shuttle-data/type' {

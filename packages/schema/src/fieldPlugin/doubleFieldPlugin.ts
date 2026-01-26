@@ -11,8 +11,6 @@ export default class DoubleFieldPlugin
   extends _DoubleFieldPlugin
   implements DataModel.Schema.ServerFieldPlugin<'double'>
 {
-  readonly canAsDisplay = true
-
   fieldBuilder(
     table: Knex.CreateTableBuilder,
     field: DataModel.DoubleField,

@@ -5,16 +5,18 @@ import baseFieldZod from './baseFieldZod'
 
 export default class BooleanFieldPlugin implements DataModel.FieldPlugin<'boolean'> {
   readonly type = 'boolean'
+  readonly label = '布尔'
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('boolean'),
       extra: z
         .object({
-          trueText: z.string().optional(),
-          falseText: z.string().optional(),
+          trueText: z.string().optional().nullable(),
+          falseText: z.string().optional().nullable(),
         })
-        .optional(),
+        .optional()
+        .nullable(),
     })
   }
 

@@ -9,7 +9,7 @@ declare module '@shuttle-data/type' {
       export interface Transporter {
         createTable(table: WithoutNameModel): Promise<void>
         updateTable(table: WhenUpdateModel): Promise<void>
-        dropTable(name: string, useApiName?: boolean): Promise<void>
+        dropTable(tableName: string, useApiName?: boolean): Promise<void>
         addField(
           tableName: string,
           field: WithoutNameField,
@@ -47,7 +47,7 @@ declare module '@shuttle-data/type' {
         createTable?: NHttpTransporter.MethodConfig<WithoutNameModel>
         updateTable?: NHttpTransporter.MethodConfig<WhenUpdateModel>
         dropTable?: NHttpTransporter.MethodConfig<{
-          name: string
+          tableName: string
           useApiName?: boolean
         }>
         addField?: NHttpTransporter.MethodConfig<{

@@ -5,18 +5,21 @@ import baseFieldZod from './baseFieldZod'
 
 export default class NumberFieldPlugin implements DataModel.FieldPlugin<'number'> {
   readonly type = 'number'
+  readonly label = '整数'
+  readonly canAsDisplay = true
 
   getZod() {
     return baseFieldZod.extend({
       type: z.literal('number'),
       extra: z
         .object({
-          autoIncrement: z.boolean().optional(),
-          unique: z.boolean().optional(),
-          min: z.number().optional(),
-          max: z.number().optional(),
+          autoIncrement: z.boolean().optional().nullable(),
+          unique: z.boolean().optional().nullable(),
+          min: z.number().optional().nullable(),
+          max: z.number().optional().nullable(),
         })
-        .optional(),
+        .optional()
+        .nullable(),
     })
   }
 
