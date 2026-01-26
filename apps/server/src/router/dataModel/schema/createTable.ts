@@ -20,7 +20,7 @@ const createTable: Middleware = async (ctx) => {
     )
 
     if (innerSystemField) {
-      return [...total, innerSystemField]
+      return [...total, { ...innerSystemField, order: field.order }]
     }
 
     const fieldName = generateName('field')

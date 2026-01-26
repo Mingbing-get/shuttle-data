@@ -8,6 +8,7 @@ export namespace DataModel {
     label?: string
     required?: boolean
     isSystem?: boolean
+    order?: number
 
     extra?: E
   }

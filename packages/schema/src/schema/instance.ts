@@ -119,6 +119,7 @@ export default class Schema {
               [fieldFields.required]: field.required,
               [fieldFields.isSystem]: field.isSystem,
               [fieldFields.isDelete]: false,
+              [fieldFields.order]: field.order,
               [fieldFields.extra]: field.extra
                 ? JSON.stringify(field.extra)
                 : null,
@@ -201,22 +202,28 @@ export default class Schema {
       'apiName',
       'label',
       'required',
+      'order',
     ]
     model.fields.forEach((field) => {
       const oldField = oldModel.fields.find((f) => f.name === field.name)
       if (!oldField) {
         willAddFields.push(field)
       } else if (!field.isSystem) {
-        canUpdateFieldKeys.forEach((key) => {
-          if (field[key] !== oldField[key]) {
+        for (const key in canUpdateFieldKeys) {
+          if (
+            field[key as keyof DataModel.Field] !==
+            oldField[key as keyof DataModel.Field]
+          ) {
             willUpdateFields.push(field)
+            return
           }
-        })
+        }
         if (
           JSON.stringify(field.extra || {}) !==
           JSON.stringify(oldField.extra || {})
         ) {
           willUpdateFields.push(field)
+          return
         }
       }
     })
@@ -290,6 +297,7 @@ export default class Schema {
                 [fieldFields.type]: field.type,
                 [fieldFields.isSystem]: field.isSystem,
                 [fieldFields.isDelete]: false,
+                [fieldFields.order]: field.order,
                 [fieldFields.extra]: field.extra
                   ? JSON.stringify(field.extra)
                   : null,
@@ -319,6 +327,7 @@ export default class Schema {
                   [fieldFields.apiName]: field.apiName,
                   [fieldFields.label]: field.label,
                   [fieldFields.required]: field.required,
+                  [fieldFields.order]: field.order,
                   [fieldFields.extra]: field.extra
                     ? JSON.stringify(field.extra)
                     : null,
@@ -348,6 +357,7 @@ export default class Schema {
                 label: needUpdate.label,
                 required: needUpdate.required,
                 extra: needUpdate.extra,
+                order: needUpdate.order,
               } as any)
             } else {
               total.push(field)
@@ -542,6 +552,7 @@ export default class Schema {
           [fieldFields.required]: field.required,
           [fieldFields.type]: field.type,
           [fieldFields.isSystem]: field.isSystem,
+          [fieldFields.order]: field.order,
           [fieldFields.extra]: field.extra ? JSON.stringify(field.extra) : null,
           [fieldFields.isDelete]: false,
           ...this.createCustomRecord(
@@ -621,6 +632,7 @@ export default class Schema {
             [fieldFields.apiName]: field.apiName,
             [fieldFields.label]: field.label,
             [fieldFields.required]: field.required,
+            [fieldFields.order]: field.order,
             [fieldFields.extra]: field.extra
               ? JSON.stringify(field.extra)
               : null,
@@ -634,6 +646,7 @@ export default class Schema {
         label: field.label,
         required: field.required,
         extra: field.extra,
+        order: field.order,
       } as DataModel.Field
       const allModels = await this.all()
       this.dataModelCache = Promise.resolve({
@@ -882,6 +895,7 @@ export default class Schema {
       extra: 'extra',
       isDelete: 'isDelete',
       isSystem: 'isSystem',
+      order: 'order',
     }
 
     const fieldTableConfig = this.options.modelTableConfig?.fieldConfig || {}
@@ -992,6 +1006,7 @@ export default class Schema {
       table.json(fieldTableFieldMap.extra)
       table.boolean(fieldTableFieldMap.isDelete).defaultTo(false)
       table.boolean(fieldTableFieldMap.isSystem).defaultTo(false)
+      table.increments(fieldTableFieldMap.order)
       Object.values(fieldConfig.custom || {}).forEach((customField) => {
         customField.builder(table)
       })

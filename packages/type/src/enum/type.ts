@@ -4,6 +4,7 @@ export namespace DataEnum {
     apiName: string
     label?: string
     isDisabled?: boolean
+    order?: number
   }
 
   export interface Group {

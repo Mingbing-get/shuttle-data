@@ -26,6 +26,7 @@ export default class DataEnumManager {
         apiName: z.string(),
         label: z.string().optional().nullable(),
         isDisabled: z.boolean().optional().nullable(),
+        order: z.number().optional().nullable(),
       })
       .catchall(z.any())
   }
