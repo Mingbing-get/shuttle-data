@@ -1,13 +1,14 @@
 import { z } from 'zod'
 import { DataEnum } from './type'
+import { nameZod, apiNameZod, labelZod, uniqueArrayZod } from '../utils'
 
 export default class DataEnumManager {
   getGroupZod() {
     return z
       .object({
-        name: z.string(),
-        apiName: z.string(),
-        label: z.string().optional().nullable(),
+        name: nameZod(),
+        apiName: apiNameZod(),
+        label: labelZod(),
         isSystem: z.boolean().optional().nullable(),
       })
       .catchall(z.any())
@@ -15,16 +16,16 @@ export default class DataEnumManager {
 
   getGroupZodWithItems() {
     return this.getGroupZod().extend({
-      items: z.array(this.getItemZod()),
+      items: uniqueArrayZod(z.array(this.getItemZod()), ['name', 'apiName']),
     })
   }
 
   getItemZod() {
     return z
       .object({
-        name: z.string(),
-        apiName: z.string(),
-        label: z.string().optional().nullable(),
+        name: nameZod(),
+        apiName: apiNameZod(),
+        label: labelZod(),
         isDisabled: z.boolean().optional().nullable(),
         order: z.number().optional().nullable(),
       })

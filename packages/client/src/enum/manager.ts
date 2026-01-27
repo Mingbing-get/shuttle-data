@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   DataEnumManager as _DataEnumManager,
   DataEnum,
+  helper,
 } from '@shuttle-data/type'
 import './type'
 
@@ -235,7 +236,10 @@ export default class DataEnumManager extends _DataEnumManager {
 
     groupZod
       .extend({
-        items: z.array(groupItemZod),
+        items: helper.uniqueArrayZod(z.array(groupItemZod), [
+          'name',
+          'apiName',
+        ]),
       })
       .parse(group)
   }
@@ -259,7 +263,10 @@ export default class DataEnumManager extends _DataEnumManager {
 
     groupZod
       .extend({
-        items: z.array(groupItemZod),
+        items: helper.uniqueArrayZod(z.array(groupItemZod), [
+          'name',
+          'apiName',
+        ]),
       })
       .parse(group)
   }

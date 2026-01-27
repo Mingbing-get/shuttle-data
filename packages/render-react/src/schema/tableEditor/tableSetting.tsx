@@ -3,6 +3,7 @@ import { Form, Input, Switch, Select, Divider } from 'antd'
 import { DataModel, dataModelManager } from '@shuttle-data/type'
 
 import PrefixInput from '../../components/prefixInput'
+import { apiNameRules, labelRules } from '../../utils'
 
 interface Props {
   prefix?: string
@@ -61,22 +62,14 @@ export default function TableSetting({
         />
       </Form.Item>
 
-      <Form.Item
-        name="apiName"
-        label="API名称"
-        rules={[{ required: true, message: '请输入API名称' }]}
-      >
+      <Form.Item name="apiName" label="API名称" rules={apiNameRules}>
         <PrefixInput
           prefix={isSystemModel ? '' : prefix}
           disabled={isSystemModel}
         />
       </Form.Item>
 
-      <Form.Item
-        name="label"
-        label="名称"
-        rules={[{ required: true, message: '请输入名称' }]}
-      >
+      <Form.Item name="label" label="名称" rules={labelRules}>
         <Input disabled={isSystemModel} />
       </Form.Item>
     </>

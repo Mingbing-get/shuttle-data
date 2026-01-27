@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { nameZod, apiNameZod, labelZod, uniqueArrayZod } from '../utils'
 
 import BooleanFieldPlugin from './fieldPlugin/booleanFieldPlugin'
 import StringFieldPlugin from './fieldPlugin/stringFieldPlugin'
@@ -49,10 +50,10 @@ class DataModelManager {
     return z
       .object({
         dataSourceName: z.string(),
-        name: z.string(),
-        apiName: z.string(),
-        label: z.string().optional().nullable(),
-        displayField: z.string(),
+        name: nameZod(),
+        apiName: apiNameZod(),
+        label: labelZod(),
+        displayField: nameZod(),
         isSystem: z.boolean().optional().nullable(),
       })
       .catchall(z.any())
@@ -66,7 +67,7 @@ class DataModelManager {
     )
 
     return modelZod.extend({
-      fields: z.array(z.union(fieldZods)),
+      fields: uniqueArrayZod(z.array(z.union(fieldZods)), ['name', 'apiName']),
     })
   }
 

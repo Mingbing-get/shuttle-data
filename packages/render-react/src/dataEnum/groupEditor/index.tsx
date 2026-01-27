@@ -17,6 +17,7 @@ import {
   FormProps,
   FormInstance,
   Button,
+  message,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
@@ -25,9 +26,9 @@ import { DataEnum } from '@shuttle-data/type'
 
 import PrefixInput from '../../components/prefixInput'
 import FormTableItem from '../../components/formTableItem'
+import { generateUUID, apiNameRules, labelRules } from '../../utils'
 
 import './index.scss'
-import { generateUUID } from '../../utils'
 
 export interface DataEnumGroupEditorProps extends Omit<FormProps, 'form'> {
   manager: DataEnumManager
@@ -97,10 +98,7 @@ function GroupEditor(
       {
         title: <label className="table-header-required">API名称</label>,
         render: (_, field, index) => (
-          <Form.Item
-            name={['items', index, 'apiName']}
-            rules={[{ required: true, message: '请输入API名称' }]}
-          >
+          <Form.Item name={['items', index, 'apiName']} rules={apiNameRules}>
             <PrefixInput prefix={prefix} />
           </Form.Item>
         ),
@@ -109,10 +107,7 @@ function GroupEditor(
       {
         title: <label className="table-header-required">名称</label>,
         render: (_, field, index) => (
-          <Form.Item
-            name={['items', index, 'label']}
-            rules={[{ required: true, message: '请输入名称' }]}
-          >
+          <Form.Item name={['items', index, 'label']} rules={labelRules}>
             <Input />
           </Form.Item>
         ),
@@ -139,9 +134,15 @@ function GroupEditor(
         await form.validateFields({ validateOnly: false })
         const value = form.getFieldsValue()
 
-        value.items.forEach((item, index) => {
+        const apiNameList: string[] = []
+        for (const [index, item] of value.items.entries()) {
           item.order = index + 1
-        })
+          if (apiNameList.includes(item.apiName)) {
+            message.error(`API 名称: ${item.apiName} 不能重复`)
+            throw new Error('API 名称不能重复')
+          }
+          apiNameList.push(item.apiName)
+        }
 
         if (value.name) {
           await manager.updateGroup(value)
@@ -177,20 +178,12 @@ function GroupEditor(
       )}
       <Row gutter={24}>
         <Col span={12}>
-          <Form.Item
-            name="apiName"
-            label="API名称"
-            rules={[{ required: true, message: '请输入API名称' }]}
-          >
+          <Form.Item name="apiName" label="API名称" rules={apiNameRules}>
             <PrefixInput prefix={prefix} />
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item
-            name="label"
-            label="名称"
-            rules={[{ required: true, message: '请输入名称' }]}
-          >
+          <Form.Item name="label" label="名称" rules={labelRules}>
             <Input />
           </Form.Item>
         </Col>

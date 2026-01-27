@@ -1,3 +1,5 @@
+import { FormRule } from 'antd'
+
 export function generateUUID(prefix = '') {
   const array = new Uint8Array(16)
   crypto.getRandomValues(array)
@@ -26,3 +28,46 @@ export function generateUUID(prefix = '') {
       .join(''),
   ].join('')
 }
+
+export const nameRules: FormRule[] = [
+  {
+    required: true,
+    message: '请输入名称',
+  },
+  {
+    min: 1,
+    max: 255,
+    message: '名称长度必须在 1 到 255 个字符之间',
+  },
+  {
+    pattern: /^[a-zA-Z0-9_]+$/,
+    message: '名称只能包含字母、数字和下划线',
+  },
+]
+
+export const apiNameRules: FormRule[] = [
+  {
+    required: true,
+    message: '请输入 API 名称',
+  },
+  {
+    min: 1,
+    max: 255,
+    message: 'API 名称长度必须在 1 到 255 个字符之间',
+  },
+  {
+    pattern: /^[a-zA-Z0-9_]+$/,
+    message: 'API 名称只能包含字母、数字和下划线',
+  },
+]
+
+export const labelRules: FormRule[] = [
+  {
+    required: true,
+    message: '请输入名称',
+  },
+  {
+    max: 100,
+    message: '名称长度必须在 1 到 100 个字符之间',
+  },
+]

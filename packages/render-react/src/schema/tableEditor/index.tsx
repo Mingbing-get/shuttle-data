@@ -13,6 +13,7 @@ import {
   Input,
   FormProps,
   FormInstance,
+  message,
 } from 'antd'
 import classNames from 'classnames'
 import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
@@ -20,7 +21,7 @@ import { DataModel } from '@shuttle-data/type'
 
 import FieldTypeSelect from '../fieldTypeSelect'
 import { getInitDataModel } from '../utils'
-import { generateUUID } from '../../utils'
+import { generateUUID, apiNameRules, labelRules } from '../../utils'
 import PrefixInput from '../../components/prefixInput'
 import TableSetting from './tableSetting'
 import FieldSetting from './fieldSetting'
@@ -102,10 +103,7 @@ function TableEditor(
       {
         title: <label className="table-header-required">API名称</label>,
         render: (_, field, index) => (
-          <Form.Item
-            name={['fields', index, 'apiName']}
-            rules={[{ required: true, message: '请输入API名称' }]}
-          >
+          <Form.Item name={['fields', index, 'apiName']} rules={apiNameRules}>
             <PrefixInput
               prefix={field?.isSystem ? '' : prefix}
               disabled={field?.isSystem}
@@ -117,10 +115,7 @@ function TableEditor(
       {
         title: <label className="table-header-required">名称</label>,
         render: (_, field, index) => (
-          <Form.Item
-            name={['fields', index, 'label']}
-            rules={[{ required: true, message: '请输入名称' }]}
-          >
+          <Form.Item name={['fields', index, 'label']} rules={labelRules}>
             <Input disabled={field?.isSystem} />
           </Form.Item>
         ),
@@ -163,9 +158,16 @@ function TableEditor(
       submit: async () => {
         await form.validateFields({ validateOnly: false })
         const value = form.getFieldsValue()
-        value.fields.forEach((field, index) => {
+
+        const apiNameList: string[] = []
+        for (const [index, field] of value.fields.entries()) {
           field.order = index + 1
-        })
+          if (apiNameList.includes(field.apiName)) {
+            message.error(`API 名称: ${field.apiName} 不能重复`)
+            throw new Error('API 名称不能重复')
+          }
+          apiNameList.push(field.apiName)
+        }
 
         if (value.name) {
           await schema.updateTable(value)

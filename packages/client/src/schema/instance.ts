@@ -164,6 +164,8 @@ export default class Schema {
 
     modelZod.parse(model)
 
+    this.checkFieldNameAndApiNameIsUnique(model.fields)
+
     for (const field of model.fields) {
       this.checkField(field)
     }
@@ -175,6 +177,8 @@ export default class Schema {
     })
 
     modelZod.parse(model)
+
+    this.checkFieldNameAndApiNameIsUnique(model.fields)
 
     for (const field of model.fields) {
       this.checkWithOutNameField(field)
@@ -209,6 +213,8 @@ export default class Schema {
 
     modelZod.parse(model)
 
+    this.checkFieldNameAndApiNameIsUnique(model.fields)
+
     for (const field of model.fields) {
       if ('name' in field) {
         this.checkField(field)
@@ -216,6 +222,28 @@ export default class Schema {
         this.checkWithOutNameField(field)
       }
     }
+  }
+
+  private checkFieldNameAndApiNameIsUnique(
+    fields: (DataModel.WithoutNameField | DataModel.Field)[],
+  ) {
+    const nameList: string[] = []
+    const apiNameList: string[] = []
+
+    fields.forEach((field) => {
+      if ('name' in field && field.name) {
+        if (nameList.includes(field.name)) {
+          throw new Error(`field name ${field.name} is not unique`)
+        }
+        nameList.push(field.name)
+      }
+      if (field.apiName) {
+        if (apiNameList.includes(field.apiName)) {
+          throw new Error(`field apiName ${field.apiName} is not unique`)
+        }
+        apiNameList.push(field.apiName)
+      }
+    })
   }
 
   observe(

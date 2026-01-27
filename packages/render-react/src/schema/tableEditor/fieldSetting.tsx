@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Form, Input, Divider, Switch } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
@@ -5,7 +6,7 @@ import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
 import PrefixInput from '../../components/prefixInput'
 import FieldTypeSelect from '../fieldTypeSelect'
 import renderFieldPlugin from '../fieldPlugin'
-import { useMemo } from 'react'
+import { apiNameRules, labelRules } from '../../utils'
 
 interface Props {
   schema: DataModelSchema
@@ -42,7 +43,7 @@ export default function FieldSetting({
 
       <Form.Item
         name={[fieldListName, index, 'apiName']}
-        rules={[{ required: true, message: '请输入API名称' }]}
+        rules={apiNameRules}
         label="API名称"
       >
         <PrefixInput
@@ -53,7 +54,7 @@ export default function FieldSetting({
 
       <Form.Item
         name={[fieldListName, index, 'label']}
-        rules={[{ required: true, message: '请输入名称' }]}
+        rules={labelRules}
         label="名称"
       >
         <Input disabled={field?.isSystem} />
