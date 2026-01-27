@@ -1,4 +1,5 @@
 .data-enum-group-editor {
+  overflow-y: auto;
   .table-header-required {
     &::before {
       content: '*';

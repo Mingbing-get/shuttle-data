@@ -637,6 +637,7 @@ export default class DataEnumManager extends _DataEnumManager {
         table.string(itemTableFields.name).primary()
         table.string(itemTableFields.apiName)
         table.string(itemTableFields.label)
+        table.integer(itemTableFields.order)
         table.boolean(itemTableFields.isDisabled).defaultTo(false)
         table.boolean(itemTableFields.isDelete).defaultTo(false)
         Object.values(groupTableConfig.itemTableConfig.custom || {}).forEach(

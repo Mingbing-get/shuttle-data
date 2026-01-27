@@ -1,5 +1,4 @@
 import {
-  useCallback,
   ForwardedRef,
   forwardRef,
   useImperativeHandle,
@@ -9,9 +8,7 @@ import {
 } from 'react'
 import {
   Form,
-  Table,
-  Button,
-  Switch,
+  Tag,
   TableColumnsType,
   Input,
   FormProps,
@@ -22,10 +19,12 @@ import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
 import { DataModel } from '@shuttle-data/type'
 
 import FieldTypeSelect from '../fieldTypeSelect'
-import { getInitDataModel, generateUUID } from '../utils'
+import { getInitDataModel } from '../utils'
+import { generateUUID } from '../../utils'
 import PrefixInput from '../../components/prefixInput'
 import TableSetting from './tableSetting'
 import FieldSetting from './fieldSetting'
+import FormTableItem from '../../components/formTableItem'
 
 import './index.scss'
 
@@ -65,7 +64,7 @@ function TableEditor(
   const fields = Form.useWatch('fields', form)
 
   const filterEmptyFields = useMemo(
-    () => fields?.filter((field) => field.name),
+    () => fields?.filter((item) => item.name) || [],
     [fields],
   )
 
@@ -78,6 +77,7 @@ function TableEditor(
 
     schema.getTable(tableName, useApiName).then((table) => {
       if (table) {
+        table.fields.sort((cur, next) => (cur.order || 0) - (next.order || 0))
         form.setFieldsValue(table)
         setInitTable(table)
       } else {
@@ -86,27 +86,6 @@ function TableEditor(
       }
     })
   }, [tableName, useApiName, dataSourceName, userTableName])
-
-  const handleRemove = useCallback((fieldName: string) => {
-    const fields = form.getFieldValue('fields') || []
-    const index = fields.findIndex(
-      (field: DataModel.Field) => field.name === fieldName,
-    )
-    if (index !== -1) {
-      const newFields = [...fields]
-      newFields.splice(index, 1)
-      form.setFieldValue('fields', newFields)
-      setFocusFieldName((old) => (old === fieldName ? '' : old))
-    }
-  }, [])
-
-  const handleAdd = useCallback(() => {
-    const name = generateUUID('temp_')
-    const fields = form.getFieldValue('fields') || []
-    const newFields = [{ name }, ...fields]
-    form.setFieldValue('fields', newFields)
-    setFocusFieldName(name)
-  }, [])
 
   const tableColumns: TableColumnsType<DataModel.Field> = useMemo(() => {
     return [
@@ -154,7 +133,9 @@ function TableEditor(
             name={['fields', index, 'type']}
             rules={[{ required: true, message: '请选择类型' }]}
           >
-            <FieldTypeSelect disabled={field?.isSystem} />
+            <FieldTypeSelect
+              disabled={field?.isSystem || !field.name.startsWith('temp_')}
+            />
           </Form.Item>
         ),
         width: 160,
@@ -162,30 +143,14 @@ function TableEditor(
       {
         title: '系统字段',
         render: (_, field, index) => (
-          <Form.Item name={['fields', index, 'isSystem']} required>
-            <Switch disabled />
+          <Form.Item name={['fields', index, 'isSystem']}>
+            {field.isSystem ? (
+              <Tag color="green">是</Tag>
+            ) : (
+              <Tag color="orange">否</Tag>
+            )}
           </Form.Item>
         ),
-        width: 100,
-      },
-      {
-        title: '操作',
-        key: 'operation',
-        render: (_, field, index) => {
-          return (
-            <Form.Item name={['fields', index, 'isSystem']}>
-              <Button
-                disabled={field?.isSystem}
-                type="link"
-                danger
-                onClick={() => handleRemove(field.name)}
-              >
-                删除
-              </Button>
-            </Form.Item>
-          )
-        },
-        fixed: 'end',
         width: 100,
       },
     ]
@@ -198,6 +163,9 @@ function TableEditor(
       submit: async () => {
         await form.validateFields({ validateOnly: false })
         const value = form.getFieldsValue()
+        value.fields.forEach((field, index) => {
+          field.order = index + 1
+        })
 
         if (value.name) {
           await schema.updateTable(value)
@@ -220,34 +188,15 @@ function TableEditor(
         <Form.Item name="fields" hidden>
           <span />
         </Form.Item>
-        <Table
-          onRow={(record) => {
-            return {
-              onClick: () => {
-                setFocusFieldName(record.name)
-              },
-            }
-          }}
-          onHeaderRow={() => {
-            return {
-              onClick: () => {
-                setFocusFieldName('')
-              },
-            }
-          }}
-          rowClassName={(record) => {
-            return record.name === focusFieldName ? 'table-row-focused' : ''
-          }}
+        <FormTableItem
+          fieldName="fields"
           rowKey="name"
-          dataSource={filterEmptyFields}
           columns={tableColumns}
           pagination={false}
           scroll={{ x: 1200, y: '100%' }}
-          footer={() => (
-            <Button type="primary" block onClick={handleAdd}>
-              添加字段
-            </Button>
-          )}
+          onFocusRowChange={setFocusFieldName}
+          onAdd={() => ({ name: generateUUID('temp_') }) as any}
+          disabledDelete={(row) => row.isSystem}
         />
       </div>
       <div className="data-schema-editor-detail">

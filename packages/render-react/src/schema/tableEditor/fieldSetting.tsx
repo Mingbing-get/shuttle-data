@@ -1,4 +1,4 @@
-import { Form, Input, Divider } from 'antd'
+import { Form, Input, Divider, Switch } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
 
@@ -65,6 +65,10 @@ export default function FieldSetting({
         label="类型"
       >
         <FieldTypeSelect disabled={field?.isSystem || !isNewField} />
+      </Form.Item>
+
+      <Form.Item name={[fieldListName, index, 'required']} label="是否必填">
+        <Switch disabled={field?.isSystem} />
       </Form.Item>
 
       {Render && (

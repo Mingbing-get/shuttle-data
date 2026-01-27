@@ -5,22 +5,29 @@ import { DataModelSchema } from '@shuttle-data/client'
 
 import { useTable } from './hooks'
 
-export interface FieldSelectProps {
+export interface FieldSelectProps extends Omit<
+  SelectProps,
+  'options' | 'loading'
+> {
   schema: DataModelSchema
   tableName: string
   useApiName?: boolean
-  selectProps?: Omit<SelectProps, 'options' | 'loading'>
-  radioGroupProps?: Omit<RadioGroupProps, 'options'>
-  checkboxGroupProps?: Omit<CheckboxGroupProps, 'options'>
+  radioGroupProps?: Omit<RadioGroupProps, keyof SelectProps>
+  checkboxGroupProps?: Omit<CheckboxGroupProps, keyof SelectProps>
+  showAs?: 'radio' | 'checkbox' | 'select'
 }
 
 export default function FieldSelect({
   schema,
   tableName,
   useApiName,
-  selectProps,
   radioGroupProps,
   checkboxGroupProps,
+  showAs = 'select',
+  value,
+  onChange,
+  mode,
+  ...selectProps
 }: FieldSelectProps) {
   const { loading, table } = useTable(schema, tableName, useApiName)
   const [options, setOptions] = useState<{ value: string; label: string }[]>([])
@@ -34,13 +41,38 @@ export default function FieldSelect({
     )
   }, [table, useApiName])
 
-  if (radioGroupProps) {
-    return <Radio.Group {...radioGroupProps} options={options} />
+  if (mode !== 'multiple' && showAs === 'radio') {
+    return (
+      <Radio.Group
+        {...radioGroupProps}
+        {...selectProps}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        options={options}
+      />
+    )
   }
 
-  if (checkboxGroupProps) {
-    return <Checkbox.Group {...checkboxGroupProps} options={options} />
+  if (mode === 'multiple' && showAs === 'checkbox') {
+    return (
+      <Checkbox.Group
+        {...checkboxGroupProps}
+        {...selectProps}
+        value={value}
+        onChange={onChange}
+        options={options}
+      />
+    )
   }
 
-  return <Select {...selectProps} loading={loading} options={options} />
+  return (
+    <Select
+      {...selectProps}
+      mode={mode}
+      value={value}
+      onChange={onChange}
+      loading={loading}
+      options={options}
+    />
+  )
 }

@@ -1,31 +1,33 @@
 import {
-  useCallback,
   ForwardedRef,
   forwardRef,
   useImperativeHandle,
   useEffect,
   useState,
+  useMemo,
+  useCallback,
 } from 'react'
 import {
   Row,
   Col,
   Form,
-  Table,
-  Button,
   Switch,
   TableColumnsType,
-  FormListFieldData,
   Input,
   FormProps,
   FormInstance,
+  Button,
 } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import classNames from 'classnames'
 import { DataEnumManager } from '@shuttle-data/client'
 import { DataEnum } from '@shuttle-data/type'
 
 import PrefixInput from '../../components/prefixInput'
+import FormTableItem from '../../components/formTableItem'
 
 import './index.scss'
+import { generateUUID } from '../../utils'
 
 export interface DataEnumGroupEditorProps extends Omit<FormProps, 'form'> {
   manager: DataEnumManager
@@ -64,6 +66,7 @@ function GroupEditor(
 
     manager.getGroup(groupName, useApiName).then((group) => {
       if (group) {
+        group.items.sort((a, b) => (a.order || 0) - (b.order || 0))
         form.setFieldsValue(group)
         setInitGroup(group)
       } else {
@@ -73,66 +76,58 @@ function GroupEditor(
     })
   }, [groupName, useApiName])
 
-  const createTableColumns = useCallback(
-    (remove: (name: number) => void) => {
-      const tableColumns: TableColumnsType<FormListFieldData> = [
-        {
-          title: '唯一值',
-          dataIndex: 'name',
-          minWidth: 220,
-          render: (_, field) => (
-            <Form.Item name={[field.name, 'name']}>
-              <Input disabled />
-            </Form.Item>
-          ),
-        },
-        {
-          title: <label className="table-header-required">API名称</label>,
-          render: (_, field) => (
-            <Form.Item
-              name={[field.name, 'apiName']}
-              rules={[{ required: true, message: '请输入API名称' }]}
-            >
-              <PrefixInput prefix={prefix} />
-            </Form.Item>
-          ),
-          minWidth: 220,
-        },
-        {
-          title: <label className="table-header-required">名称</label>,
-          render: (_, field) => (
-            <Form.Item
-              name={[field.name, 'label']}
-              rules={[{ required: true, message: '请输入名称' }]}
-            >
-              <Input />
-            </Form.Item>
-          ),
-          minWidth: 220,
-        },
-        {
-          title: '是否禁用',
-          render: (_, field) => (
-            <Form.Item name={[field.name, 'isDisabled']} required>
-              <Switch />
-            </Form.Item>
-          ),
-          minWidth: 120,
-        },
-        {
-          title: '操作',
-          render: (_, field) => {
-            return (
-              <Form.Item name={[field.name, 'name']}>
-                <RemoveItem remove={() => remove(field.name)} />
-              </Form.Item>
-            )
-          },
-          width: 120,
-        },
-      ]
-      return tableColumns
-    },
+  const handleAdd = useCallback(() => {
+    const items = form.getFieldValue('items') || []
+
+    form.setFieldValue('items', [...items, { name: generateUUID('temp_') }])
+  }, [form])
+
+  const tableColumns: TableColumnsType<DataEnum.Item> = useMemo(
+    () => [
+      {
+        title: '唯一值',
+        dataIndex: 'name',
+        minWidth: 220,
+        render: (_, field, index) => (
+          <Form.Item name={['items', index, 'name']}>
+            <Input disabled />
+          </Form.Item>
+        ),
+      },
+      {
+        title: <label className="table-header-required">API名称</label>,
+        render: (_, field, index) => (
+          <Form.Item
+            name={['items', index, 'apiName']}
+            rules={[{ required: true, message: '请输入API名称' }]}
+          >
+            <PrefixInput prefix={prefix} />
+          </Form.Item>
+        ),
+        minWidth: 220,
+      },
+      {
+        title: <label className="table-header-required">名称</label>,
+        render: (_, field, index) => (
+          <Form.Item
+            name={['items', index, 'label']}
+            rules={[{ required: true, message: '请输入名称' }]}
+          >
+            <Input />
+          </Form.Item>
+        ),
+        minWidth: 220,
+      },
+      {
+        title: '是否禁用',
+        render: (_, field, index) => (
+          <Form.Item name={['items', index, 'isDisabled']} required>
+            <Switch />
+          </Form.Item>
+        ),
+        width: 120,
+      },
+    ],
     [prefix],
   )
 
@@ -143,6 +138,10 @@ function GroupEditor(
       submit: async () => {
         await form.validateFields({ validateOnly: false })
         const value = form.getFieldsValue()
+
+        value.items.forEach((item, index) => {
+          item.order = index + 1
+        })
 
         if (value.name) {
           await manager.updateGroup(value)
@@ -196,40 +195,27 @@ function GroupEditor(
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item label="枚举项">
-        <Form.List name="items">
-          {(fields, { add, remove }) => (
-            <Table
-              dataSource={fields}
-              columns={createTableColumns(remove)}
-              pagination={false}
-              footer={
-                initGroup?.isSystem
-                  ? undefined
-                  : () => (
-                      <Button type="primary" block onClick={() => add()}>
-                        添加枚举项
-                      </Button>
-                    )
-              }
-            />
-          )}
-        </Form.List>
+      <Form.Item name="items" hidden>
+        <span />
       </Form.Item>
+      <FormTableItem<DataEnum.Item>
+        fieldName="items"
+        rowKey="name"
+        columns={tableColumns}
+        pagination={false}
+        scroll={{ x: 1000, y: '100%' }}
+        onAdd={() => ({ name: generateUUID('temp_') }) as any}
+        disabledDelete={(row) => !row.name.startsWith('temp_')}
+        locale={{
+          emptyText: (
+            <Button icon={<PlusOutlined />} type="primary" onClick={handleAdd}>
+              添加项
+            </Button>
+          ),
+        }}
+      />
     </Form>
   )
 }
 
 export default forwardRef(GroupEditor)
-
-interface RemoveItemProps {
-  value?: string
-  remove: () => void
-}
-function RemoveItem({ value, remove }: RemoveItemProps) {
-  return (
-    <Button disabled={!!value} type="link" danger onClick={remove}>
-      删除
-    </Button>
-  )
-}

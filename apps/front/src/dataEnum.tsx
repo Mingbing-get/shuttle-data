@@ -81,6 +81,7 @@ export default function DataEnumRender({ manager }: Props) {
           manager={manager}
           groupName={currentEditGroupName}
           prefix="test_"
+          style={{ maxHeight: 'calc(80vh - 140px)' }}
         />
       </Modal>
     </>

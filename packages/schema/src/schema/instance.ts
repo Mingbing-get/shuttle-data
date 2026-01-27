@@ -141,7 +141,7 @@ export default class Schema {
         },
         modelMap: {
           ...allModels.modelMap,
-          [model.name]: model,
+          [model.name]: this.filterDeleteField(model),
         },
       }
       this.dataModelCache = Promise.resolve(newModels)
@@ -207,13 +207,15 @@ export default class Schema {
     model.fields.forEach((field) => {
       const oldField = oldModel.fields.find((f) => f.name === field.name)
       if (!oldField) {
-        willAddFields.push(field)
-      } else if (!field.isSystem) {
-        for (const key in canUpdateFieldKeys) {
-          if (
-            field[key as keyof DataModel.Field] !==
-            oldField[key as keyof DataModel.Field]
-          ) {
+        if (!field.isSystem) {
+          willAddFields.push(field)
+        }
+        return
+      }
+
+      if (!oldField.isSystem) {
+        for (const key of canUpdateFieldKeys) {
+          if (field[key] !== oldField[key]) {
             willUpdateFields.push(field)
             return
           }
@@ -225,6 +227,13 @@ export default class Schema {
           willUpdateFields.push(field)
           return
         }
+      }
+
+      if (oldField.order !== field.order) {
+        willUpdateFields.push({
+          ...oldField,
+          order: field.order,
+        })
       }
     })
     oldModel.fields.forEach((field) => {
@@ -324,10 +333,10 @@ export default class Schema {
               await trx(tableConfig.fieldConfig.tableName)
                 .where(fieldFields.name, '=', field.name)
                 .update({
+                  [fieldFields.order]: field.order,
                   [fieldFields.apiName]: field.apiName,
                   [fieldFields.label]: field.label,
                   [fieldFields.required]: field.required,
-                  [fieldFields.order]: field.order,
                   [fieldFields.extra]: field.extra
                     ? JSON.stringify(field.extra)
                     : null,
@@ -379,7 +388,7 @@ export default class Schema {
         },
         modelMap: {
           ...allModels.modelMap,
-          [newModel.name]: newModel,
+          [newModel.name]: this.filterDeleteField(newModel),
         },
       }
       if (newModel.apiName !== oldModel.apiName) {
@@ -837,6 +846,7 @@ export default class Schema {
               ),
             )
             .where('isDelete', '<>', true)
+            .andWhere('name', '<>', '_isDelete')
 
         return this.modelListToCache(
           modelTables.map((model) => ({
@@ -1006,7 +1016,7 @@ export default class Schema {
       table.json(fieldTableFieldMap.extra)
       table.boolean(fieldTableFieldMap.isDelete).defaultTo(false)
       table.boolean(fieldTableFieldMap.isSystem).defaultTo(false)
-      table.increments(fieldTableFieldMap.order)
+      table.integer(fieldTableFieldMap.order)
       Object.values(fieldConfig.custom || {}).forEach((customField) => {
         customField.builder(table)
       })
@@ -1052,6 +1062,13 @@ export default class Schema {
     })
 
     return id
+  }
+
+  private filterDeleteField(model: DataModel.Define) {
+    return {
+      ...model,
+      fields: model.fields.filter((field) => field.name !== '_isDelete'),
+    }
   }
 
   // 添加数据锁
@@ -1142,14 +1159,30 @@ export default class Schema {
 
   fillDefaultField(model: DataModel.Define) {
     const systemFields = this.getSystemFields()
-    const systemFieldNames = systemFields.map((field) => field.name)
-    const otherFields = model.fields.filter(
-      (field) => !systemFieldNames.includes(field.name),
+    const hasSystemFields: string[] = []
+    const fields = model.fields.reduce((acc, field) => {
+      const systemField = systemFields.find(
+        (systemField) => systemField.name === field.name,
+      )
+      if (!systemField) {
+        acc.push(field)
+      } else {
+        hasSystemFields.push(field.name)
+        acc.push({
+          ...systemField,
+          order: field.order,
+        })
+      }
+      return acc
+    }, [] as DataModel.Field[])
+
+    const missingSystemFields = systemFields.filter(
+      (systemField) => !hasSystemFields.includes(systemField.name),
     )
 
     return {
       ...model,
-      fields: [...systemFields, ...otherFields],
+      fields: [...missingSystemFields, ...fields],
     }
   }
 

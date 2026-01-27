@@ -8,21 +8,6 @@
       margin-right: 4px;
     }
   }
-  .ant-table-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .ant-table-tbody {
-    .ant-form-item {
-      margin-bottom: 0;
-    }
-  }
-  .table-row-focused {
-    .ant-table-cell {
-      background-color: var(--ant-blue-1) !important;
-    }
-  }
 
   .data-schema-editor-fields {
     flex: 1;
