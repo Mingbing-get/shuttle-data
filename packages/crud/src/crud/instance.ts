@@ -631,7 +631,19 @@ export default class CRUD<M extends Record<string, any>> {
         throw new Error(`Plugin for field ${field.type} not found`)
       }
 
-      fieldWithPlugin[this.options.useApiName ? field.apiName : field.name] = {
+      const fieldKey = this.options.useApiName ? field.apiName : field.name
+      if (field.required && !plugin.skipCheckRequired?.(field)) {
+        records.forEach((record) => {
+          if (
+            record[fieldKey] === null ||
+            (action === 'create' && record[fieldKey] === undefined)
+          ) {
+            throw new Error(`Field ${fieldKey} is required`)
+          }
+        })
+      }
+
+      fieldWithPlugin[fieldKey] = {
         field,
         plugin,
       }
@@ -641,7 +653,6 @@ export default class CRUD<M extends Record<string, any>> {
     const toDbRecords: Record<string, any>[] = records.map((record) => {
       if (action === 'create') {
         return {
-          ...record,
           [CRUD.ID]: this.options.generateId(),
           [CRUD.CREATED_AT]: now,
           [CRUD.UPDATED_AT]: now,
@@ -651,7 +662,7 @@ export default class CRUD<M extends Record<string, any>> {
       }
 
       return {
-        ...record,
+        [CRUD.ID]: record[CRUD.ID],
         [CRUD.UPDATED_AT]: now,
         [CRUD.UPDATED_BY]: this.options.context.user._id,
       }
@@ -660,17 +671,14 @@ export default class CRUD<M extends Record<string, any>> {
     for (const key in fieldWithPlugin) {
       const { field, plugin } = fieldWithPlugin[key]
       if (!plugin.toDb) {
-        if (key !== field.name) {
-          toDbRecords.forEach((record) => {
-            record[field.name] = record[key]
-            delete record[key]
-          })
-        }
+        records.forEach((record, index) => {
+          toDbRecords[index][field.name] = record[key]
+        })
 
         continue
       }
 
-      const values = toDbRecords.map((record) => record[key])
+      const values = records.map((record) => record[key])
       const afterTransformValues = await plugin.toDb({
         generateId: this.options.generateId,
         getKnex: this.options.getKnex,
@@ -680,16 +688,9 @@ export default class CRUD<M extends Record<string, any>> {
         useApiName: this.options.useApiName,
         context: this.options.context,
       })
-      if (key !== field.name) {
-        toDbRecords.forEach((record, index) => {
-          record[field.name] = afterTransformValues[index]
-          delete record[key]
-        })
-      } else {
-        toDbRecords.forEach((record, index) => {
-          record[field.name] = afterTransformValues[index]
-        })
-      }
+      toDbRecords.forEach((record, index) => {
+        record[field.name] = afterTransformValues[index]
+      })
     }
 
     return toDbRecords

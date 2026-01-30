@@ -11,6 +11,8 @@ export default function useTable(
   const [table, setTable] = useState<DataModel.Define>()
 
   const fetchTable = useCallback(async () => {
+    if (!tableName) return
+
     try {
       setLoading(true)
       const table = await schema.getTable(tableName, useApiName)
@@ -23,6 +25,8 @@ export default function useTable(
   }, [tableName, useApiName])
 
   useEffect(() => {
+    if (!tableName) return
+
     const removeListener = schema.observe(
       (table) => {
         if (table) {

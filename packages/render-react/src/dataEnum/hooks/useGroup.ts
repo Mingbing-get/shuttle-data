@@ -11,6 +11,8 @@ export default function useGroup(
   const [group, setGroup] = useState<DataEnum.Group>()
 
   const fetchGroup = useCallback(async () => {
+    if (!groupName) return
+
     try {
       setLoading(true)
       const group = await manager.getGroup(groupName, useApiName)
@@ -23,6 +25,8 @@ export default function useGroup(
   }, [groupName, useApiName])
 
   useEffect(() => {
+    if (!groupName) return
+
     const removeListener = manager.observe(
       (group) => {
         if (group) {

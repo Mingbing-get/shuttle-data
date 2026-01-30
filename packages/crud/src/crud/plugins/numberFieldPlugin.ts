@@ -1,4 +1,4 @@
-import { DataCRUD } from '@shuttle-data/type'
+import { DataCRUD, DataModel } from '@shuttle-data/type'
 import { NumberFieldPlugin as _NumberFieldPlugin } from '@shuttle-data/schema'
 
 import conditionPluginManager from '../conditionBuilder'
@@ -65,5 +65,9 @@ export default class NumberFieldPlugin
 
       return v
     })
+  }
+
+  skipCheckRequired(field: DataModel.NumberField) {
+    return !!field.extra?.autoIncrement
   }
 }

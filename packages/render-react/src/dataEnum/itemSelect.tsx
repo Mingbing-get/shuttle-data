@@ -5,7 +5,7 @@ import { DataEnumManager } from '@shuttle-data/client'
 
 import { useGroup } from './hooks'
 
-export interface ItemSelectProps extends Omit<
+export interface DataEnumItemSelectProps extends Omit<
   SelectProps,
   'options' | 'loading'
 > {
@@ -28,7 +28,7 @@ export default function ItemSelect({
   onChange,
   mode,
   ...extraProps
-}: ItemSelectProps) {
+}: DataEnumItemSelectProps) {
   const { loading, group } = useGroup(manager, groupName, useApiName)
   const [options, setOptions] = useState<{ value: string; label: string }[]>([])
 

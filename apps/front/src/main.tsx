@@ -14,10 +14,7 @@ export default function Main() {
         <DataEnumRender manager={dataModel.enumManager} />
       </Tabs.TabPane>
       <Tabs.TabPane tab="数据模型" key="model">
-        <DataModelRender
-          schema={dataModel.schema}
-          enumManager={dataModel.enumManager}
-        />
+        <DataModelRender dataModel={dataModel} />
       </Tabs.TabPane>
     </Tabs>
   )

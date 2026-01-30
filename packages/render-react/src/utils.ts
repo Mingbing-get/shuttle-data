@@ -29,6 +29,12 @@ export function generateUUID(prefix = '') {
   ].join('')
 }
 
+export function isSameStringArray(arr1: string[], arr2: string[]) {
+  return (
+    arr1.length === arr2.length && arr1.every((item) => arr2.includes(item))
+  )
+}
+
 export const nameRules: FormRule[] = [
   {
     required: true,

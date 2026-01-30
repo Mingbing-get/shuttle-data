@@ -1,4 +1,8 @@
-import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
+import {
+  DataModelSchema,
+  DataEnumManager,
+  DataModel,
+} from '@shuttle-data/client'
 import '@shuttle-data/type'
 
 declare module '@shuttle-data/type' {
@@ -14,10 +18,37 @@ declare module '@shuttle-data/type' {
         enumManager: DataEnumManager
       }
 
+      export interface FormInputRenderProps<
+        T extends DataModel.FieldType,
+        V = any,
+      > {
+        field: Extract<DataModel.Field, { type: T }>
+        dataModel: DataModel
+        useApiName?: boolean
+        disabled?: boolean
+        value?: V
+        onChange?: (value?: V | null) => void
+      }
+
+      export interface DisplayRenderProps<
+        T extends DataModel.FieldType,
+        V = any,
+      > {
+        field: Extract<DataModel.Field, { type: T }>
+        dataModel: DataModel
+        useApiName?: boolean
+        value?: V
+      }
+
       export interface FieldPlugin<
         T extends DataModel.FieldType,
+        V = any,
       > extends DataModel.FieldPlugin<T> {
         getSettingRender?: () => React.ComponentType<SettingRenderProps<T>>
+        getFormInputRender: () => React.ComponentType<
+          FormInputRenderProps<T, V>
+        >
+        getDisplayRender?: () => React.ComponentType<DisplayRenderProps<T, V>>
       }
     }
   }

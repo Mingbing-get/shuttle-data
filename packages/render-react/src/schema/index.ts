@@ -2,8 +2,6 @@ export { default as ModelFieldSelect } from './fieldSelect'
 export { default as ModelTableSelect } from './tableSelect'
 export { default as ModelListRender } from './tableList'
 export { default as TableEditorRender } from './tableEditor'
-export { default as renderFieldPluginManager } from './fieldPlugin'
-export * from './fieldPlugin'
 
 export * from './hooks'
 export * from './fieldSelect'

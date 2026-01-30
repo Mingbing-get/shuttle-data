@@ -10,9 +10,13 @@ import dataEnumRouter from './router/dataEnum'
 
 import './global.d.ts'
 
+import { init } from './init'
+
 main()
 
 async function main() {
+  await init()
+
   // 创建Koa应用实例
   const app = new Koa()
 

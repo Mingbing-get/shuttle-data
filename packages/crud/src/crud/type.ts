@@ -123,6 +123,9 @@ declare module '@shuttle-data/type' {
           options: FieldToOutputOption<T, any>,
         ) => any[] | Promise<any[]>
         toDb?: (options: FieldToDbOption<T, any>) => any[] | Promise<any[]>
+        skipCheckRequired?: (
+          field: Extract<DataModel.Field, { type: T }>,
+        ) => boolean
       }
     }
   }

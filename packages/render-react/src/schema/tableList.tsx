@@ -28,14 +28,13 @@ export default function DataModelTableList({
         {
           title: '唯一标识',
           dataIndex: 'name',
-          fixed: 'left',
+          fixed: 'start',
           minWidth: 220,
           ...tableStringFilter<Omit<DataModel.Define, 'fields'>>('name'),
         },
         {
           title: 'API名称',
           dataIndex: 'apiName',
-          fixed: 'left',
           minWidth: 220,
           ...tableStringFilter<Omit<DataModel.Define, 'fields'>>('apiName'),
         },

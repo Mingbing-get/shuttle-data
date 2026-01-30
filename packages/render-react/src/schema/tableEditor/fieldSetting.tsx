@@ -5,7 +5,7 @@ import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
 
 import PrefixInput from '../../components/prefixInput'
 import FieldTypeSelect from '../fieldTypeSelect'
-import renderFieldPlugin from '../fieldPlugin'
+import renderFieldPlugin from '../../fieldPlugin'
 import { apiNameRules, labelRules } from '../../utils'
 
 interface Props {

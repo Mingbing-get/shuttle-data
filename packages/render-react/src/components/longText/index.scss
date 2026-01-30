@@ -1,0 +1,7 @@
+.shuttle-data-long-text {
+  display: inline-block;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  word-break: keep-all;
+  white-space: nowrap;
+}

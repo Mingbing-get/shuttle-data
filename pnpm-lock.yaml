@@ -255,6 +255,9 @@ importers:
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
+      dayjs:
+        specifier: ^1.11.11
+        version: 1.11.19
       react:
         specifier: ^18.2.0
         version: 18.3.1

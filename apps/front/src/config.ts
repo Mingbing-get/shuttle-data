@@ -9,7 +9,7 @@ import {
 const dataModel = new DataModel(
   {
     transporter: new CRUDHttpTransporter({
-      baseUrl: 'http://localhost:3100/dataModel',
+      baseUrl: 'http://localhost:3100/dataModel/crud',
       async afterSend(response) {
         if (response.data?.code !== 200) {
           message.error(response.data?.message || '未知错误')
