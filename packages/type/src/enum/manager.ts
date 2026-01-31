@@ -28,6 +28,7 @@ export default class DataEnumManager {
         label: labelZod(),
         isDisabled: z.boolean().optional().nullable(),
         order: z.number().optional().nullable(),
+        color: z.string().optional().nullable(),
       })
       .catchall(z.any())
   }

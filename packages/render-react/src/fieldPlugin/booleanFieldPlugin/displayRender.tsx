@@ -2,6 +2,8 @@ import { Tag, TagProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function BooleanDisplayRender({
+  dataModel,
+  useApiName,
   field,
   value,
   ...tagProps

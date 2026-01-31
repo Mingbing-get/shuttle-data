@@ -1,4 +1,4 @@
-import { FormRule } from 'antd'
+import { FormRule, ColorPickerProps } from 'antd'
 
 export function generateUUID(prefix = '') {
   const array = new Uint8Array(16)
@@ -75,5 +75,58 @@ export const labelRules: FormRule[] = [
   {
     max: 100,
     message: '名称长度必须在 1 到 100 个字符之间',
+  },
+]
+
+export const presetColors: ColorPickerProps['presets'] = [
+  {
+    label: '常用',
+    colors: [
+      // 红色
+      '#FFF0F0',
+      '#FFD6D6',
+      '#FFBBB9',
+      '#FFA39E',
+      '#F5222D',
+      '#CF1322',
+      '#A8071A',
+      '#5C0011',
+      // 绿色
+      '#F6FFED',
+      '#D9F7BE',
+      '#B7EB8F',
+      '#95DE64',
+      '#52C41A',
+      '#389E0D',
+      '#237804',
+      '#092B00',
+      // 蓝色
+      '#E6F7FF',
+      '#BAE7FF',
+      '#91D5FF',
+      '#69C0FF',
+      '#1890FF',
+      '#096DD9',
+      '#0050B3',
+      '#002766',
+      // 紫色
+      '#F9F0FF',
+      '#EFDBFF',
+      '#D3ADF7',
+      '#B37FEB',
+      '#722ED1',
+      '#531DAB',
+      '#391085',
+      '#120338',
+      // 灰色
+      '#FFFFFF',
+      '#F5F5F5',
+      '#D9D9D9',
+      '#8C8C8C',
+      '#595959',
+      '#434343',
+      '#262626',
+      '#000000',
+    ],
   },
 ]

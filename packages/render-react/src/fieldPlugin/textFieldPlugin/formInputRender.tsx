@@ -3,6 +3,8 @@ import { TextAreaProps } from 'antd/es/input'
 import { DataModel } from '@shuttle-data/type'
 
 export default function TextFormInputRender({
+  dataModel,
+  useApiName,
   field,
   value,
   onChange,

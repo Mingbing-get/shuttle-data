@@ -2,6 +2,8 @@ import { InputNumber, InputNumberProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function DoubleFormInputRender({
+  dataModel,
+  useApiName,
   field,
   value,
   onChange,

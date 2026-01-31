@@ -2,6 +2,8 @@ import { Switch, SwitchProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function BooleanFormInputRender({
+  dataModel,
+  useApiName,
   field,
   value,
   onChange,

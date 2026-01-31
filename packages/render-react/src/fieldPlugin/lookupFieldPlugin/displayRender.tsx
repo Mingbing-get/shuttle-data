@@ -5,7 +5,9 @@ import { DataModel, DataCRUD } from '@shuttle-data/type'
 export default function LookupDisplayRender({
   field,
   value,
+  useApiName,
   dataModel,
+  color = 'var(--ant-color-primary)',
   ...tagProps
 }: DataModel.Render.DisplayRenderProps<
   'lookup',
@@ -25,7 +27,7 @@ export default function LookupDisplayRender({
   return (
     <Flex gap={4}>
       {displayItems.map((item) => (
-        <Tag key={item._id} {...tagProps}>
+        <Tag key={item._id} {...tagProps} color={color}>
           {item._display || item._id}
         </Tag>
       ))}

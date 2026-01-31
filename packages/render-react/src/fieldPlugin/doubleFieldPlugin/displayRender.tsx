@@ -2,6 +2,8 @@ import { DataModel } from '@shuttle-data/type'
 import { useMemo } from 'react'
 
 export default function DoubleDisplayRender({
+  dataModel,
+  useApiName,
   field,
   value,
   ...spanProps

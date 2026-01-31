@@ -14,6 +14,7 @@ import {
   Switch,
   TableColumnsType,
   Input,
+  ColorPicker,
   FormProps,
   FormInstance,
   Button,
@@ -26,7 +27,12 @@ import { DataEnum } from '@shuttle-data/type'
 
 import PrefixInput from '../../components/prefixInput'
 import FormTableItem from '../../components/formTableItem'
-import { generateUUID, apiNameRules, labelRules } from '../../utils'
+import {
+  generateUUID,
+  apiNameRules,
+  labelRules,
+  presetColors,
+} from '../../utils'
 
 import './index.scss'
 
@@ -112,6 +118,18 @@ function GroupEditor(
           </Form.Item>
         ),
         minWidth: 220,
+      },
+      {
+        title: '颜色',
+        render: (_, field, index) => (
+          <Form.Item
+            name={['items', index, 'color']}
+            getValueFromEvent={(_, color) => color}
+          >
+            <ColorPicker presets={presetColors} />
+          </Form.Item>
+        ),
+        minWidth: 120,
       },
       {
         title: '是否禁用',

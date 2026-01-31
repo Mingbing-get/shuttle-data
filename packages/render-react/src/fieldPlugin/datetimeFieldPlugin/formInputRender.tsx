@@ -4,6 +4,8 @@ import { DataModel } from '@shuttle-data/type'
 import dayjs, { Dayjs } from 'dayjs'
 
 export default function DateTimeFormInputRender({
+  dataModel,
+  useApiName,
   field,
   value,
   onChange,

@@ -2,6 +2,8 @@ import { Input, InputProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function StringFormInputRender({
+  dataModel,
+  useApiName,
   field,
   value,
   onChange,

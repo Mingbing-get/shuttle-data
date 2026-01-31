@@ -2,6 +2,8 @@ import { DataModel } from '@shuttle-data/type'
 import LongText from '../../components/longText'
 
 export default function TextDisplayRender({
+  dataModel,
+  useApiName,
   field,
   value,
   ...spanProps

@@ -3,6 +3,8 @@ import dayjs from 'dayjs'
 import LongText from '../../components/longText'
 
 export default function DateDisplayRender({
+  dataModel,
+  useApiName,
   field,
   value,
   ...spanProps

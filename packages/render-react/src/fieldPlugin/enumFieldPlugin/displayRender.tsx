@@ -11,7 +11,7 @@ export default function EnumDisplayRender({
   useApiName,
   ...tagProps
 }: DataModel.Render.DisplayRenderProps<'enum', string | string[]> &
-  Omit<TagProps, 'children'>) {
+  Omit<TagProps, 'children' | 'color'>) {
   const { group } = useGroup(
     dataModel.enumManager,
     field.extra?.groupName || '',
@@ -44,7 +44,7 @@ export default function EnumDisplayRender({
   return (
     <Flex gap={4}>
       {displayItems.map((item) => (
-        <Tag key={item.name} {...tagProps}>
+        <Tag key={item.name} color={item.color} {...tagProps}>
           {item.label || item.apiName || item.name}
         </Tag>
       ))}

@@ -70,6 +70,7 @@ export default function DataTable({
       {headerBlock?.()}
       <Table<any>
         {...tableProps}
+        rowKey="_id"
         scroll={computedScroll}
         dataSource={data}
         columns={mergedColumns}

@@ -1,5 +1,12 @@
-import { useState, useEffect } from 'react'
-import { Select, Radio, Checkbox, SelectProps, RadioGroupProps } from 'antd'
+import { useState, useEffect, useCallback } from 'react'
+import {
+  Select,
+  Radio,
+  Checkbox,
+  SelectProps,
+  RadioGroupProps,
+  Tag,
+} from 'antd'
 import { CheckboxGroupProps } from 'antd/es/checkbox'
 import { DataEnumManager } from '@shuttle-data/client'
 
@@ -30,16 +37,27 @@ export default function ItemSelect({
   ...extraProps
 }: DataEnumItemSelectProps) {
   const { loading, group } = useGroup(manager, groupName, useApiName)
-  const [options, setOptions] = useState<{ value: string; label: string }[]>([])
+  const [options, setOptions] = useState<
+    { value: string; label: string; color?: string }[]
+  >([])
 
   useEffect(() => {
     setOptions(
       group?.items?.map((item) => ({
         label: item.label || item.apiName,
         value: useApiName ? item.apiName : item.name,
+        color: item.color,
       })) || [],
     )
   }, [group, useApiName])
+
+  const getColor = useCallback(
+    (value: string) => {
+      const option = options.find((item) => item.value === value)
+      return option?.color
+    },
+    [options],
+  )
 
   if (mode !== 'multiple' && showAs === 'radio') {
     return (
@@ -73,6 +91,18 @@ export default function ItemSelect({
       options={options}
       value={value}
       onChange={onChange}
+      optionRender={(option) => (
+        <Tag color={option.data.color}>{option.label}</Tag>
+      )}
+      tagRender={(tagProps) => (
+        <Tag
+          {...tagProps}
+          className="ant-select-selection-item"
+          color={getColor(tagProps.value)}
+        >
+          {tagProps.label}
+        </Tag>
+      )}
     />
   )
 }

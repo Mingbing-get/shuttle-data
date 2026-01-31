@@ -5,6 +5,7 @@ export namespace DataEnum {
     label?: string
     isDisabled?: boolean
     order?: number
+    color?: string
   }
 
   export interface Group {

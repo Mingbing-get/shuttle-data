@@ -59,6 +59,7 @@ export default class DataEnumManager extends _DataEnumManager {
             [itemFields.apiName]: item.apiName,
             [itemFields.label]: item.label,
             [itemFields.order]: item.order,
+            [itemFields.color]: item.color,
             [itemFields.isDelete]: false,
             [itemFields.isDisabled]: item.isDisabled,
             ...this.createCustomRecord(
@@ -128,7 +129,8 @@ export default class DataEnumManager extends _DataEnumManager {
         oldItem.apiName !== item.apiName ||
         oldItem.label !== item.label ||
         oldItem.isDisabled !== item.isDisabled ||
-        oldItem.order !== item.order
+        oldItem.order !== item.order ||
+        oldItem.color !== item.color
       ) {
         willUpdateItems.push(item)
       }
@@ -170,6 +172,7 @@ export default class DataEnumManager extends _DataEnumManager {
                 [itemFields.apiName]: item.apiName,
                 [itemFields.label]: item.label,
                 [itemFields.order]: item.order,
+                [itemFields.color]: item.color,
                 [itemFields.isDelete]: false,
                 [itemFields.isDisabled]: item.isDisabled,
                 ...this.createCustomRecord(
@@ -193,6 +196,7 @@ export default class DataEnumManager extends _DataEnumManager {
               [itemFields.label]: item.label,
               [itemFields.isDisabled]: item.isDisabled,
               [itemFields.order]: item.order,
+              [itemFields.color]: item.color,
             })
         }
       })
@@ -215,6 +219,7 @@ export default class DataEnumManager extends _DataEnumManager {
               label: needUpdateItem.label,
               isDisabled: needUpdateItem.isDisabled,
               order: needUpdateItem.order,
+              color: needUpdateItem.color,
             })
           } else {
             acc.push(item)
@@ -334,6 +339,7 @@ export default class DataEnumManager extends _DataEnumManager {
           [itemFields.apiName]: item.apiName,
           [itemFields.label]: item.label,
           [itemFields.order]: item.order,
+          [itemFields.color]: item.color,
           [itemFields.isDelete]: false,
           [itemFields.isDisabled]: item.isDisabled,
           ...this.createCustomRecord(
@@ -401,6 +407,7 @@ export default class DataEnumManager extends _DataEnumManager {
           [itemFields.label]: item.label,
           [itemFields.isDisabled]: item.isDisabled,
           [itemFields.order]: item.order,
+          [itemFields.color]: item.color,
         })
     }
 
@@ -420,6 +427,7 @@ export default class DataEnumManager extends _DataEnumManager {
               label: item.label,
               isDisabled: item.isDisabled,
               order: item.order,
+              color: item.color,
             },
           ],
         },
@@ -638,6 +646,7 @@ export default class DataEnumManager extends _DataEnumManager {
         table.string(itemTableFields.apiName)
         table.string(itemTableFields.label)
         table.integer(itemTableFields.order)
+        table.string(itemTableFields.color)
         table.boolean(itemTableFields.isDisabled).defaultTo(false)
         table.boolean(itemTableFields.isDelete).defaultTo(false)
         Object.values(groupTableConfig.itemTableConfig.custom || {}).forEach(
@@ -685,6 +694,7 @@ export default class DataEnumManager extends _DataEnumManager {
       isDisabled: 'isDisabled',
       isDelete: 'isDelete',
       order: 'order',
+      color: 'color',
     }
 
     const itemTableConfig = this.options.groupTableConfig?.itemTableConfig || {}
