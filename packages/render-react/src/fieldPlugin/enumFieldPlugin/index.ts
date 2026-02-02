@@ -4,6 +4,7 @@ import { DataModel } from '@shuttle-data/type'
 import EnumSettingRender from './settingRender'
 import EnumFormInputRender from './formInputRender'
 import EnumDisplayRender from './displayRender'
+import EnumConditionInputRender from './conditionInputRender'
 
 export default class EnumFieldPlugin
   extends _EnumFieldPlugin
@@ -19,5 +20,9 @@ export default class EnumFieldPlugin
 
   getDisplayRender() {
     return EnumDisplayRender
+  }
+
+  getConditionInputRender() {
+    return EnumConditionInputRender
   }
 }

@@ -2,6 +2,16 @@ import { Input } from 'antd'
 import { TextAreaProps } from 'antd/es/input'
 import { DataModel } from '@shuttle-data/type'
 
+export interface TextFormInputRenderExtraProps extends Omit<
+  TextAreaProps,
+  'value' | 'onChange'
+> {}
+
+export interface TextFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<'text', string>,
+    TextFormInputRenderExtraProps {}
+
 export default function TextFormInputRender({
   dataModel,
   useApiName,
@@ -9,8 +19,7 @@ export default function TextFormInputRender({
   value,
   onChange,
   ...inputProps
-}: DataModel.Render.FormInputRenderProps<'text', string> &
-  Omit<TextAreaProps, 'value' | 'onChange'>) {
+}: TextFormInputRenderProps) {
   return (
     <Input.TextArea
       {...inputProps}

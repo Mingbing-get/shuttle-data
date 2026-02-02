@@ -4,6 +4,7 @@ import { BooleanFieldPlugin as _BooleanFieldPlugin } from '@shuttle-data/type'
 import BooleanSettingRender from './settingRender'
 import BooleanFormInputRender from './formInputRender'
 import BooleanDisplayRender from './displayRender'
+import BooleanConditionInputRender from './conditionInputRender'
 
 export default class BooleanFieldPlugin
   extends _BooleanFieldPlugin
@@ -19,5 +20,9 @@ export default class BooleanFieldPlugin
 
   getDisplayRender() {
     return BooleanDisplayRender
+  }
+
+  getConditionInputRender() {
+    return BooleanConditionInputRender
   }
 }

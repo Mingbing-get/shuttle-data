@@ -3,6 +3,16 @@ import { DatePicker, DatePickerProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 import dayjs, { Dayjs } from 'dayjs'
 
+export interface DateTimeInputRenderExtraProps extends Omit<
+  DatePickerProps<Dayjs, false>,
+  'value' | 'onChange' | 'mode' | 'multiple' | 'format' | 'showTime'
+> {}
+
+export interface DateTimeFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<'datetime', string>,
+    DateTimeInputRenderExtraProps {}
+
 export default function DateTimeFormInputRender({
   dataModel,
   useApiName,
@@ -11,11 +21,7 @@ export default function DateTimeFormInputRender({
   onChange,
   style,
   ...dateProps
-}: DataModel.Render.FormInputRenderProps<'datetime', string> &
-  Omit<
-    DatePickerProps<Dayjs, false>,
-    'value' | 'onChange' | 'mode' | 'multiple' | 'format' | 'showTime'
-  >) {
+}: DateTimeFormInputRenderProps) {
   const handleChange = useCallback(
     (date: Dayjs | null) => {
       if (!date) {

@@ -4,6 +4,7 @@ import { NumberFieldPlugin as _NumberFieldPlugin } from '@shuttle-data/type'
 import NumberSettingRender from './settingRender'
 import NumberDisplayRender from './displayRender'
 import NumberFormInputRender from './formInputRender'
+import NumberConditionInputRender from './conditionInputRender'
 
 export default class NumberFieldPlugin
   extends _NumberFieldPlugin
@@ -19,5 +20,9 @@ export default class NumberFieldPlugin
 
   getFormInputRender() {
     return NumberFormInputRender
+  }
+
+  getConditionInputRender() {
+    return NumberConditionInputRender
   }
 }

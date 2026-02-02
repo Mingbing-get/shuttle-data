@@ -1,6 +1,16 @@
 import { InputNumber, InputNumberProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
+export interface DoubleInputRenderExtraProps extends Omit<
+  InputNumberProps<number>,
+  'value' | 'onChange' | 'min' | 'max' | 'precision'
+> {}
+
+export interface DoubleFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<'double', number>,
+    DoubleInputRenderExtraProps {}
+
 export default function DoubleFormInputRender({
   dataModel,
   useApiName,
@@ -9,11 +19,7 @@ export default function DoubleFormInputRender({
   onChange,
   style,
   ...inputNumberProps
-}: DataModel.Render.FormInputRenderProps<'double', number> &
-  Omit<
-    InputNumberProps<number>,
-    'value' | 'onChange' | 'min' | 'max' | 'precision'
-  >) {
+}: DoubleFormInputRenderProps) {
   return (
     <InputNumber
       {...inputNumberProps}

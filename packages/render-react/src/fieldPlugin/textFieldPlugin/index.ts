@@ -4,6 +4,7 @@ import { TextFieldPlugin as _TextFieldPlugin } from '@shuttle-data/type'
 import TextSettingRender from './settingRender'
 import TextFormInputRender from './formInputRender'
 import TextDisplayRender from './displayRender'
+import TextConditionInputRender from './conditionInputRender'
 
 export default class TextFieldPlugin
   extends _TextFieldPlugin
@@ -19,5 +20,9 @@ export default class TextFieldPlugin
 
   getDisplayRender() {
     return TextDisplayRender
+  }
+
+  getConditionInputRender() {
+    return TextConditionInputRender
   }
 }

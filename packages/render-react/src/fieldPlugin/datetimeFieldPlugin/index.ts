@@ -4,6 +4,7 @@ import { DatetimeFieldPlugin as _DatetimeFieldPlugin } from '@shuttle-data/type'
 import DateTimeSettingRender from './settingRender'
 import DateTimeFormInputRender from './formInputRender'
 import DateTimeDisplayRender from './displayRender'
+import DateTimeConditionInputRender from './conditionInputRender'
 
 export default class DatetimeFieldPlugin
   extends _DatetimeFieldPlugin
@@ -19,5 +20,9 @@ export default class DatetimeFieldPlugin
 
   getDisplayRender() {
     return DateTimeDisplayRender
+  }
+
+  getConditionInputRender() {
+    return DateTimeConditionInputRender
   }
 }

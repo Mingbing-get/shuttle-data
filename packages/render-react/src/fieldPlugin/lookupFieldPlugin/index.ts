@@ -7,6 +7,7 @@ import { DataModel } from '@shuttle-data/type'
 import LookupSettingRender from './settingRender'
 import LookupDisplayRender from './displayRender'
 import LookupFormInputRender from './formInputRender'
+import LookupConditionInputRender from './conditionInputRender'
 
 export default class LookupFieldPlugin
   extends _LookupFieldPlugin
@@ -26,5 +27,9 @@ export default class LookupFieldPlugin
 
   getFormInputRender() {
     return LookupFormInputRender
+  }
+
+  getConditionInputRender() {
+    return LookupConditionInputRender
   }
 }

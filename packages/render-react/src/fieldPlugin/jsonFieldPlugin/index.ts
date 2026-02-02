@@ -8,4 +8,8 @@ export default class JsonFieldPlugin
   getFormInputRender() {
     return null as any
   }
+
+  getConditionInputRender() {
+    return null as any
+  }
 }

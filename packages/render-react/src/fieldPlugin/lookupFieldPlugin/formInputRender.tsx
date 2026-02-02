@@ -2,20 +2,26 @@ import { DataModel, DataCRUD } from '@shuttle-data/type'
 
 import { RecordSelect, DataRecordSelectProps } from '../../data'
 
+export interface LookupInputRenderExtraProps extends Omit<
+  DataRecordSelectProps,
+  'value' | 'onChange' | 'tableName' | 'multiple' | 'useApiName'
+> {}
+
+export interface LookupFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<
+      'lookup',
+      DataCRUD.LookupInRecord | DataCRUD.LookupInRecord[]
+    >,
+    LookupInputRenderExtraProps {}
+
 export default function LookupFormInputRender({
   field,
   value,
   onChange,
   useApiName,
   ...selectProps
-}: DataModel.Render.FormInputRenderProps<
-  'lookup',
-  DataCRUD.LookupInRecord | DataCRUD.LookupInRecord[]
-> &
-  Omit<
-    DataRecordSelectProps,
-    'value' | 'onChange' | 'tableName' | 'multiple' | 'useApiName'
-  >) {
+}: LookupFormInputRenderProps) {
   return (
     <RecordSelect
       {...selectProps}

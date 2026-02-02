@@ -4,6 +4,7 @@ import { DoubleFieldPlugin as _DoubleFieldPlugin } from '@shuttle-data/type'
 import DoubleSettingRender from './settingRender'
 import DoubleDisplayRender from './displayRender'
 import DoubleFormInputRender from './formInputRender'
+import DoubleConditionInputRender from './conditionInputRender'
 
 export default class DoubleFieldPlugin
   extends _DoubleFieldPlugin
@@ -19,5 +20,9 @@ export default class DoubleFieldPlugin
 
   getFormInputRender() {
     return DoubleFormInputRender
+  }
+
+  getConditionInputRender() {
+    return DoubleConditionInputRender
   }
 }

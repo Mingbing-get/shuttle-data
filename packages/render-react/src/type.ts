@@ -40,6 +40,19 @@ declare module '@shuttle-data/type' {
         value?: V
       }
 
+      export interface ConditionInputRenderProps<
+        T extends DataModel.FieldType,
+        V = any,
+      > {
+        field: Extract<DataModel.Field, { type: T }>
+        dataModel: DataModel
+        op: Exclude<DataCondition.Op, 'and' | 'or'>
+        useApiName?: boolean
+        disabled?: boolean
+        value?: V
+        onChange?: (value?: V | null) => void
+      }
+
       export interface FieldPlugin<
         T extends DataModel.FieldType,
         V = any,
@@ -47,6 +60,9 @@ declare module '@shuttle-data/type' {
         getSettingRender?: () => React.ComponentType<SettingRenderProps<T>>
         getFormInputRender: () => React.ComponentType<
           FormInputRenderProps<T, V>
+        >
+        getConditionInputRender: () => React.ComponentType<
+          ConditionInputRenderProps<T, V>
         >
         getDisplayRender?: () => React.ComponentType<DisplayRenderProps<T, V>>
       }

@@ -1,6 +1,16 @@
 import { Switch, SwitchProps } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
+export interface BooleanInputRenderExtraProps extends Omit<
+  SwitchProps,
+  'checked' | 'onChange' | 'checkedChildren' | 'unCheckedChildren'
+> {}
+
+export interface BooleanFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<'boolean', boolean>,
+    BooleanInputRenderExtraProps {}
+
 export default function BooleanFormInputRender({
   dataModel,
   useApiName,
@@ -8,11 +18,7 @@ export default function BooleanFormInputRender({
   value,
   onChange,
   ...switchProps
-}: DataModel.Render.FormInputRenderProps<'boolean', boolean> &
-  Omit<
-    SwitchProps,
-    'checked' | 'onChange' | 'checkedChildren' | 'unCheckedChildren'
-  >) {
+}: BooleanFormInputRenderProps) {
   return (
     <Switch
       {...switchProps}

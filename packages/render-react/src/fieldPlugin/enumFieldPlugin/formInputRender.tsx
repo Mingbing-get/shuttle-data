@@ -6,6 +6,16 @@ import {
   useGroup,
 } from '../../dataEnum'
 
+export interface EnumInputRenderExtraProps extends Omit<
+  DataEnumItemSelectProps,
+  'value' | 'onChange' | 'manager' | 'groupName' | 'mode' | 'useApiName'
+> {}
+
+export interface EnumFormInputRenderProps
+  extends
+    DataModel.Render.FormInputRenderProps<'enum', string | string[]>,
+    EnumInputRenderExtraProps {}
+
 export default function EnumFormInputRender({
   field,
   dataModel,
@@ -13,11 +23,7 @@ export default function EnumFormInputRender({
   onChange,
   useApiName,
   ...selectProps
-}: DataModel.Render.FormInputRenderProps<'enum', string | string[]> &
-  Omit<
-    DataEnumItemSelectProps,
-    'value' | 'onChange' | 'manager' | 'groupName' | 'mode' | 'useApiName'
-  >) {
+}: EnumFormInputRenderProps) {
   const { group } = useGroup(
     dataModel.enumManager,
     field.extra?.groupName || '',

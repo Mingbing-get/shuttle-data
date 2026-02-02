@@ -4,6 +4,7 @@ import { StringFieldPlugin as _StringFieldPlugin } from '@shuttle-data/type'
 import StringSettingRender from './settingRender'
 import StringFormInputRender from './formInputRender'
 import StringDisplayRender from './displayRender'
+import StringConditionInputRender from './conditionInputRender'
 
 export default class StringFieldPlugin
   extends _StringFieldPlugin
@@ -19,5 +20,9 @@ export default class StringFieldPlugin
 
   getDisplayRender() {
     return StringDisplayRender
+  }
+
+  getConditionInputRender() {
+    return StringConditionInputRender
   }
 }
