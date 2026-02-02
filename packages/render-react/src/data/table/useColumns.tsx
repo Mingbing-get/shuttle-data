@@ -149,6 +149,9 @@ function mergeColumns(
       usedColumnNames.push(...childrenInfo.usedColumnNames)
 
       return {
+        minWidth: childrenInfo.afterMergeBaseColumns.reduce((acc, item) => {
+          return acc + (item.minWidth || 240)
+        }, 0),
         ...column,
         ...columnsConfig[column.key as string],
         children: childrenInfo.afterMergeBaseColumns,

@@ -1,10 +1,38 @@
-import { useMemo } from 'react'
-import { Table, TableProps, TablePaginationConfig } from 'antd'
+import { useMemo, useState } from 'react'
+import {
+  Table,
+  TableProps,
+  TableColumnsType,
+  TablePaginationConfig,
+} from 'antd'
 import { DataModel } from '@shuttle-data/client'
+import {
+  DataCondition,
+  DataCRUD,
+  DataModel as NDataModel,
+} from '@shuttle-data/type'
 
 import { useTable } from '../../schema'
-import useColumns from './useColumns'
+import useColumns, { ColumnConfig } from './useColumns'
 import useData from './useData'
+import HeaderBlock from './headerBlock'
+
+export interface HeaderBlockContext {
+  table: NDataModel.Define
+  columns: TableColumnsType
+  condition: DataCondition.Define<Record<string, any>> | undefined
+  orders: DataCRUD.OrderBy<Record<string, any>>[]
+  useApiName?: boolean
+  updateCondition: (
+    condition?: DataCondition.Define<Record<string, any>>,
+  ) => void
+  updateOrders: (orders: DataCRUD.OrderBy<Record<string, any>>[]) => void
+  updateColumnConfig: <K extends keyof ColumnConfig>(
+    columnKey: string,
+    k: K,
+    v: ColumnConfig[K],
+  ) => void
+}
 
 export interface DataTableProps extends Omit<
   TableProps,
@@ -12,7 +40,10 @@ export interface DataTableProps extends Omit<
 > {
   dataModel: DataModel
   tableName: string
-  headerBlock?: () => React.ReactNode
+  headerBlock?: (
+    context: HeaderBlockContext,
+    actionRender: React.ReactNode,
+  ) => React.ReactNode
   useApiName?: boolean
   pagination?: TablePaginationConfig
   showAll?: boolean
@@ -29,6 +60,12 @@ export default function DataTable({
   showAll,
   ...tableProps
 }: DataTableProps) {
+  const [condition, setCondition] =
+    useState<DataCondition.Define<Record<string, any>>>()
+  const [orders, setOrders] = useState<DataCRUD.OrderBy<Record<string, any>>[]>(
+    [],
+  )
+
   const { table, loading: schemaLoading } = useTable(
     dataModel.schema,
     tableName,
@@ -50,9 +87,12 @@ export default function DataTable({
   } = useData({
     dataModel,
     baseColumns: columns,
+    showAll,
     table,
     useApiName,
     pagination,
+    condition,
+    orders,
   })
 
   const computedScroll = useMemo(() => {
@@ -65,9 +105,26 @@ export default function DataTable({
     return { ...scroll, x }
   }, [scroll, mergedColumns])
 
+  const header = useMemo(() => {
+    if (!headerBlock || !table) return null
+
+    const context: HeaderBlockContext = {
+      table,
+      columns: mergedColumns,
+      condition,
+      orders,
+      useApiName,
+      updateCondition: setCondition,
+      updateOrders: setOrders,
+      updateColumnConfig,
+    }
+
+    return headerBlock(context, <HeaderBlock {...context} />)
+  }, [headerBlock, condition, orders, table, mergedColumns, useApiName])
+
   return (
     <>
-      {headerBlock?.()}
+      {header}
       <Table<any>
         {...tableProps}
         rowKey="_id"

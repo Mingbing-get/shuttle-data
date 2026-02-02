@@ -9,6 +9,7 @@ import { isGroupColumn } from './utils'
 interface UseDataOptions {
   dataModel: DataModelInstance
   baseColumns?: TableColumnsType
+  showAll?: boolean
   table?: DataModel.Define
   useApiName?: boolean
   pagination?: TablePaginationConfig
@@ -19,6 +20,7 @@ interface UseDataOptions {
 export default function useData({
   dataModel,
   baseColumns,
+  showAll,
   table,
   useApiName,
   pagination,
@@ -34,11 +36,14 @@ export default function useData({
   const [total, setTotal] = useState(0)
 
   const needRequestColumns = useMemo(() => {
-    const dataIndexList = findDataIndexFromColumn(baseColumns || [])
     const tableFields =
       table?.fields?.map((field) =>
         useApiName ? field.apiName : field.name,
       ) || []
+
+    if (showAll) return tableFields
+
+    const dataIndexList = findDataIndexFromColumn(baseColumns || [])
 
     const inTableDataIndex = dataIndexList.filter((index) =>
       tableFields.includes(index),
@@ -47,7 +52,7 @@ export default function useData({
       return tableFields
     }
     return inTableDataIndex
-  }, [table, baseColumns, useApiName])
+  }, [table, baseColumns, useApiName, showAll])
 
   const handleChangePage = useCallback((page: number, pageSize: number) => {
     setPage({

@@ -40,6 +40,16 @@ export default function DataModelRender({ dataModel }: Props) {
   const dataTableColumns = useMemo(() => {
     const columns: TableColumnsType = [
       {
+        title: '系统字段',
+        children: [
+          { dataIndex: '_id' },
+          { dataIndex: '_createdBy' },
+          { dataIndex: '_createdAt' },
+          { dataIndex: '_updatedBy' },
+          { dataIndex: '_updatedAt' },
+        ],
+      },
+      {
         title: '操作',
         key: 'action',
         fixed: 'right',
@@ -196,11 +206,21 @@ export default function DataModelRender({ dataModel }: Props) {
         {currentTableName && (
           <DataTable
             showAll
-            headerBlock={() => (
-              <div style={{ display: 'flex', marginBottom: 12, gap: 8 }}>
-                <Button type="primary" onClick={() => setShowForm(true)}>
-                  添加数据
-                </Button>
+            headerBlock={(_, action) => (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
+                }}
+              >
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Button type="primary" onClick={() => setShowForm(true)}>
+                    添加数据
+                  </Button>
+                </div>
+                {action}
               </div>
             )}
             columns={dataTableColumns}
