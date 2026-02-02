@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class JsonFieldPlugin implements DataModel.FieldPlugin<'json'> {
   readonly type = 'json'
@@ -23,5 +24,14 @@ export default class JsonFieldPlugin implements DataModel.FieldPlugin<'json'> {
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: any`
+  }
+
+  getSupportConditionOps() {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = [
+      'isNull',
+      'isNotNull',
+    ]
+
+    return ops
   }
 }

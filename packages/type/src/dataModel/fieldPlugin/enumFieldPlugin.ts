@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
   readonly type = 'enum'
@@ -29,6 +30,21 @@ export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: ${enumTypeName}${field.extra?.multiple ? '[]' : ''}`
+  }
+
+  getSupportConditionOps(field: DataModel.EnumField) {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = field.extra?.multiple
+      ? [
+          'isNull',
+          'isNotNull',
+          'contains',
+          'notContains',
+          'hasAnyOf',
+          'notAnyOf',
+        ]
+      : ['isNull', 'isNotNull', 'eq', 'neq', 'in', 'notIn']
+
+    return ops
   }
 
   private capitalizeFirstLetter(str: string): string {

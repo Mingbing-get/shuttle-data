@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class DatetimeFieldPlugin implements DataModel.FieldPlugin<'datetime'> {
   readonly type = 'datetime'
@@ -31,5 +32,22 @@ export default class DatetimeFieldPlugin implements DataModel.FieldPlugin<'datet
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: number`
+  }
+
+  getSupportConditionOps() {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = [
+      'isNull',
+      'isNotNull',
+      'eq',
+      'neq',
+      'gt',
+      'lt',
+      'gte',
+      'lte',
+      'in',
+      'notIn',
+    ]
+
+    return ops
   }
 }

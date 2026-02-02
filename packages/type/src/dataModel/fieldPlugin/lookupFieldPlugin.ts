@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'> {
   readonly type = 'lookup'
@@ -30,6 +31,21 @@ export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: ${modalName}${field.extra?.multiple ? '[]' : ''}`
+  }
+
+  getSupportConditionOps(field: DataModel.LookupField) {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = field.extra?.multiple
+      ? [
+          'isNull',
+          'isNotNull',
+          'contains',
+          'notContains',
+          'hasAnyOf',
+          'notAnyOf',
+        ]
+      : ['isNull', 'isNotNull', 'eq', 'neq', 'in', 'notIn']
+
+    return ops
   }
 
   private capitalizeFirstLetter(str: string): string {

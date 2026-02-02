@@ -1,4 +1,5 @@
 import { ZodObject } from 'zod'
+import { DataCondition } from '../condition'
 
 export namespace DataModel {
   export interface BaseField<T extends string, E = undefined> {
@@ -99,5 +100,9 @@ export namespace DataModel {
     getZod(): ZodObject<any, any>
 
     getTs(field: Extract<Field, { type: T }>, useApiName?: boolean): string
+
+    getSupportConditionOps(
+      field: Extract<Field, { type: T }>,
+    ): Exclude<DataCondition.Op, 'and' | 'or'>[]
   }
 }

@@ -18,18 +18,7 @@ export default class DateFieldPlugin
         ...condition,
         key: field.name,
       },
-      [
-        'isNull',
-        'isNotNull',
-        'eq',
-        'neq',
-        'gt',
-        'lt',
-        'gte',
-        'lte',
-        'in',
-        'notIn',
-      ],
+      this.getSupportConditionOps(),
     )
   }
 }

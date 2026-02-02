@@ -18,7 +18,7 @@ export default class JsonFieldPlugin
         ...condition,
         key: field.name,
       },
-      ['isNull', 'isNotNull'],
+      this.getSupportConditionOps(),
     )
   }
 

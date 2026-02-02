@@ -18,7 +18,7 @@ export default class TextFieldPlugin
         ...condition,
         key: field.name,
       },
-      ['isNull', 'isNotNull', 'eq', 'neq', 'like', 'notLike'],
+      this.getSupportConditionOps(),
     )
   }
 }

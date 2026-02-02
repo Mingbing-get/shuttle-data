@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class TextFieldPlugin implements DataModel.FieldPlugin<'text'> {
   readonly type = 'text'
@@ -30,5 +31,18 @@ export default class TextFieldPlugin implements DataModel.FieldPlugin<'text'> {
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: string`
+  }
+
+  getSupportConditionOps() {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = [
+      'isNull',
+      'isNotNull',
+      'eq',
+      'neq',
+      'like',
+      'notLike',
+    ]
+
+    return ops
   }
 }

@@ -18,7 +18,7 @@ export default class BooleanFieldPlugin
         ...condition,
         key: field.name,
       },
-      ['isNull', 'isNotNull', 'isTrue', 'isNotTrue', 'eq', 'neq'],
+      this.getSupportConditionOps(),
     )
   }
 }

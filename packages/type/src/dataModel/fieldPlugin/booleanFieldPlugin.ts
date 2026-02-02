@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import type { DataModel } from '../type'
 import baseFieldZod from './baseFieldZod'
+import { DataCondition } from '../../condition'
 
 export default class BooleanFieldPlugin implements DataModel.FieldPlugin<'boolean'> {
   readonly type = 'boolean'
@@ -30,5 +31,18 @@ export default class BooleanFieldPlugin implements DataModel.FieldPlugin<'boolea
  * apiName: ${field.apiName}
  */
 ${key}${field.required ? '' : '?'}: boolean`
+  }
+
+  getSupportConditionOps() {
+    const ops: Exclude<DataCondition.Op, 'and' | 'or'>[] = [
+      'isNull',
+      'isNotNull',
+      'isTrue',
+      'isNotTrue',
+      'eq',
+      'neq',
+    ]
+
+    return ops
   }
 }

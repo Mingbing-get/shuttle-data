@@ -18,7 +18,7 @@ export default class StringFieldPlugin
         ...condition,
         key: field.name,
       },
-      ['isNull', 'isNotNull', 'eq', 'neq', 'like', 'notLike', 'in', 'notIn'],
+      this.getSupportConditionOps(),
     )
   }
 

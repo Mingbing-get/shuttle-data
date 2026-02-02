@@ -19,16 +19,7 @@ export default class LookupFieldPlugin
         ...condition,
         key: field.name,
       },
-      field.extra?.multiple
-        ? [
-            'isNull',
-            'isNotNull',
-            'contains',
-            'notContains',
-            'hasAnyOf',
-            'notAnyOf',
-          ]
-        : ['isNull', 'isNotNull', 'eq', 'neq', 'in', 'notIn'],
+      this.getSupportConditionOps(field),
     )
   }
 
