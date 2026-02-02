@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  InConditionPlugin as BaseInConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class InConditionPlugin implements DataCondition.Server
-  .Plugin<'in'> {
-  readonly op = 'in'
-
+export default class InConditionPlugin
+  extends BaseInConditionPlugin
+  implements DataCondition.Server.Plugin<'in'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.InCondition<M>,

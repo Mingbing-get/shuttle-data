@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  IsNullConditionPlugin as BaseIsNullConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class IsNullConditionPlugin implements DataCondition.Server
-  .Plugin<'isNull'> {
-  readonly op = 'isNull'
-
+export default class IsNullConditionPlugin
+  extends BaseIsNullConditionPlugin
+  implements DataCondition.Server.Plugin<'isNull'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.IsNullCondition<M>,

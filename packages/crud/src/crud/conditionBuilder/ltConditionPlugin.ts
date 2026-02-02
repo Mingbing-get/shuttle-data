@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  LtConditionPlugin as BaseLtConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class LtConditionPlugin implements DataCondition.Server
-  .Plugin<'lt'> {
-  readonly op = 'lt'
-
+export default class LtConditionPlugin
+  extends BaseLtConditionPlugin
+  implements DataCondition.Server.Plugin<'lt'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.LtCondition<M>,

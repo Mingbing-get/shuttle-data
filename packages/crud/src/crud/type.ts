@@ -7,9 +7,9 @@ declare module '@shuttle-data/type' {
   export namespace DataEnum {}
   export namespace DataCondition {
     export namespace Server {
-      export interface Plugin<T extends DataCondition.Op> {
-        readonly op: T
-
+      export interface Plugin<
+        T extends DataCondition.Op,
+      > extends DataCondition.Plugin<T> {
         create<M extends Record<string, any>>(
           builder: Knex.QueryBuilder,
           condition: Extract<DataCondition.Define<M>, { op: T }>,

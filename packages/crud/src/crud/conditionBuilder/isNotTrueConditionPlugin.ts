@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  IsNotTrueConditionPlugin as BaseIsNotTrueConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class IsNotTrueConditionPlugin implements DataCondition.Server
-  .Plugin<'isNotTrue'> {
-  readonly op = 'isNotTrue'
-
+export default class IsNotTrueConditionPlugin
+  extends BaseIsNotTrueConditionPlugin
+  implements DataCondition.Server.Plugin<'isNotTrue'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.IsNotTrueCondition<M>,

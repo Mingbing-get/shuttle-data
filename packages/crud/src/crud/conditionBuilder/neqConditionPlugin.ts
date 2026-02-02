@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  NeqConditionPlugin as BaseNeqConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class NeqConditionPlugin implements DataCondition.Server
-  .Plugin<'neq'> {
-  readonly op = 'neq'
-
+export default class NeqConditionPlugin
+  extends BaseNeqConditionPlugin
+  implements DataCondition.Server.Plugin<'neq'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.NeqCondition<M>,

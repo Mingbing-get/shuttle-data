@@ -1,5 +1,4 @@
-import { Knex } from 'knex'
-import { DataCondition, conditionPluginManager } from '@shuttle-data/type'
+import { DataCondition } from '../type'
 
 import EqConditionPlugin from './eqConditionPlugin'
 import IsNullConditionPlugin from './isNullConditionPlugin'
@@ -41,10 +40,10 @@ export {
   NotContainsConditionPlugin,
 }
 
-class ConditionPliuginManager {
+class ConditionPluginManager {
   private pluginMap: Record<
     Exclude<DataCondition.Op, 'and' | 'or'>,
-    DataCondition.Server.Plugin<any>
+    DataCondition.Plugin<any>
   > = {
     eq: new EqConditionPlugin(),
     neq: new NeqConditionPlugin(),
@@ -67,29 +66,9 @@ class ConditionPliuginManager {
   }
 
   use<T extends Exclude<DataCondition.Op, 'and' | 'or'>>(
-    plugin: DataCondition.Server.Plugin<T>,
+    plugin: DataCondition.Plugin<T>,
   ) {
     this.pluginMap[plugin.op] = plugin
-    conditionPluginManager.use(plugin)
-  }
-
-  create<M extends Record<string, any>>(
-    builder: Knex.QueryBuilder,
-    condition: Exclude<DataCondition.Define<M>, { op: 'and' | 'or' }>,
-    onlyOps?: Exclude<DataCondition.Op, 'and' | 'or'>[],
-  ) {
-    if (onlyOps) {
-      if (!onlyOps.includes(condition.op)) {
-        throw new Error(`Op ${condition.op} not supported`)
-      }
-    }
-
-    const plugin = this.pluginMap[condition.op]
-    if (!plugin) {
-      throw new Error(`Plugin for op ${condition.op} not found`)
-    }
-
-    plugin.create(builder, condition)
   }
 
   getPlugin(op: Exclude<DataCondition.Op, 'and' | 'or'>) {
@@ -97,4 +76,4 @@ class ConditionPliuginManager {
   }
 }
 
-export default new ConditionPliuginManager()
+export default new ConditionPluginManager()

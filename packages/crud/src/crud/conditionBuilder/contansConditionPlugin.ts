@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  ContainsConditionPlugin as BaseContainsConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class ContainsConditionPlugin implements DataCondition.Server
-  .Plugin<'contains'> {
-  readonly op = 'contains'
-
+export default class ContainsConditionPlugin
+  extends BaseContainsConditionPlugin
+  implements DataCondition.Server.Plugin<'contains'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.ContainsCondition<M>,

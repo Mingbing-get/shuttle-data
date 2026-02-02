@@ -166,4 +166,9 @@ export namespace DataCondition {
     ConditionMap<M>[keyof ConditionMap<M>]
 
   export type Op = Define<any>['op']
+
+  export interface Plugin<T extends Op> {
+    readonly op: T
+    readonly label: string
+  }
 }

@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  NotAnyOfConditionPlugin as BaseNotAnyOfConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class NotAnyOfConditionPlugin implements DataCondition.Server
-  .Plugin<'notAnyOf'> {
-  readonly op = 'notAnyOf'
-
+export default class NotAnyOfConditionPlugin
+  extends BaseNotAnyOfConditionPlugin
+  implements DataCondition.Server.Plugin<'notAnyOf'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.NotAnyOfCondition<M>,

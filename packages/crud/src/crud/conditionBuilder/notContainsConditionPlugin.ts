@@ -1,10 +1,13 @@
 import { Knex } from 'knex'
-import { DataCondition } from '@shuttle-data/type'
+import {
+  DataCondition,
+  NotContainsConditionPlugin as BaseNotContainsConditionPlugin,
+} from '@shuttle-data/type'
 
-export default class NotContainsConditionPlugin implements DataCondition.Server
-  .Plugin<'notContains'> {
-  readonly op = 'notContains'
-
+export default class NotContainsConditionPlugin
+  extends BaseNotContainsConditionPlugin
+  implements DataCondition.Server.Plugin<'notContains'>
+{
   create<M extends Record<string, any>>(
     builder: Knex.QueryBuilder,
     condition: DataCondition.NotContainsCondition<M>,
