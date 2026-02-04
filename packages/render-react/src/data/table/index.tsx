@@ -18,6 +18,7 @@ import useData from './useData'
 import HeaderBlock from './headerBlock'
 
 export interface HeaderBlockContext {
+  dataModel: DataModel
   table: NDataModel.Define
   columns: TableColumnsType
   condition: DataCondition.Define<Record<string, any>> | undefined
@@ -109,6 +110,7 @@ export default function DataTable({
     if (!headerBlock || !table) return null
 
     const context: HeaderBlockContext = {
+      dataModel,
       table,
       columns: mergedColumns,
       condition,
@@ -120,7 +122,15 @@ export default function DataTable({
     }
 
     return headerBlock(context, <HeaderBlock {...context} />)
-  }, [headerBlock, condition, orders, table, mergedColumns, useApiName])
+  }, [
+    headerBlock,
+    dataModel,
+    condition,
+    orders,
+    table,
+    mergedColumns,
+    useApiName,
+  ])
 
   return (
     <>

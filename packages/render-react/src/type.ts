@@ -28,6 +28,9 @@ declare module '@shuttle-data/type' {
         disabled?: boolean
         value?: V
         onChange?: (value?: V | null) => void
+        onFocus?: (e: React.FocusEvent) => void
+        style?: React.CSSProperties
+        className?: string
       }
 
       export interface DisplayRenderProps<
@@ -38,6 +41,8 @@ declare module '@shuttle-data/type' {
         dataModel: DataModel
         useApiName?: boolean
         value?: V
+        style?: React.CSSProperties
+        className?: string
       }
 
       export interface ConditionInputRenderProps<
@@ -51,6 +56,9 @@ declare module '@shuttle-data/type' {
         disabled?: boolean
         value?: V
         onChange?: (value?: V | null) => void
+        onFocus?: (e: React.FocusEvent) => void
+        style?: React.CSSProperties
+        className?: string
       }
 
       export interface FieldPlugin<

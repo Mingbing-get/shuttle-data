@@ -1,0 +1,123 @@
+.shuttle-data-condition-wrapper {
+  padding: 1px;
+  --offset-x: 0px;
+
+  .shuttle-data-condition-logic-wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: calc(60px + var(--offset-x)) auto;
+  }
+
+  .shuttle-data-condition-logic-left {
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+
+    .shuttle-data-condition-logic-select {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .shuttle-data-condition-logic-readonly {
+      text-align: center;
+    }
+
+    .shuttle-data-condition-logic-top,
+    .shuttle-data-condition-logic-bottom {
+      flex: 1;
+      overflow: hidden;
+      &::before {
+        content: ' ';
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+    }
+    .shuttle-data-condition-logic-top::before {
+      transform: translate(
+        calc((100% + var(--offset-x)) / 2),
+        var(--logic-line-top-offset)
+      );
+    }
+    .shuttle-data-condition-logic-bottom::before {
+      transform: translate(
+        calc((100% + var(--offset-x)) / 2),
+        var(--logic-line-bottom-offset)
+      );
+    }
+  }
+
+  .shuttle-data-condition-logic-right {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .shuttle-data-condition-normal-item {
+    position: relative;
+    min-width: 320px;
+    flex: 1;
+
+    .shuttle-data-condition-normal-item-actions {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translate(-100%, -50%);
+      transition: transform 0.3s ease-in-out;
+      user-select: none;
+      opacity: 0;
+    }
+
+    &:hover {
+      .shuttle-data-condition-normal-item-actions {
+        user-select: unset;
+        opacity: 1;
+        transform: translate(0, -50%);
+      }
+    }
+  }
+
+  .shuttle-data-condition-single {
+    position: relative;
+    &.not-complete {
+      outline: 1px solid #f54a45;
+      border-radius: 6px;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 20px;
+    }
+    &:empty {
+      margin-bottom: 0;
+    }
+  }
+
+  .add-condition-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .icon-add {
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px 6px;
+      border: 1px dashed #ccc;
+      margin-right: -1px;
+      color: gray;
+      &:hover {
+        color: var(--primary-6);
+      }
+
+      &:first-child {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+    }
+  }
+}

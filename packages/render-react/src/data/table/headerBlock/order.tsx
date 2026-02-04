@@ -1,26 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Popover, Button, Radio, Tooltip, Select } from 'antd'
-import { DeleteOutlined } from '@ant-design/icons'
-import { SortAscendingOutlined } from '@ant-design/icons'
+import { useCallback, useEffect, useState } from 'react'
+import { Popover, Button, Radio, Tooltip, Select, Flex, Divider } from 'antd'
+import { DeleteOutlined, SortAscendingOutlined } from '@ant-design/icons'
 import { DataCRUD } from '@shuttle-data/type'
 
 import { HeaderBlockContext } from '..'
-import { isGroupColumn } from '../utils'
+import { ColumnOption } from '.'
 import SortList, {
   RenderItemProps,
   ExtraRenderProps,
 } from '../../../components/sortList'
 
-export default function ColumnsConfig({
-  table,
-  columns,
+export default function Order({
+  columnOptions,
   orders,
   updateOrders,
-  useApiName,
-}: Pick<
-  HeaderBlockContext,
-  'table' | 'columns' | 'orders' | 'updateOrders' | 'useApiName'
->) {
+}: Pick<HeaderBlockContext, 'orders' | 'updateOrders'> & {
+  columnOptions: ColumnOption[]
+}) {
   const [showPopover, setShowPopover] = useState(false)
   const [orderList, setOrderList] = useState(orders || [])
 
@@ -31,14 +27,6 @@ export default function ColumnsConfig({
       })
     }
   }, [showPopover, orders])
-
-  const orderColumnOptions = useMemo(() => {
-    return findDataFieldOptionsFromColumns({
-      table,
-      columns,
-      useApiName,
-    })
-  }, [table, columns, useApiName])
 
   const handleClear = useCallback(() => {
     updateOrders([])
@@ -57,11 +45,11 @@ export default function ColumnsConfig({
 
   const subOptions = useCallback(
     (values: string[], keep?: string) => {
-      return orderColumnOptions.filter(
+      return columnOptions.filter(
         (item) => item.value === keep || !values.includes(item.value),
       )
     },
-    [orderColumnOptions],
+    [columnOptions],
   )
 
   const RenderItem = useCallback(
@@ -129,20 +117,14 @@ export default function ColumnsConfig({
               onChange={(v: string) => add({ key: v })}
             />
           )}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 8,
-              marginTop: 8,
-            }}
-          >
+          <Divider style={{ margin: '0.5rem 0' }} />
+          <Flex justify="center" gap={8}>
             <Button onClick={handleClear}>清空</Button>
             <Button onClick={handleReset}>重置</Button>
             <Button type="primary" onClick={handleConfirm}>
               确定
             </Button>
-          </div>
+          </Flex>
         </>
       )
     },
@@ -159,7 +141,7 @@ export default function ColumnsConfig({
       showArrow={false}
       content={
         <SortList
-          style={{ minWidth: 320 }}
+          className="shuttle-data-order-list"
           pagination={false}
           list={orderList}
           rowKey="key"
@@ -176,36 +158,4 @@ export default function ColumnsConfig({
       />
     </Popover>
   )
-}
-
-function findDataFieldOptionsFromColumns({
-  columns,
-  table,
-  useApiName,
-}: Pick<HeaderBlockContext, 'table' | 'columns' | 'useApiName'>) {
-  const options: { value: string; label?: React.ReactNode }[] = []
-
-  const willHandleColumns = [...columns]
-  while (willHandleColumns.length > 0) {
-    const first = willHandleColumns.pop()
-    if (!first) break
-
-    if (isGroupColumn(first)) {
-      willHandleColumns.push(...first.children)
-    } else {
-      const field = table.fields.find((field) =>
-        useApiName
-          ? field.apiName === first.dataIndex
-          : field.name === first.dataIndex,
-      )
-      if (field) {
-        options.push({
-          value: first.dataIndex as string,
-          label: first.title as React.ReactNode,
-        })
-      }
-    }
-  }
-
-  return options
 }

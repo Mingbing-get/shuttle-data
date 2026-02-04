@@ -1,0 +1,31 @@
+.drag-target {
+  height: 14px;
+  background-color: color-mix(
+    in srgb,
+    var(--ant-color-primary),
+    transparent 95%
+  );
+  border: 1px dashed
+    color-mix(in srgb, var(--ant-color-primary), transparent 60%);
+  border-radius: 2px;
+
+  position: absolute;
+  width: 100%;
+  left: 0;
+  z-index: 1;
+  &.is-before {
+    top: 0;
+  }
+  &.is-after {
+    bottom: 0;
+  }
+
+  &.is-over {
+    background-color: color-mix(
+      in srgb,
+      var(--ant-color-primary),
+      transparent 40%
+    );
+    border-color: var(--ant-color-primary);
+  }
+}
