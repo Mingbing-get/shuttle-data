@@ -74,6 +74,19 @@ class ConditionPluginManager {
   getPlugin(op: Exclude<DataCondition.Op, 'and' | 'or'>) {
     return this.pluginMap[op]
   }
+
+  check(condition: Partial<DataCondition.Define<any>>): boolean {
+    if (!condition.op) return false
+
+    if (condition.op === 'and' || condition.op === 'or') {
+      if (!condition.subCondition?.length) return true
+
+      return condition.subCondition.every((item) => this.check(item))
+    }
+
+    const plugin = this.getPlugin(condition.op)
+    return plugin.check(condition)
+  }
 }
 
 export default new ConditionPluginManager()

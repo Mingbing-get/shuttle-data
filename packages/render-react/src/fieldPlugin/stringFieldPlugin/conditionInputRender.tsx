@@ -13,14 +13,7 @@ export default function StringConditionInputRender({
   op,
   ...inputProps
 }: StringConditionInputRenderProps) {
-  if (
-    op === 'eq' ||
-    op === 'neq' ||
-    op === 'like' ||
-    op === 'notLike' ||
-    op === 'in' ||
-    op === 'notIn'
-  ) {
+  if (op === 'eq' || op === 'neq' || op === 'like' || op === 'notLike') {
     return <StringFormInputRender {...inputProps} />
   }
 

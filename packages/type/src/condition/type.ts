@@ -170,5 +170,9 @@ export namespace DataCondition {
   export interface Plugin<T extends Op> {
     readonly op: T
     readonly label: string
+
+    check(
+      condition: Partial<Extract<Define<any>, { op: T }>>,
+    ): condition is Extract<Define<any>, { op: T }>
   }
 }

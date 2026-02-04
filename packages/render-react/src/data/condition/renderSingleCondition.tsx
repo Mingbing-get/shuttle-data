@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import classNames from 'classnames'
-import { DataCondition } from '@shuttle-data/type'
+import { DataCondition, conditionPluginManager } from '@shuttle-data/type'
 
 import RenderLogicRule from './renderLogicCondition'
 import RenderNormalCondition from './renderNormalCondition'
@@ -18,7 +18,7 @@ export default function RenderSingleCondition({ condition }: Props) {
   const isComplete = useMemo(() => {
     if (isLogicCondition(condition)) return true
 
-    // return checkConditionIsComplete(condition)
+    return conditionPluginManager.check(condition)
   }, [condition])
 
   const canDrop = useMemo(
