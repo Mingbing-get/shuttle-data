@@ -4,20 +4,19 @@ import { FilterOutlined } from '@ant-design/icons'
 import { DataModel as NDataModel } from '@shuttle-data/type'
 
 import { HeaderBlockContext } from '..'
-import { ColumnOption } from '.'
 import ConditionRender from '../../condition'
 
 export default function Condition({
   useApiName,
   dataModel,
-  columnOptions,
+  fields,
   condition,
   updateCondition,
 }: Pick<
   HeaderBlockContext,
   'dataModel' | 'condition' | 'updateCondition' | 'useApiName'
 > & {
-  columnOptions: ColumnOption[]
+  fields: NDataModel.Field[]
 }) {
   const [showPopover, setShowPopover] = useState(false)
   const [_condition, setCondition] = useState(condition)
@@ -45,16 +44,6 @@ export default function Condition({
     setShowPopover(false)
   }, [_condition, updateCondition])
 
-  const conditionFields = useMemo(() => {
-    return columnOptions.map(
-      ({ label, field }) =>
-        ({
-          ...field,
-          label,
-        }) as NDataModel.Field,
-    )
-  }, [columnOptions])
-
   return (
     <Popover
       open={showPopover}
@@ -68,7 +57,7 @@ export default function Condition({
           <ConditionRender
             style={{ maxHeight: 280, minWidth: 320, overflowY: 'auto' }}
             dataModel={dataModel}
-            fields={conditionFields}
+            fields={fields}
             condition={_condition}
             onChange={setCondition}
             useApiName={useApiName}

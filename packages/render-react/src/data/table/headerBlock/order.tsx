@@ -1,21 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Popover, Button, Radio, Tooltip, Select, Flex, Divider } from 'antd'
-import { DeleteOutlined, SortAscendingOutlined } from '@ant-design/icons'
-import { DataCRUD } from '@shuttle-data/type'
+import { Popover, Button, Flex, Divider } from 'antd'
+import { SortAscendingOutlined } from '@ant-design/icons'
+import { DataModel as NDataModel } from '@shuttle-data/type'
 
 import { HeaderBlockContext } from '..'
-import { ColumnOption } from '.'
-import SortList, {
-  RenderItemProps,
-  ExtraRenderProps,
-} from '../../../components/sortList'
+import DataOrderRender, { OrderRenderFooterProps } from '../../order'
 
 export default function Order({
-  columnOptions,
+  fields,
+  useApiName,
   orders,
   updateOrders,
-}: Pick<HeaderBlockContext, 'orders' | 'updateOrders'> & {
-  columnOptions: ColumnOption[]
+}: Pick<HeaderBlockContext, 'orders' | 'updateOrders' | 'useApiName'> & {
+  fields: NDataModel.Field[]
 }) {
   const [showPopover, setShowPopover] = useState(false)
   const [orderList, setOrderList] = useState(orders || [])
@@ -43,80 +40,11 @@ export default function Order({
     setShowPopover(false)
   }, [orderList, updateOrders])
 
-  const subOptions = useCallback(
-    (values: string[], keep?: string) => {
-      return columnOptions.filter(
-        (item) => item.value === keep || !values.includes(item.value),
-      )
-    },
-    [columnOptions],
-  )
-
-  const RenderItem = useCallback(
-    ({
-      list,
-      dragHandle,
-      item,
-      remove,
-      update,
-    }: RenderItemProps<DataCRUD.OrderBy<Record<string, any>>>) => {
-      const leftOptions = subOptions(
-        list.map((i) => i.key),
-        item.key,
-      )
-
-      return (
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          {dragHandle}
-          <Select
-            style={{ flex: 1 }}
-            value={item.key}
-            options={leftOptions}
-            onChange={(v) => update('key', v)}
-          />
-          <Radio.Group
-            optionType="button"
-            options={[
-              { label: '升序', value: 'asc' },
-              { label: '降序', value: 'desc' },
-            ]}
-            value={item.desc ? 'desc' : 'asc'}
-            onChange={(e) => update('desc', e.target.value === 'desc')}
-          />
-          <Tooltip title="删除">
-            <Button danger icon={<DeleteOutlined />} onClick={remove} />
-          </Tooltip>
-        </div>
-      )
-    },
-    [subOptions],
-  )
-
   const FooterRender = useCallback(
-    ({
-      list,
-      add,
-    }: ExtraRenderProps<DataCRUD.OrderBy<Record<string, any>>, 'key'>) => {
-      const leftOptions = subOptions(list.map((i) => i.key))
-
+    ({ defaultAdd }: OrderRenderFooterProps) => {
       return (
         <>
-          {leftOptions.length > 0 && (
-            <Select
-              placeholder="添加排序字段"
-              style={{ width: '100%' }}
-              value={null}
-              options={leftOptions}
-              onChange={(v: string) => add({ key: v })}
-            />
-          )}
+          {defaultAdd}
           <Divider style={{ margin: '0.5rem 0' }} />
           <Flex justify="center" gap={8}>
             <Button onClick={handleClear}>清空</Button>
@@ -128,7 +56,7 @@ export default function Order({
         </>
       )
     },
-    [subOptions, handleClear, handleReset, handleConfirm],
+    [handleClear, handleReset, handleConfirm],
   )
 
   return (
@@ -140,12 +68,11 @@ export default function Order({
       placement="bottomLeft"
       showArrow={false}
       content={
-        <SortList
+        <DataOrderRender
           className="shuttle-data-order-list"
-          pagination={false}
-          list={orderList}
-          rowKey="key"
-          RenderItem={RenderItem}
+          value={orderList}
+          fields={fields}
+          useApiName={useApiName}
           FooterRender={FooterRender}
           onChange={setOrderList}
         />

@@ -9,12 +9,6 @@ import { isGroupColumn } from '../utils'
 
 import './index.scss'
 
-export interface ColumnOption {
-  value: string
-  label?: React.ReactNode
-  field: NDataModel.Field
-}
-
 export default function HeaderBlock({
   dataModel,
   table,
@@ -26,8 +20,8 @@ export default function HeaderBlock({
   updateOrders,
   updateColumnConfig,
 }: HeaderBlockContext) {
-  const columnOptions = useMemo(() => {
-    return findDataFieldOptionsFromColumns({
+  const effectFields = useMemo(() => {
+    return mergeFieldLabel({
       table,
       columns,
       useApiName,
@@ -38,15 +32,16 @@ export default function HeaderBlock({
     <div className="shuttle-data-table-header-actions">
       <Condition
         dataModel={dataModel}
-        columnOptions={columnOptions}
+        fields={effectFields}
         useApiName={useApiName}
         condition={condition}
         updateCondition={updateCondition}
       />
       <Order
-        columnOptions={columnOptions}
+        fields={effectFields}
         orders={orders}
         updateOrders={updateOrders}
+        useApiName={useApiName}
       />
       <ColumnsConfig
         columns={columns}
@@ -56,12 +51,12 @@ export default function HeaderBlock({
   )
 }
 
-function findDataFieldOptionsFromColumns({
+function mergeFieldLabel({
   columns,
   table,
   useApiName,
 }: Pick<HeaderBlockContext, 'table' | 'columns' | 'useApiName'>) {
-  const options: ColumnOption[] = []
+  const fields: NDataModel.Field[] = []
 
   const willHandleColumns = [...columns]
   while (willHandleColumns.length > 0) {
@@ -77,14 +72,13 @@ function findDataFieldOptionsFromColumns({
           : field.name === first.dataIndex,
       )
       if (field) {
-        options.push({
-          value: first.dataIndex as string,
-          label: first.title as React.ReactNode,
-          field,
+        fields.push({
+          ...field,
+          label: first.title as string,
         })
       }
     }
   }
 
-  return options
+  return fields
 }
