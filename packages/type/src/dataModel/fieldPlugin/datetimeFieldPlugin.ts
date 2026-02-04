@@ -44,8 +44,6 @@ ${key}${field.required ? '' : '?'}: number`
       'lt',
       'gte',
       'lte',
-      'in',
-      'notIn',
     ]
 
     return ops
