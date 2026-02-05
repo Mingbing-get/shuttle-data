@@ -1,3 +1,4 @@
+import z from 'zod'
 import { DataCondition } from '../type'
 
 export default class GtConditionPlugin implements DataCondition.Plugin<'gt'> {
@@ -13,5 +14,13 @@ export default class GtConditionPlugin implements DataCondition.Plugin<'gt'> {
       condition.value !== undefined &&
       condition.value !== null
     )
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: z.union([z.string(), z.number()]),
+    })
   }
 }

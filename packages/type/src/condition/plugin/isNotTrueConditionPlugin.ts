@@ -1,3 +1,4 @@
+import z from 'zod'
 import { DataCondition } from '../type'
 
 export default class IsNotTrueConditionPlugin implements DataCondition.Plugin<'isNotTrue'> {
@@ -8,5 +9,12 @@ export default class IsNotTrueConditionPlugin implements DataCondition.Plugin<'i
     condition: Partial<DataCondition.IsNotTrueCondition<any>>,
   ): condition is DataCondition.IsNotTrueCondition<any> {
     return !!condition.op && !!condition.key
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+    })
   }
 }

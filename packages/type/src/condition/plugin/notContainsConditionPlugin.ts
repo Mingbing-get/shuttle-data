@@ -1,4 +1,6 @@
+import z from 'zod'
 import { DataCondition } from '../type'
+import { withIdValueZod } from './utils'
 
 export default class NotContainsConditionPlugin implements DataCondition.Plugin<'notContains'> {
   readonly op = 'notContains'
@@ -13,5 +15,13 @@ export default class NotContainsConditionPlugin implements DataCondition.Plugin<
       condition.value !== undefined &&
       condition.value !== null
     )
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: withIdValueZod,
+    })
   }
 }

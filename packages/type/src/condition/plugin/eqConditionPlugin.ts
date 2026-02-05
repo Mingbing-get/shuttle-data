@@ -1,3 +1,5 @@
+import z from 'zod'
+import { withIdValueZod } from './utils'
 import { DataCondition } from '../type'
 
 export default class EqConditionPlugin implements DataCondition.Plugin<'eq'> {
@@ -13,5 +15,13 @@ export default class EqConditionPlugin implements DataCondition.Plugin<'eq'> {
       condition.value !== undefined &&
       condition.value !== null
     )
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: withIdValueZod,
+    })
   }
 }

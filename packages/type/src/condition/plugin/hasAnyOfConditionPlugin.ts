@@ -1,4 +1,6 @@
+import z from 'zod'
 import { DataCondition } from '../type'
+import { withIdValueZod } from './utils'
 
 export default class HasAnyOfConditionPlugin implements DataCondition.Plugin<'hasAnyOf'> {
   readonly op = 'hasAnyOf'
@@ -8,5 +10,13 @@ export default class HasAnyOfConditionPlugin implements DataCondition.Plugin<'ha
     condition: Partial<DataCondition.HasAnyOfCondition<any>>,
   ): condition is DataCondition.HasAnyOfCondition<any> {
     return !!condition.op && !!condition.key && !!condition.value?.length
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: z.array(withIdValueZod),
+    })
   }
 }

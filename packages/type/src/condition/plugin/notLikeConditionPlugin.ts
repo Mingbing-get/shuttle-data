@@ -1,3 +1,4 @@
+import z from 'zod'
 import { DataCondition } from '../type'
 
 export default class NotLikeConditionPlugin implements DataCondition.Plugin<'notLike'> {
@@ -8,5 +9,13 @@ export default class NotLikeConditionPlugin implements DataCondition.Plugin<'not
     condition: Partial<DataCondition.NotLikeCondition<any>>,
   ): condition is DataCondition.NotLikeCondition<any> {
     return !!condition.op && !!condition.key && !!condition.value
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: z.string(),
+    })
   }
 }

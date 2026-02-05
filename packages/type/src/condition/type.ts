@@ -1,3 +1,5 @@
+import { ZodObject } from 'zod'
+
 export namespace DataCondition {
   export type WithIdValue = string | number | boolean | { _id: string }
 
@@ -174,5 +176,7 @@ export namespace DataCondition {
     check(
       condition: Partial<Extract<Define<any>, { op: T }>>,
     ): condition is Extract<Define<any>, { op: T }>
+
+    getZod(): ZodObject<any, any>
   }
 }

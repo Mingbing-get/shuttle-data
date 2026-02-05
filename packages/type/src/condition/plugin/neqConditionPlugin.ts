@@ -1,4 +1,6 @@
+import z from 'zod'
 import { DataCondition } from '../type'
+import { withIdValueZod } from './utils'
 
 export default class NeqConditionPlugin implements DataCondition.Plugin<'neq'> {
   readonly op = 'neq'
@@ -13,5 +15,13 @@ export default class NeqConditionPlugin implements DataCondition.Plugin<'neq'> {
       condition.value !== undefined &&
       condition.value !== null
     )
+  }
+
+  getZod() {
+    return z.object({
+      op: z.literal(this.op),
+      key: z.string(),
+      value: withIdValueZod,
+    })
   }
 }

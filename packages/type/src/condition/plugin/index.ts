@@ -1,3 +1,4 @@
+import z from 'zod'
 import { DataCondition } from '../type'
 
 import EqConditionPlugin from './eqConditionPlugin'
@@ -86,6 +87,28 @@ class ConditionPluginManager {
 
     const plugin = this.getPlugin(condition.op)
     return plugin.check(condition)
+  }
+
+  getAndOrZod() {
+    const singleSchema = Object.values(this.pluginMap).map((plugin) =>
+      plugin.getZod(),
+    )
+
+    const andOrSchema: z.ZodObject<any, any> = z.object({
+      op: z.literal(['and', 'or']),
+      subCondition: z.array(
+        z.union([...singleSchema, z.lazy(() => andOrSchema)]),
+      ),
+    })
+
+    return andOrSchema
+  }
+
+  getZod() {
+    return z.union([
+      this.getAndOrZod(),
+      ...Object.values(this.pluginMap).map((plugin) => plugin.getZod()),
+    ])
   }
 }
 
