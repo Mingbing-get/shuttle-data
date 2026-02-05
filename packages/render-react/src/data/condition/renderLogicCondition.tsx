@@ -34,6 +34,15 @@ export default function RenderLogicCondition({ condition }: Props) {
   const leftBox = useRef<HTMLDivElement>(null)
   const wrapper = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    if (!rightBox.current) return
+
+    const observer = new ResizeObserver(computedOffset)
+    observer.observe(rightBox.current)
+
+    return () => observer.disconnect()
+  }, [])
+
   const computedOffset = useCallback(() => {
     if (!rightBox.current) return
 
