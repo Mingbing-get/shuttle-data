@@ -1,7 +1,7 @@
 {
-  "name": "@shuttle-formula/root",
+  "name": "@shuttle-data/root",
   "version": "0.0.0",
-  "description": "公式编辑器",
+  "description": "shuttle-data",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -48,6 +48,7 @@
     "vite-plugin-node-externals": "^0.0.1"
   },
   "keywords": [
+    "shuttle",
     "data",
     "database",
     "vue",

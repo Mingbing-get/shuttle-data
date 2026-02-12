@@ -1,4 +1,4 @@
-import { AxiosHeaders, AxiosResponse, Method } from 'axios'
+import { RawAxiosRequestHeaders, AxiosResponse, Method } from 'axios'
 
 export namespace NHttpTransporter {
   export interface MethodConfig<T> {
@@ -10,7 +10,7 @@ export namespace NHttpTransporter {
 
   export interface Options {
     baseUrl?: string
-    requestHeaders?: AxiosHeaders
+    requestHeaders?: RawAxiosRequestHeaders
     afterSend?: (response: AxiosResponse) => Promise<void>
   }
 }
