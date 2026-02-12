@@ -16,6 +16,7 @@ declare module '@shuttle-data/type' {
         prePath: (string | number)[]
         schema: DataModelSchema
         enumManager: DataEnumManager
+        disabled?: boolean
       }
 
       export interface FormInputRenderProps<

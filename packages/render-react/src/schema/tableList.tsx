@@ -11,11 +11,13 @@ export interface DataModelTableListProps extends Omit<
   'dataSource' | 'loading' | 'rowKey'
 > {
   schema: DataModelSchema
+  showTableList?: Omit<DataModel.Define, 'fields'>[]
   dataSourceName?: string
 }
 
 export default function DataModelTableList({
   schema,
+  showTableList,
   columns,
   dataSourceName,
   ...rest
@@ -65,12 +67,14 @@ export default function DataModelTableList({
     }, [columns])
 
   const afterFilterTableList = useMemo(() => {
+    const displayTableList = showTableList || tableList
+
     if (!dataSourceName) {
-      return tableList
+      return displayTableList
     }
 
-    return tableList.filter((item) => item.name === dataSourceName)
-  }, [dataSourceName, tableList])
+    return displayTableList.filter((item) => item.name === dataSourceName)
+  }, [dataSourceName, tableList, showTableList])
 
   return (
     <Table

@@ -3,6 +3,7 @@ import {
   Form,
   Button,
   TableColumnsType,
+  TableColumnType,
   Divider,
   Tooltip,
   TableProps,
@@ -33,6 +34,7 @@ export interface FormTableItemProps<T extends Record<string, any>> extends Omit<
   fieldName: string
   rowKey: keyof T
   showFocusRow?: boolean
+  disabled?: boolean
   onAdd?: () => T
   disabledDelete?: (row: T) => boolean
   onFocusRowChange?: (fieldName: string) => void
@@ -45,6 +47,7 @@ export default function FormTableItem<T extends Record<string, any>>({
   style,
   className,
   showFocusRow = true,
+  disabled,
   onAdd,
   disabledDelete,
   onFocusRowChange,
@@ -136,71 +139,73 @@ export default function FormTableItem<T extends Record<string, any>>({
   }, [])
 
   const tableColumns: TableColumnsType<T> = useMemo(() => {
-    return [
-      {
-        render: (_, row, index) => (
-          <div
-            className="table-action-cell"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <DragHandle />
-            <Divider vertical style={{ height: '100%' }} />
-            <Tooltip title="删除">
+    const actoinCell: TableColumnType<T> = {
+      render: (_, row, index) => (
+        <div className="table-action-cell" onClick={(e) => e.stopPropagation()}>
+          <DragHandle />
+          <Divider vertical style={{ height: '100%' }} />
+          <Tooltip title="删除">
+            <Button
+              disabled={disabledDelete?.(row)}
+              danger
+              onClick={() => handleRemove(row[rowKey])}
+              icon={<DeleteFilled />}
+            />
+          </Tooltip>
+          <Divider vertical style={{ height: '100%' }} />
+          <div className="table-action-col">
+            <Tooltip title="在前面插入行">
               <Button
-                disabled={disabledDelete?.(row)}
-                danger
-                onClick={() => handleRemove(row[rowKey])}
-                icon={<DeleteFilled />}
+                type="primary"
+                size="small"
+                onClick={() => handleAdd(row[rowKey], 'before')}
+                icon={<PlusOutlined />}
               />
             </Tooltip>
-            <Divider vertical style={{ height: '100%' }} />
-            <div className="table-action-col">
-              <Tooltip title="在前面插入行">
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => handleAdd(row[rowKey], 'before')}
-                  icon={<PlusOutlined />}
-                />
-              </Tooltip>
-              <Divider style={{ margin: '2px 0' }} />
-              <Tooltip title="在后面插入行">
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => handleAdd(row[rowKey], 'after')}
-                  icon={<PlusOutlined />}
-                />
-              </Tooltip>
-            </div>
-            <Divider vertical style={{ height: '100%' }} />
-            <div className="table-action-col">
-              <Tooltip title="上移">
-                <Button
-                  disabled={index === 0}
-                  type="primary"
-                  size="small"
-                  onClick={() => handleMove(row[rowKey], 'up')}
-                  icon={<ArrowUpOutlined />}
-                />
-              </Tooltip>
-              <Divider style={{ margin: '2px 0' }} />
-              <Tooltip title="下移">
-                <Button
-                  type="primary"
-                  size="small"
-                  onClick={() => handleMove(row[rowKey], 'down')}
-                  icon={<ArrowDownOutlined />}
-                />
-              </Tooltip>
-            </div>
+            <Divider style={{ margin: '2px 0' }} />
+            <Tooltip title="在后面插入行">
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleAdd(row[rowKey], 'after')}
+                icon={<PlusOutlined />}
+              />
+            </Tooltip>
           </div>
-        ),
-        width: 0,
-      },
-      ...(columns || []),
-    ]
-  }, [columns])
+          <Divider vertical style={{ height: '100%' }} />
+          <div className="table-action-col">
+            <Tooltip title="上移">
+              <Button
+                disabled={index === 0}
+                type="primary"
+                size="small"
+                onClick={() => handleMove(row[rowKey], 'up')}
+                icon={<ArrowUpOutlined />}
+              />
+            </Tooltip>
+            <Divider style={{ margin: '2px 0' }} />
+            <Tooltip title="下移">
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => handleMove(row[rowKey], 'down')}
+                icon={<ArrowDownOutlined />}
+              />
+            </Tooltip>
+          </div>
+        </div>
+      ),
+      width: 0,
+    }
+
+    const tableColumns = [...(columns || [])]
+
+    if (!disabled) {
+      tableColumns.unshift(actoinCell)
+    }
+
+    return tableColumns
+  }, [columns, disabled])
 
   return (
     <SortTable

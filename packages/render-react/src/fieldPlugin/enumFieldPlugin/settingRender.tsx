@@ -4,6 +4,7 @@ import { DataModel } from '@shuttle-data/type'
 import GroupSelect from '../../dataEnum/groupSelect'
 
 export default function EnumSettingRender({
+  disabled,
   field,
   prePath,
   enumManager,
@@ -18,12 +19,12 @@ export default function EnumSettingRender({
       <Form.Item name={[...prePath, 'groupName']} label="枚举组">
         <GroupSelect
           manager={enumManager}
-          disabled={field.isSystem || !isNewField}
+          disabled={field.isSystem || !isNewField || disabled}
         />
       </Form.Item>
 
       <Form.Item name={[...prePath, 'multiple']} label="是否多选">
-        <Switch disabled={field.isSystem || !isNewField} />
+        <Switch disabled={field.isSystem || !isNewField || disabled} />
       </Form.Item>
     </>
   )

@@ -3,6 +3,7 @@ import { Form, Switch, InputNumber } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function StringSettingRender({
+  disabled,
   field,
   prePath,
 }: DataModel.Render.SettingRenderProps<'string'>) {
@@ -14,12 +15,12 @@ export default function StringSettingRender({
   return (
     <>
       <Form.Item name={[...prePath, 'unique']} label="是否唯一">
-        <Switch disabled={field.isSystem || !isNewField} />
+        <Switch disabled={field.isSystem || !isNewField || disabled} />
       </Form.Item>
 
       <Form.Item name={[...prePath, 'maxLength']} label="最大长度">
         <InputNumber
-          disabled={field.isSystem}
+          disabled={field.isSystem || disabled}
           precision={0}
           min={1}
           max={255}

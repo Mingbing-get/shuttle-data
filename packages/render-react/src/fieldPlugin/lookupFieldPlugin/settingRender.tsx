@@ -4,6 +4,7 @@ import { DataModel } from '@shuttle-data/type'
 import TableSelect from '../../schema/tableSelect'
 
 export default function LookupSettingRender({
+  disabled,
   field,
   prePath,
   schema,
@@ -16,16 +17,19 @@ export default function LookupSettingRender({
   return (
     <>
       <Form.Item name={[...prePath, 'modalName']} label="关联模型">
-        <TableSelect schema={schema} disabled={field.isSystem || !isNewField} />
+        <TableSelect
+          schema={schema}
+          disabled={field.isSystem || !isNewField || disabled}
+        />
       </Form.Item>
 
       <Form.Item name={[...prePath, 'multiple']} label="是否多选">
-        <Switch disabled={field.isSystem || !isNewField} />
+        <Switch disabled={field.isSystem || !isNewField || disabled} />
       </Form.Item>
 
       {!field.extra?.multiple && (
         <Form.Item name={[...prePath, 'unique']} label="是否唯一">
-          <Switch disabled={field.isSystem || !isNewField} />
+          <Switch disabled={field.isSystem || !isNewField || disabled} />
         </Form.Item>
       )}
     </>

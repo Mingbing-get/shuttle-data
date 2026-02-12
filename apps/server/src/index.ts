@@ -7,6 +7,7 @@ import errorHandle from './middleware/errorHandle'
 import { jwtVerify } from './middleware/jwt'
 import dataModelRouter from './router/dataModel'
 import dataEnumRouter from './router/dataEnum'
+import aiRouter from './router/ai'
 
 import './global.d.ts'
 
@@ -34,6 +35,7 @@ async function main() {
 
   app.use(mount('/dataModel', dataModelRouter.routes()))
   app.use(mount('/dataEnum', dataEnumRouter.routes()))
+  app.use(mount('/ai', aiRouter.routes()))
 
   // 错误处理中间件
   app.use(async (ctx, next) => {

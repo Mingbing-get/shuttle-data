@@ -35,6 +35,7 @@ export interface TableEditorProps extends Omit<FormProps, 'form'> {
   schema: DataModelSchema
   enumManager: DataEnumManager
   tableName?: string
+  table?: DataModel.Define
   useApiName?: boolean
   prefix?: string
 }
@@ -51,10 +52,12 @@ function TableEditor(
     dataSourceName,
     userTableName,
     tableName,
+    table,
     useApiName = false,
     layout = 'vertical',
     className,
     prefix,
+    disabled,
     ...formProps
   }: TableEditorProps,
   ref?: ForwardedRef<TableEditorInstance>,
@@ -70,6 +73,13 @@ function TableEditor(
   )
 
   useEffect(() => {
+    if (table) {
+      table.fields.sort((cur, next) => (cur.order || 0) - (next.order || 0))
+      form.setFieldsValue(table)
+      setInitTable(table)
+      return
+    }
+
     if (!tableName) {
       form.resetFields()
       form.setFieldsValue(getInitDataModel({ dataSourceName, userTableName }))
@@ -86,7 +96,7 @@ function TableEditor(
         setInitTable(undefined)
       }
     })
-  }, [tableName, useApiName, dataSourceName, userTableName])
+  }, [table, tableName, useApiName, dataSourceName, userTableName])
 
   const tableColumns: TableColumnsType<DataModel.Field> = useMemo(() => {
     return [
@@ -106,7 +116,7 @@ function TableEditor(
           <Form.Item name={['fields', index, 'apiName']} rules={apiNameRules}>
             <PrefixInput
               prefix={field?.isSystem ? '' : prefix}
-              disabled={field?.isSystem}
+              disabled={field?.isSystem || disabled}
             />
           </Form.Item>
         ),
@@ -116,7 +126,7 @@ function TableEditor(
         title: <label className="table-header-required">名称</label>,
         render: (_, field, index) => (
           <Form.Item name={['fields', index, 'label']} rules={labelRules}>
-            <Input disabled={field?.isSystem} />
+            <Input disabled={field?.isSystem || disabled} />
           </Form.Item>
         ),
         minWidth: 220,
@@ -149,7 +159,7 @@ function TableEditor(
         width: 100,
       },
     ]
-  }, [prefix])
+  }, [prefix, disabled])
 
   useImperativeHandle(
     ref,
@@ -182,6 +192,7 @@ function TableEditor(
   return (
     <Form
       {...formProps}
+      disabled={disabled}
       form={form}
       layout={layout}
       className={classNames(className, 'data-schema-editor')}
@@ -191,6 +202,7 @@ function TableEditor(
           <span />
         </Form.Item>
         <FormTableItem
+          disabled={disabled}
           fieldName="fields"
           rowKey="name"
           columns={tableColumns}
@@ -204,6 +216,7 @@ function TableEditor(
       <div className="data-schema-editor-detail">
         <RightPanel show={!focusFieldName}>
           <TableSetting
+            disabled={disabled}
             initTable={initTable}
             prefix={prefix}
             fields={filterEmptyFields}
@@ -213,6 +226,7 @@ function TableEditor(
         {filterEmptyFields?.map((field, index) => (
           <RightPanel key={field.name} show={field.name === focusFieldName}>
             <FieldSetting
+              disabled={disabled}
               key={field.name}
               schema={schema}
               enumManager={enumManager}

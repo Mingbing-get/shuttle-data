@@ -1,14 +1,13 @@
 {
-  "name": "@shuttle-data/front",
+  "name": "@shuttle-data/ai-react",
   "version": "0.0.0",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
-  "description": "web端数据模型react渲染库",
+  "description": "web端ai相关的react渲染库",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
   "type": "module",
-  "private": true,
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -31,19 +30,34 @@
     "classnames": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "antd": "^6.1.1",
-    "@shuttle-data/render-react": "workspace:*",
-    "@shuttle-data/ai-react": "workspace:*",
     "@shuttle-data/client": "workspace:*",
     "@shuttle-data/type": "workspace:*",
-    "@shuttle-ai/render-react": "/Users/mingbing/apps/shuttle-ai/packages/render-react",
+    "@shuttle-data/render-react": "workspace:*",
+    "antd": "^6.1.1",
+    "@ant-design/icons": "^6.1.0",
+    "@shuttle-ai/type": "/Users/mingbing/apps/shuttle-ai/packages/type",
     "@shuttle-ai/client": "/Users/mingbing/apps/shuttle-ai/packages/client",
-    "@shuttle-ai/type": "/Users/mingbing/apps/shuttle-ai/packages/type"
+    "@shuttle-ai/render-react": "/Users/mingbing/apps/shuttle-ai/packages/render-react"
   },
   "devDependencies": {
     "typescript": "^5.3.3",
     "@types/react": "^18.2.60",
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1"
+  },
+  "access": "public",
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/es/index.mjs",
+    "types": "dist/types/index.d.ts",
+    "type": "module",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/es/index.mjs",
+        "require": "./dist/cjs/index.cjs"
+      }
+    }
   }
 }

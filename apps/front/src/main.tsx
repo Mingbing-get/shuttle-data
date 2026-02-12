@@ -4,6 +4,7 @@ import { Tabs } from 'antd'
 import dataModel from './config'
 import DataEnumRender from './dataEnum'
 import DataModelRender from './dataModel'
+import AiRender from './aiRender'
 
 export default function Main() {
   const [activeTab, setActiveTab] = useState('enum')
@@ -15,6 +16,9 @@ export default function Main() {
       </Tabs.TabPane>
       <Tabs.TabPane tab="数据模型" key="model">
         <DataModelRender dataModel={dataModel} />
+      </Tabs.TabPane>
+      <Tabs.TabPane tab="AI" key="ai">
+        <AiRender />
       </Tabs.TabPane>
     </Tabs>
   )

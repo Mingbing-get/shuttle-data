@@ -10,6 +10,7 @@ interface Props {
   initTable?: DataModel.Define
   isSystemModel?: boolean
   fields?: DataModel.Field[]
+  disabled?: boolean
 }
 
 export default function TableSetting({
@@ -17,6 +18,7 @@ export default function TableSetting({
   prefix,
   isSystemModel,
   fields,
+  disabled,
 }: Props) {
   const displayFields = useMemo(() => {
     return (
@@ -53,7 +55,7 @@ export default function TableSetting({
         rules={[{ required: true, message: '请选择展示字段' }]}
       >
         <Select
-          disabled={isSystemModel}
+          disabled={isSystemModel || disabled}
           fieldNames={{
             label: 'label',
             value: 'name',
@@ -65,12 +67,12 @@ export default function TableSetting({
       <Form.Item name="apiName" label="API名称" rules={apiNameRules}>
         <PrefixInput
           prefix={isSystemModel ? '' : prefix}
-          disabled={isSystemModel}
+          disabled={isSystemModel || disabled}
         />
       </Form.Item>
 
       <Form.Item name="label" label="名称" rules={labelRules}>
-        <Input disabled={isSystemModel} />
+        <Input disabled={isSystemModel || disabled} />
       </Form.Item>
     </>
   )

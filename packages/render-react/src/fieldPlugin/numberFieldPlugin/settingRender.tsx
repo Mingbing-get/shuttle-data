@@ -3,6 +3,7 @@ import { Form, Switch, InputNumber, Select } from 'antd'
 import { DataModel } from '@shuttle-data/type'
 
 export default function NumberSettingRender({
+  disabled,
   field,
   prePath,
 }: DataModel.Render.SettingRenderProps<'number'>) {
@@ -14,18 +15,18 @@ export default function NumberSettingRender({
   return (
     <>
       <Form.Item name={[...prePath, 'autoIncrement']} label="是否自动递增">
-        <Switch disabled={field.isSystem || !isNewField} />
+        <Switch disabled={field.isSystem || !isNewField || disabled} />
       </Form.Item>
 
       {!field.extra?.autoIncrement && (
         <>
           <Form.Item name={[...prePath, 'unique']} label="是否唯一">
-            <Switch disabled={field.isSystem || !isNewField} />
+            <Switch disabled={field.isSystem || !isNewField || disabled} />
           </Form.Item>
 
           <Form.Item name={[...prePath, 'min']} label="最小值">
             <InputNumber
-              disabled={field.isSystem}
+              disabled={field.isSystem || disabled}
               precision={0}
               style={{ width: '100%' }}
             />
@@ -33,7 +34,7 @@ export default function NumberSettingRender({
 
           <Form.Item name={[...prePath, 'max']} label="最大值">
             <InputNumber
-              disabled={field.isSystem}
+              disabled={field.isSystem || disabled}
               precision={0}
               style={{ width: '100%' }}
             />
@@ -45,7 +46,7 @@ export default function NumberSettingRender({
             tooltip="当值为小数时，用于转换成整数的方式"
           >
             <Select
-              disabled={field.isSystem}
+              disabled={field.isSystem || disabled}
               defaultValue={'round'}
               options={[
                 {

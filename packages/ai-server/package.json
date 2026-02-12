@@ -1,9 +1,9 @@
 {
-  "name": "@shuttle-data/server",
+  "name": "@shuttle-data/ai-server",
   "version": "0.0.0",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
-  "description": "数据模型服务端",
+  "description": "数据模型相关的AI提示词和工具定义",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
@@ -15,41 +15,43 @@
       "require": "./src/index.ts"
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "dev": "tsx watch ./src/index.ts",
     "build": "vite build",
     "clean": "rm -rf dist",
     "type-check": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "private": true,
   "dependencies": {
-    "@koa/cors": "^5.0.0",
-    "@koa/router": "^14.0.0",
-    "dotenv": "^17.2.3",
-    "koa": "^3.1.1",
-    "koa-body": "^7.0.0",
-    "knex": "^3.1.0",
-    "mysql2": "^3.9.1",
-    "koa-mount": "^4.2.0",
-    "string-random": "^1.0.0",
-    "@shuttle-data/crud": "workspace:*",
     "@shuttle-data/type": "workspace:*",
-    "@shuttle-data/ai-server": "workspace:*",
+    "@shuttle-data/schema": "workspace:*",
+    "@shuttle-data/crud": "workspace:*",
     "langchain": "^1.2.17",
     "@langchain/core": "^1.1.19",
-    "@langchain/openai": "^1.2.4",
+    "zod": "^4.3.5",
     "@shuttle-ai/type": "/Users/mingbing/apps/shuttle-ai/packages/type",
     "@shuttle-ai/agent": "/Users/mingbing/apps/shuttle-ai/packages/agent"
   },
   "devDependencies": {
-    "tsx": "^4.7.1",
     "typescript": "^5.3.3",
-    "@types/node": "^20.11.0",
-    "@types/koa": "^3.0.1",
-    "@types/koa__cors": "^5.0.1",
-    "@types/koa__router": "^12.0.5",
-    "@types/koa-router": "^7.4.9",
-    "@types/koa-mount": "^4.0.5"
+    "@types/node": "^20.11.0"
+  },
+  "access": "public",
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/es/index.mjs",
+    "types": "dist/types/index.d.ts",
+    "type": "module",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/es/index.mjs",
+        "require": "./dist/cjs/index.cjs"
+      }
+    }
   }
 }

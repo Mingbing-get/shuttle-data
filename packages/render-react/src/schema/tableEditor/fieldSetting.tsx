@@ -15,6 +15,7 @@ interface Props {
   index: number
   fieldListName?: string
   prefix?: string
+  disabled?: boolean
 }
 
 export default function FieldSetting({
@@ -24,6 +25,7 @@ export default function FieldSetting({
   index,
   fieldListName = 'fields',
   prefix,
+  disabled,
 }: Props) {
   const Render = useMemo(() => {
     const plugin = renderFieldPlugin.getPlugin(field.type)
@@ -48,7 +50,7 @@ export default function FieldSetting({
       >
         <PrefixInput
           prefix={field?.isSystem ? '' : prefix}
-          disabled={field?.isSystem}
+          disabled={field?.isSystem || disabled}
         />
       </Form.Item>
 
@@ -57,7 +59,7 @@ export default function FieldSetting({
         rules={labelRules}
         label="名称"
       >
-        <Input disabled={field?.isSystem} />
+        <Input disabled={field?.isSystem || disabled} />
       </Form.Item>
 
       <Form.Item
@@ -69,13 +71,14 @@ export default function FieldSetting({
       </Form.Item>
 
       <Form.Item name={[fieldListName, index, 'required']} label="是否必填">
-        <Switch disabled={field?.isSystem} />
+        <Switch disabled={field?.isSystem || disabled} />
       </Form.Item>
 
       {Render && (
         <>
           <Divider style={{ marginTop: 0 }} />
           <Render
+            disabled={disabled}
             field={field}
             prePath={[fieldListName, index, 'extra']}
             schema={schema}
