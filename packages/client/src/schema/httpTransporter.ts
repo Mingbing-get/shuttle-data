@@ -15,7 +15,7 @@ export default class HttpTransporter
     })
   }
 
-  async updateTable(table: DataModel.WhenUpdateModel): Promise<void> {
+  async updateTable(table: DataModel.MabyFieldNameModel): Promise<void> {
     await this.request(this.options?.updateTable, table, {
       defaultPath: 'updateTable',
     })

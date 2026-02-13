@@ -8,7 +8,7 @@ declare module '@shuttle-data/type' {
     export namespace Schema {
       export interface Transporter {
         createTable(table: WithoutNameModel): Promise<void>
-        updateTable(table: WhenUpdateModel): Promise<void>
+        updateTable(table: MabyFieldNameModel): Promise<void>
         dropTable(tableName: string, useApiName?: boolean): Promise<void>
         addField(
           tableName: string,
@@ -45,7 +45,7 @@ declare module '@shuttle-data/type' {
 
       export interface HttpTransporterOptions extends NHttpTransporter.Options {
         createTable?: NHttpTransporter.MethodConfig<WithoutNameModel>
-        updateTable?: NHttpTransporter.MethodConfig<WhenUpdateModel>
+        updateTable?: NHttpTransporter.MethodConfig<MabyFieldNameModel>
         dropTable?: NHttpTransporter.MethodConfig<{
           tableName: string
           useApiName?: boolean
@@ -71,19 +71,6 @@ declare module '@shuttle-data/type' {
         }>
         getTableList?: NHttpTransporter.MethodConfig<{}>
       }
-    }
-
-    export interface WithoutNameField extends Omit<DataModel.Field, 'name'> {}
-
-    export interface WithoutNameModel extends Omit<
-      DataModel.Define,
-      'name' | 'fields'
-    > {
-      fields: WithoutNameField[]
-    }
-
-    export interface WhenUpdateModel extends Omit<DataModel.Define, 'fields'> {
-      fields: (WithoutNameField | DataModel.Field)[]
     }
   }
 }

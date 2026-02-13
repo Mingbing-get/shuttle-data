@@ -1,2 +1,10 @@
 export { default as getTableListTool } from './getTableList'
 export { default as getTableDetailTool } from './getTableDetail'
+export { default as createTableTool } from './createTable'
+export { default as dropTableTool } from './dropTable'
+export { default as updateTableTool } from './updateTable'
+
+export type { GetTableListToolRenderProps } from './getTableList/render'
+export type { GetTableDetailToolRenderProps } from './getTableDetail/render'
+export type { CreateTableToolRenderProps } from './createTable/render'
+export type { DropTableToolRenderProps } from './dropTable/render'

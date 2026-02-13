@@ -11,7 +11,6 @@ const getTableDetailTool: ShuttleAi.Client.Agent.WithRunTool = {
   },
   extras: {
     disableExport: true,
-    onlyShow: true,
   },
 }
 

@@ -92,6 +92,19 @@ export namespace DataModel {
     fields: Field[]
   }
 
+  export interface WithoutNameField extends Omit<DataModel.Field, 'name'> {}
+
+  export interface WithoutNameModel extends Omit<
+    DataModel.Define,
+    'name' | 'fields'
+  > {
+    fields: WithoutNameField[]
+  }
+
+  export interface MabyFieldNameModel extends Omit<DataModel.Define, 'fields'> {
+    fields: (WithoutNameField | DataModel.Field)[]
+  }
+
   export interface FieldPlugin<T extends FieldType> {
     readonly type: T
     readonly label: string

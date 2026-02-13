@@ -39,7 +39,7 @@ export default class Schema {
     this.clearTableList()
   }
 
-  async updateTable(model: DataModel.WhenUpdateModel) {
+  async updateTable(model: DataModel.MabyFieldNameModel) {
     this.checkModelWhenUpdate(model)
 
     await this.options.transporter.updateTable(model)
@@ -208,7 +208,7 @@ export default class Schema {
       .parse(field)
   }
 
-  checkModelWhenUpdate(model: DataModel.WhenUpdateModel) {
+  checkModelWhenUpdate(model: DataModel.MabyFieldNameModel) {
     const modelZod = dataModelManager.getZod()
 
     modelZod.parse(model)

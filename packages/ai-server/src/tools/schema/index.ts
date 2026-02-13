@@ -1,3 +1,5 @@
 export { default as createTableTool } from './createTable'
 export { default as getTableDetailTool } from './getTableDetail'
 export { default as getTableListTool } from './getTableList'
+export { default as dropTableTool } from './dropTable'
+export { default as updateTableTool } from './updateTable'
