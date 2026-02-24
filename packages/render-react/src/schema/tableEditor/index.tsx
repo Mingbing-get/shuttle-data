@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
   useMemo,
+  useCallback,
 } from 'react'
 import {
   Form,
@@ -20,7 +21,7 @@ import { DataModelSchema, DataEnumManager } from '@shuttle-data/client'
 import { DataModel } from '@shuttle-data/type'
 
 import FieldTypeSelect from '../fieldTypeSelect'
-import { getInitDataModel } from '../utils'
+import { getInitDataModel, fillSystemFields } from '../utils'
 import { generateUUID, apiNameRules, labelRules } from '../../utils'
 import PrefixInput from '../../components/prefixInput'
 import TableSetting from './tableSetting'
@@ -72,11 +73,67 @@ function TableEditor(
     [fields],
   )
 
+  const fitTable = useCallback(
+    async (table: DataModel.Define, userTableName?: string) => {
+      const afterFillSystemFieldModel = fillSystemFields(table, userTableName)
+      afterFillSystemFieldModel.fields.sort(
+        (cur, next) => (cur.order || 0) - (next.order || 0),
+      )
+
+      const hasTable = await schema.hasTable(table.name)
+
+      if (!hasTable) {
+        delete (afterFillSystemFieldModel as any).name
+
+        afterFillSystemFieldModel.fields = afterFillSystemFieldModel.fields.map(
+          (field) => {
+            if (field.isSystem) return field
+
+            const newField = { ...field, name: generateUUID('temp_') }
+
+            if (afterFillSystemFieldModel.displayField === field.name) {
+              afterFillSystemFieldModel.displayField = newField.name
+            }
+
+            return newField
+          },
+        )
+      } else {
+        const oldTable = await schema.getTable(table.name)
+
+        afterFillSystemFieldModel.fields = afterFillSystemFieldModel.fields.map(
+          (field) => {
+            if (field.isSystem) return field
+
+            const oldField = oldTable.fields.find((f) => f.name === field.name)
+            if (oldField) return field
+
+            const newField = { ...field, name: generateUUID('temp_') }
+
+            if (afterFillSystemFieldModel.displayField === field.name) {
+              afterFillSystemFieldModel.displayField = newField.name
+            }
+
+            return newField
+          },
+        )
+      }
+
+      form.setFieldsValue(afterFillSystemFieldModel)
+      setInitTable(afterFillSystemFieldModel)
+    },
+    [schema],
+  )
+
   useEffect(() => {
     if (table) {
-      table.fields.sort((cur, next) => (cur.order || 0) - (next.order || 0))
-      form.setFieldsValue(table)
-      setInitTable(table)
+      if (disabled) {
+        table.fields.sort((cur, next) => (cur.order || 0) - (next.order || 0))
+        form.setFieldsValue(table)
+        setInitTable(table)
+      } else {
+        fitTable(table, userTableName)
+      }
       return
     }
 
@@ -96,7 +153,7 @@ function TableEditor(
         setInitTable(undefined)
       }
     })
-  }, [table, tableName, useApiName, dataSourceName, userTableName])
+  }, [disabled, table, tableName, useApiName, dataSourceName, userTableName])
 
   const tableColumns: TableColumnsType<DataModel.Field> = useMemo(() => {
     return [
@@ -139,7 +196,9 @@ function TableEditor(
             rules={[{ required: true, message: '请选择类型' }]}
           >
             <FieldTypeSelect
-              disabled={field?.isSystem || !field.name.startsWith('temp_')}
+              disabled={
+                field?.isSystem || !field.name.startsWith('temp_') || disabled
+              }
             />
           </Form.Item>
         ),

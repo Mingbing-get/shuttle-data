@@ -67,7 +67,9 @@ export default function FieldSetting({
         rules={[{ required: true, message: '请选择类型' }]}
         label="类型"
       >
-        <FieldTypeSelect disabled={field?.isSystem || !isNewField} />
+        <FieldTypeSelect
+          disabled={field?.isSystem || !isNewField || disabled}
+        />
       </Form.Item>
 
       <Form.Item name={[fieldListName, index, 'required']} label="是否必填">

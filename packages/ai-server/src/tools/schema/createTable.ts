@@ -12,7 +12,8 @@ const createTableTool = tool(
   },
   {
     name: 'create_table',
-    description: 'Create a table in the database',
+    description:
+      'Create a table in the database. The system will add fields _id, _createdAt, _updatedAt, _createdBy, _updatedBy to the table, please do not add them manually.',
     schema: dataModelManager.getZodWithFields(),
     extras: {
       scope: 'write',

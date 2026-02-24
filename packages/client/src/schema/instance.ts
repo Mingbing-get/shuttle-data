@@ -55,9 +55,13 @@ export default class Schema {
   }
 
   async hasTable(tableName: string, useApiName: boolean = false) {
-    const model = await this.getTable(tableName, useApiName)
+    try {
+      const model = await this.getTable(tableName, useApiName)
 
-    return !!model
+      return !!model
+    } catch (error) {
+      return false
+    }
   }
 
   async getTable(tableName: string, useApiName: boolean = false) {
@@ -138,12 +142,16 @@ export default class Schema {
     fieldName: string,
     useApiName: boolean = false,
   ) {
-    const table = await this.getTable(tableName, useApiName)
-    if (!table) return false
+    try {
+      const table = await this.getTable(tableName, useApiName)
+      if (!table) return false
 
-    return table.fields.some((field) => {
-      return (useApiName ? field.apiName : field.name) === fieldName
-    })
+      return table.fields.some((field) => {
+        return (useApiName ? field.apiName : field.name) === fieldName
+      })
+    } catch (error) {
+      return false
+    }
   }
 
   async getField(

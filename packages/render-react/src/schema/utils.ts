@@ -59,3 +59,35 @@ export function getInitDataModel(options: Options): DataModel.Define {
     ],
   }
 }
+
+export function fillSystemFields(
+  mode: DataModel.Define,
+  userTableName?: string,
+) {
+  const fields = getInitDataModel({
+    dataSourceName: mode.dataSourceName,
+    userTableName,
+  }).fields
+
+  mode.fields.forEach((field) => {
+    const fieldExist = fields.find(
+      (f) => f.name === field.name || f.apiName === field.apiName,
+    )
+    if (fieldExist) {
+      fieldExist.order = field.order
+    } else {
+      fields.push(field)
+    }
+  })
+
+  const newModel = {
+    ...mode,
+    fields,
+  }
+
+  if (!newModel.displayField) {
+    newModel.displayField = '_id'
+  }
+
+  return newModel
+}

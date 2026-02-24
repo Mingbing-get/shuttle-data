@@ -24,18 +24,14 @@ export default function CreateTableToolRender(
   const { dataModel } = useWorkContext()
   const { args, confirmResult, agent, toolId } = useTool<DataModel.Define>()
 
-  const handleSubmit = useCallback(async () => {
+  const getNewArgs = useCallback(async () => {
     if (!instanceRef.current) {
       throw new Error('TableEditorRender instance is not initialized')
     }
 
-    await instanceRef.current.submit()
     const value = instanceRef.current.form.getFieldsValue()
 
-    return {
-      newArgs: value,
-      result: 'created success',
-    }
+    return value
   }, [])
 
   return (
@@ -60,7 +56,7 @@ export default function CreateTableToolRender(
         agent={agent}
         toolId={toolId}
         result={confirmResult}
-        getConfirmResult={handleSubmit}
+        getNewArgs={getNewArgs}
       />
     </Flex>
   )
