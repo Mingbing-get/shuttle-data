@@ -158,7 +158,7 @@ function TableEditor(
   const tableColumns: TableColumnsType<DataModel.Field> = useMemo(() => {
     return [
       {
-        title: '唯一值',
+        title: '唯一标识',
         dataIndex: 'name',
         minWidth: 220,
         render: (_, field, index) => (

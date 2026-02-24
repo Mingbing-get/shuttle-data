@@ -60,9 +60,13 @@ export default class DataEnumManager extends _DataEnumManager {
   }
 
   async hasGroup(groupName: string, useApiName?: boolean) {
-    const group = await this.getGroup(groupName, useApiName)
+    try {
+      const group = await this.getGroup(groupName, useApiName)
 
-    return !!group
+      return !!group
+    } catch (error) {
+      return false
+    }
   }
 
   async getGroup(
@@ -208,12 +212,16 @@ export default class DataEnumManager extends _DataEnumManager {
   }
 
   async hasItem(groupName: string, name: string, useApiName?: boolean) {
-    const group = await this.getGroup(groupName, useApiName)
-    if (!group) return false
+    try {
+      const group = await this.getGroup(groupName, useApiName)
+      if (!group) return false
 
-    return group.items.some((item) =>
-      useApiName ? item.apiName === name : item.name === name,
-    )
+      return group.items.some((item) =>
+        useApiName ? item.apiName === name : item.name === name,
+      )
+    } catch (error) {
+      return false
+    }
   }
 
   async getItem(groupName: string, name: string, useApiName?: boolean) {

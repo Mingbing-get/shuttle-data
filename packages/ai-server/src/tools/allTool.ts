@@ -5,6 +5,13 @@ import {
   dropTableTool,
   updateTableTool,
 } from './schema'
+import {
+  addGroupTool,
+  updateGroupTool,
+  removeGroupTool,
+  getGroupDetailTool,
+  getGroupListTool,
+} from './enum'
 
 export default function allTool() {
   return [
@@ -13,5 +20,10 @@ export default function allTool() {
     createTableTool,
     dropTableTool,
     updateTableTool,
+    addGroupTool,
+    updateGroupTool,
+    removeGroupTool,
+    getGroupDetailTool,
+    getGroupListTool,
   ]
 }

@@ -11,11 +11,13 @@ export interface DataEnumGroupListProps extends Omit<
   'dataSource' | 'loading' | 'rowKey'
 > {
   manager: DataEnumManager
+  showEnumGroupList?: Omit<DataEnum.Group, 'items'>[]
 }
 
 export default function DataEnumGroupList({
   manager,
   columns,
+  showEnumGroupList,
   ...rest
 }: DataEnumGroupListProps) {
   const { loading, groupList } = useGroupList(manager)
@@ -63,11 +65,15 @@ export default function DataEnumGroupList({
       ]
     }, [columns])
 
+  const showGroupList = useMemo(() => {
+    return showEnumGroupList || groupList
+  }, [showEnumGroupList, groupList])
+
   return (
     <Table
       {...rest}
       rowKey="name"
-      dataSource={groupList}
+      dataSource={showGroupList}
       columns={tableColumns}
       loading={loading}
     />

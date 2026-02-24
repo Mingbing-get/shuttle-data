@@ -10,6 +10,17 @@ import {
   CreateTableToolRenderProps,
   DropTableToolRenderProps,
 } from './schema'
+import {
+  getEnumListTool,
+  getEnumDetailTool,
+  createEnumTool,
+  dropEnumTool,
+  updateEnumTool,
+  GetEnumListToolRenderProps,
+  GetEnumDetailToolRenderProps,
+  CreateEnumToolRenderProps,
+  DropEnumToolRenderProps,
+} from './enum'
 
 interface AllToolOptions {
   getTableListTool?: DefinePropsRunTool<GetTableListToolRenderProps>
@@ -17,6 +28,11 @@ interface AllToolOptions {
   createTableTool?: DefinePropsRunTool<CreateTableToolRenderProps>
   dropTableTool?: DefinePropsRunTool<DropTableToolRenderProps>
   updateTableTool?: DefinePropsRunTool<CreateTableToolRenderProps>
+  getEnumListTool?: DefinePropsRunTool<GetEnumListToolRenderProps>
+  getEnumDetailTool?: DefinePropsRunTool<GetEnumDetailToolRenderProps>
+  createEnumTool?: DefinePropsRunTool<CreateEnumToolRenderProps>
+  dropEnumTool?: DefinePropsRunTool<DropEnumToolRenderProps>
+  updateEnumTool?: DefinePropsRunTool<CreateEnumToolRenderProps>
 }
 
 export default function allTool(options?: AllToolOptions) {
@@ -26,6 +42,11 @@ export default function allTool(options?: AllToolOptions) {
     deepMerge(createTableTool, options?.createTableTool),
     deepMerge(dropTableTool, options?.dropTableTool),
     deepMerge(updateTableTool, options?.updateTableTool),
+    deepMerge(getEnumListTool, options?.getEnumListTool),
+    deepMerge(getEnumDetailTool, options?.getEnumDetailTool),
+    deepMerge(createEnumTool, options?.createEnumTool),
+    deepMerge(dropEnumTool, options?.dropEnumTool),
+    deepMerge(updateEnumTool, options?.updateEnumTool),
   ]
 }
 

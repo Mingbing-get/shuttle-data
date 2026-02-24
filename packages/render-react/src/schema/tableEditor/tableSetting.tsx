@@ -37,7 +37,7 @@ export default function TableSetting({
 
       {initTable?.name && (
         <>
-          <Form.Item name="name" label="唯一值">
+          <Form.Item name="name" label="唯一标识">
             <Input disabled />
           </Form.Item>
 

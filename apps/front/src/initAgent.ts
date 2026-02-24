@@ -22,6 +22,35 @@ const initAgent: Record<string, ShuttleAi.Client.Agent.WithRunToolParams> = {
           },
         },
       },
+      updateTableTool: {
+        run: {
+          defaultProps: {
+            dataSourceName: 'main',
+            prefix: 'test_',
+          },
+        },
+      },
+      createEnumTool: {
+        run: {
+          defaultProps: {
+            prefix: 'test_',
+          },
+        },
+      },
+      updateEnumTool: {
+        run: {
+          defaultProps: {
+            prefix: 'test_',
+          },
+        },
+      },
+      getEnumDetailTool: {
+        run: {
+          defaultProps: {
+            prefix: 'test_',
+          },
+        },
+      },
     }),
   },
 }

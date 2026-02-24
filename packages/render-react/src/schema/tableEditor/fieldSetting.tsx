@@ -39,7 +39,7 @@ export default function FieldSetting({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <Form.Item name={[fieldListName, index, 'name']} label="唯一值">
+      <Form.Item name={[fieldListName, index, 'name']} label="唯一标识">
         <Input disabled />
       </Form.Item>
 

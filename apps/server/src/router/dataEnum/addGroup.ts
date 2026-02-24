@@ -1,8 +1,7 @@
 import { Middleware } from '@koa/router'
 import { DataEnum } from '@shuttle-data/type'
 
-import { generateName } from '../../utils'
-import dataModel from '../../config/dataModel'
+import addGroupService from '../../service/dataEnum/addGroup'
 import { ResponseModel } from '../../utils/responseModel'
 
 const addGroup: Middleware = async (ctx) => {
@@ -11,12 +10,7 @@ const addGroup: Middleware = async (ctx) => {
 
   const group = ctx.request.body as any as DataEnum.Group
 
-  group.name = generateName('group')
-  group.items.forEach((item) => {
-    item.name = generateName('item')
-  })
-
-  await dataModel.schema.enumManager.addGroup(group)
+  await addGroupService(group)
 }
 
 export default addGroup

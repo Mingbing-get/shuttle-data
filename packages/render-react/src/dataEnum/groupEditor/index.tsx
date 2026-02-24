@@ -38,6 +38,7 @@ import './index.scss'
 
 export interface DataEnumGroupEditorProps extends Omit<FormProps, 'form'> {
   manager: DataEnumManager
+  group?: DataEnum.Group
   groupName?: string
   useApiName?: boolean
   prefix?: string
@@ -51,6 +52,7 @@ export interface DataEnumGroupEditorInstance {
 function GroupEditor(
   {
     manager,
+    group,
     groupName,
     useApiName = false,
     layout = 'vertical',
@@ -64,7 +66,49 @@ function GroupEditor(
   const [form] = Form.useForm<DataEnum.Group>()
   const [initGroup, setInitGroup] = useState<DataEnum.Group>()
 
+  const fitGroup = useCallback(
+    async (group: DataEnum.Group) => {
+      const hasGroup = await manager.hasGroup(group.name)
+
+      if (!hasGroup) {
+        delete (group as any).name
+
+        group.items = group.items.map((item) => {
+          const newItem = { ...item, name: generateUUID('temp_') }
+
+          return newItem
+        })
+      } else {
+        const oldGroup = await manager.getGroup(group.name)
+
+        group.items = group.items.map((item) => {
+          const oldItem = oldGroup?.items.find((f) => f.name === item.name)
+          if (oldItem) return item
+
+          const newItem = { ...item, name: generateUUID('temp_') }
+
+          return newItem
+        })
+      }
+
+      form.setFieldsValue(group)
+      setInitGroup(group)
+    },
+    [manager],
+  )
+
   useEffect(() => {
+    if (group) {
+      if (disabled) {
+        group.items.sort((cur, next) => (cur.order || 0) - (next.order || 0))
+        form.setFieldsValue(group)
+        setInitGroup(group)
+      } else {
+        fitGroup(group)
+      }
+      return
+    }
+
     if (!groupName) {
       setInitGroup(undefined)
       form.resetFields()
@@ -81,7 +125,7 @@ function GroupEditor(
         setInitGroup(undefined)
       }
     })
-  }, [groupName, useApiName])
+  }, [group, disabled, groupName, useApiName])
 
   const handleAdd = useCallback(() => {
     const items = form.getFieldValue('items') || []
@@ -92,7 +136,7 @@ function GroupEditor(
   const tableColumns: TableColumnsType<DataEnum.Item> = useMemo(
     () => [
       {
-        title: '唯一值',
+        title: '唯一标识',
         dataIndex: 'name',
         minWidth: 220,
         render: (_, field, index) => (
@@ -180,10 +224,10 @@ function GroupEditor(
       className={classNames(className, 'data-enum-group-editor')}
       disabled={disabled || initGroup?.isSystem}
     >
-      {initGroup && (
+      {initGroup?.name && (
         <Row gutter={24}>
           <Col span={12}>
-            <Form.Item name="name" label="唯一值">
+            <Form.Item name="name" label="唯一标识">
               <Input disabled />
             </Form.Item>
           </Col>
