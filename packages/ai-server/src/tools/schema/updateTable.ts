@@ -12,8 +12,9 @@ const updateTableTool = tool(
   },
   {
     name: 'update_table',
-    description: 'Update a table in the database',
-    schema: dataModelManager.getZodWithFields(),
+    description:
+      'Update a table in the database. Newly added fields do not require a name.',
+    schema: dataModelManager.getMabNameWithFieldZod(),
     extras: {
       scope: 'write',
     },

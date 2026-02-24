@@ -23,7 +23,10 @@ export default class EnumFieldPlugin
   }
 
   async check(schema: DataModelSchema, field: DataModel.EnumField) {
-    this.getZod().parse(field)
+    const result = this.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     if (!field.extra?.groupName) {
       throw new Error(`enum field ${field.name} must have groupName`)

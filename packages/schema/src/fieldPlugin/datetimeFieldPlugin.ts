@@ -22,6 +22,9 @@ export default class DatetimeFieldPlugin
   }
 
   check(schema: DataModelSchema, field: DataModel.DateTimeField) {
-    this.getZod().parse(field)
+    const result = this.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 }

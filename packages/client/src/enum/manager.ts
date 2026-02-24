@@ -242,20 +242,26 @@ export default class DataEnumManager extends _DataEnumManager {
       name: true,
     })
 
-    groupZod
+    const result = groupZod
       .extend({
         items: helper.uniqueArrayZod(z.array(groupItemZod), [
           'name',
           'apiName',
         ]),
       })
-      .parse(group)
+      .safeParse(group)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   async checkGroup(group: DataEnum.Group) {
     const groupZod = this.getGroupZodWithItems()
 
-    groupZod.parse(group)
+    const result = groupZod.safeParse(group)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   async checkWhenUpdateGroup(group: DataEnum.WhenUpdateGroup) {
@@ -269,14 +275,17 @@ export default class DataEnumManager extends _DataEnumManager {
         name: z.string().optional(),
       })
 
-    groupZod
+    const result = groupZod
       .extend({
         items: helper.uniqueArrayZod(z.array(groupItemZod), [
           'name',
           'apiName',
         ]),
       })
-      .parse(group)
+      .safeParse(group)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   async checkWithoutNameItem(item: DataEnum.WithoutNameItem) {
@@ -284,13 +293,19 @@ export default class DataEnumManager extends _DataEnumManager {
       name: true,
     })
 
-    itemZod.parse(item)
+    const result = itemZod.safeParse(item)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   async checkItem(item: DataEnum.Item) {
     const itemZod = this.getItemZod()
 
-    itemZod.parse(item)
+    const result = itemZod.safeParse(item)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   observe(

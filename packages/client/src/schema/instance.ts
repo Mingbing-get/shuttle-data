@@ -170,7 +170,10 @@ export default class Schema {
   checkModel(model: DataModel.Define) {
     const modelZod = dataModelManager.getZod()
 
-    modelZod.parse(model)
+    const result = modelZod.safeParse(model)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     this.checkFieldNameAndApiNameIsUnique(model.fields)
 
@@ -184,7 +187,10 @@ export default class Schema {
       name: true,
     })
 
-    modelZod.parse(model)
+    const result = modelZod.safeParse(model)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     this.checkFieldNameAndApiNameIsUnique(model.fields)
 
@@ -199,7 +205,10 @@ export default class Schema {
       throw new Error(`field type ${field.type} is not supported`)
     }
 
-    fieldPlugin.getZod().parse(field)
+    const result = fieldPlugin.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   checkWithOutNameField(field: DataModel.WithoutNameField) {
@@ -208,18 +217,24 @@ export default class Schema {
       throw new Error(`field type ${field.type} is not supported`)
     }
 
-    fieldPlugin
+    const result = fieldPlugin
       .getZod()
       .omit({
         name: true,
       })
-      .parse(field)
+      .safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   checkModelWhenUpdate(model: DataModel.MabyFieldNameModel) {
     const modelZod = dataModelManager.getZod()
 
-    modelZod.parse(model)
+    const result = modelZod.safeParse(model)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     this.checkFieldNameAndApiNameIsUnique(model.fields)
 

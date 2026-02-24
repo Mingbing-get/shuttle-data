@@ -1124,7 +1124,10 @@ export default class Schema {
   async checkModel(model: DataModel.Define) {
     const modelZod = dataModelManager.getZod()
 
-    modelZod.parse(model)
+    const result = modelZod.safeParse(model)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     const displayField = model.fields.find(
       (field) => field.name === model.displayField,

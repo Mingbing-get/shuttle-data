@@ -59,6 +59,10 @@ class DataModelManager {
       .catchall(z.any())
   }
 
+  getWithoutNameZod() {
+    return this.getZodWithFields().omit({ name: true })
+  }
+
   getZodWithFields() {
     const modelZod = this.getZod()
 
@@ -68,6 +72,26 @@ class DataModelManager {
 
     return modelZod.extend({
       fields: uniqueArrayZod(z.array(z.union(fieldZods)), ['name', 'apiName']),
+    })
+  }
+
+  getWithoutNameWithFieldZod() {
+    const fieldZods = Object.values(this.fieldPlugins).map((plugin) =>
+      plugin.getZod().omit({ name: true }),
+    )
+
+    return this.getWithoutNameZod().extend({
+      fields: uniqueArrayZod(z.array(z.union(fieldZods)), ['apiName']),
+    })
+  }
+
+  getMabNameWithFieldZod() {
+    const fieldZods = Object.values(this.fieldPlugins).map((plugin) =>
+      plugin.getZod().partial({ name: true }),
+    )
+
+    return this.getZod().extend({
+      fields: uniqueArrayZod(z.array(z.union(fieldZods)), ['apiName']),
     })
   }
 

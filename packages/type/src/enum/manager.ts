@@ -14,9 +14,30 @@ export default class DataEnumManager {
       .catchall(z.any())
   }
 
+  getGroupWithoutNameZod() {
+    return this.getGroupZod().omit({ name: true })
+  }
+
   getGroupZodWithItems() {
     return this.getGroupZod().extend({
       items: uniqueArrayZod(z.array(this.getItemZod()), ['name', 'apiName']),
+    })
+  }
+
+  getWithoutNameWithItemZod() {
+    return this.getGroupWithoutNameZod().extend({
+      items: uniqueArrayZod(z.array(this.getItemZod().omit({ name: true })), [
+        'apiName',
+      ]),
+    })
+  }
+
+  getMabNameWithItemZod() {
+    return this.getGroupZod().extend({
+      items: uniqueArrayZod(
+        z.array(this.getItemZod().partial({ name: true })),
+        ['apiName'],
+      ),
     })
   }
 

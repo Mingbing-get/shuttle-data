@@ -26,7 +26,10 @@ export default class LookupFieldPlugin
   }
 
   async check(schema: DataModelSchema, field: DataModel.LookupField) {
-    this.getZod().parse(field)
+    const result = this.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
 
     if (!field.extra?.modalName) {
       throw new Error(`lookup field ${field.name} must have modalName`)

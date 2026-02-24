@@ -22,6 +22,9 @@ export default class TextFieldPlugin
   }
 
   check(schema: DataModelSchema, field: DataModel.TextField) {
-    this.getZod().parse(field)
+    const result = this.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 }

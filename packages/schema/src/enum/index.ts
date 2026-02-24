@@ -594,13 +594,20 @@ export default class DataEnumManager extends _DataEnumManager {
   async checkGroup(group: DataEnum.Group) {
     const groupZod = this.getGroupZodWithItems()
 
-    groupZod.parse(group)
+    const result = groupZod.safeParse(group)
+
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   async checkItem(item: DataEnum.Item) {
     const itemZod = this.getItemZod()
 
-    itemZod.parse(item)
+    const result = itemZod.safeParse(item)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 
   private async createGroupTableIfNotExist(

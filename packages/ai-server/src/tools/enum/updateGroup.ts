@@ -12,8 +12,9 @@ const updateGroupTool = tool(
   },
   {
     name: 'update_enum_group',
-    description: 'Update an existing enum group',
-    schema: new DataEnumManager().getGroupZodWithItems(),
+    description:
+      'Update an existing enum group. Newly added items do not require a name.',
+    schema: new DataEnumManager().getMabNameWithItemZod(),
     extras: {
       scope: 'write',
     },

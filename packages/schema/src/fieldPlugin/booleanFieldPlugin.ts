@@ -19,6 +19,9 @@ export default class BooleanFieldPlugin
   }
 
   check(schema: DataModelSchema, field: DataModel.BooleanField) {
-    this.getZod().parse(field)
+    const result = this.getZod().safeParse(field)
+    if (!result.success) {
+      throw new Error(result.error.message)
+    }
   }
 }

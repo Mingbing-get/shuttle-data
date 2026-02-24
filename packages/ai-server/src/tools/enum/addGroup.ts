@@ -13,7 +13,7 @@ const addGroupTool = tool(
   {
     name: 'add_enum_group',
     description: 'Add a new enum group with items',
-    schema: new DataEnumManager().getGroupZodWithItems(),
+    schema: new DataEnumManager().getWithoutNameWithItemZod(),
     extras: {
       scope: 'write',
     },
