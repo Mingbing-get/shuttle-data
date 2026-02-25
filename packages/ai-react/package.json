@@ -35,9 +35,9 @@
     "@shuttle-data/render-react": "workspace:*",
     "antd": "^6.1.1",
     "@ant-design/icons": "^6.1.0",
-    "@shuttle-ai/type": "/Users/mingbing/apps/shuttle-ai/packages/type",
-    "@shuttle-ai/client": "/Users/mingbing/apps/shuttle-ai/packages/client",
-    "@shuttle-ai/render-react": "/Users/mingbing/apps/shuttle-ai/packages/render-react"
+    "@shuttle-ai/type": "^0.0.2",
+    "@shuttle-ai/client": "^0.0.2",
+    "@shuttle-ai/render-react": "^0.0.2"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

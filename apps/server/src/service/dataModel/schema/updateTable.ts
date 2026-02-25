@@ -15,7 +15,10 @@ export default async function updateTable(dataModelDefine: DataModel.Define) {
 
     const fieldName = generateName('field')
 
-    if (dataModelDefine.displayField === field.name) {
+    if (
+      dataModelDefine.displayField === field.name ||
+      dataModelDefine.displayField === field.apiName
+    ) {
       dataModelDefine.displayField = fieldName
     }
 

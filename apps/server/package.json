@@ -39,8 +39,8 @@
     "langchain": "^1.2.17",
     "@langchain/core": "^1.1.19",
     "@langchain/openai": "^1.2.4",
-    "@shuttle-ai/type": "/Users/mingbing/apps/shuttle-ai/packages/type",
-    "@shuttle-ai/agent": "/Users/mingbing/apps/shuttle-ai/packages/agent"
+    "@shuttle-ai/type": "^0.0.2",
+    "@shuttle-ai/agent": "^0.0.2"
   },
   "devDependencies": {
     "tsx": "^4.7.1",

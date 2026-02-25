@@ -91,7 +91,10 @@ function TableEditor(
 
             const newField = { ...field, name: generateUUID('temp_') }
 
-            if (afterFillSystemFieldModel.displayField === field.name) {
+            if (
+              afterFillSystemFieldModel.displayField === field.name ||
+              afterFillSystemFieldModel.displayField === field.apiName
+            ) {
               afterFillSystemFieldModel.displayField = newField.name
             }
 
@@ -110,7 +113,10 @@ function TableEditor(
 
             const newField = { ...field, name: generateUUID('temp_') }
 
-            if (afterFillSystemFieldModel.displayField === field.name) {
+            if (
+              afterFillSystemFieldModel.displayField === field.name ||
+              afterFillSystemFieldModel.displayField === field.apiName
+            ) {
               afterFillSystemFieldModel.displayField = newField.name
             }
 
