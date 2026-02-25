@@ -34,6 +34,15 @@ export default function CreateTableToolRender(
     return value
   }, [])
 
+  const handleAfterConfirm = useCallback(() => {
+    setTimeout(() => {
+      dataModel.schema.clearTableList()
+      if (args.name) {
+        dataModel.schema.removeModelFromCache(args.name)
+      }
+    }, 1000)
+  }, [dataModel, args.name])
+
   return (
     <Flex
       vertical
@@ -50,13 +59,14 @@ export default function CreateTableToolRender(
         disabled={!!confirmResult}
         schema={dataModel.schema}
         enumManager={dataModel.enumManager}
-        table={args}
+        table={confirmResult?.newArgs as any || args}
       />
       <ToolConfirmRender
         agent={agent}
         toolId={toolId}
         result={confirmResult}
         getNewArgs={getNewArgs}
+        onAfterConfirm={handleAfterConfirm}
       />
     </Flex>
   )

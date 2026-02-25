@@ -12,7 +12,8 @@ const addGroupTool = tool(
   },
   {
     name: 'add_enum_group',
-    description: 'Add a new enum group with items',
+    description:
+      'Add a new enum group with items. Check for an existing enum group before creation to avoid duplicates.',
     schema: new DataEnumManager().getWithoutNameWithItemZod(),
     extras: {
       scope: 'write',

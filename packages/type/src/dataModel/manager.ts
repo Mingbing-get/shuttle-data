@@ -53,7 +53,9 @@ class DataModelManager {
         name: nameZod(),
         apiName: apiNameZod(),
         label: labelZod(),
-        displayField: nameZod(),
+        displayField: nameZod().describe(
+          'Note: the field’s `name` is used here, not `apiName`',
+        ),
         isSystem: z.boolean().optional().nullable(),
       })
       .catchall(z.any())

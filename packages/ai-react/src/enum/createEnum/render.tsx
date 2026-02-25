@@ -32,6 +32,15 @@ export default function CreateEnumToolRender(props: CreateEnumToolRenderProps) {
     return value
   }, [])
 
+  const handleAfterConfirm = useCallback(() => {
+    setTimeout(() => {
+      dataModel.enumManager.clearGroupList()
+      if (args.name) {
+        dataModel.enumManager.removeGroupFromCache(args.name)
+      }
+    }, 1000)
+  }, [dataModel, args.name])
+
   return (
     <Flex
       vertical
@@ -54,6 +63,7 @@ export default function CreateEnumToolRender(props: CreateEnumToolRenderProps) {
         toolId={toolId}
         result={confirmResult}
         getNewArgs={getNewArgs}
+        onAfterConfirm={handleAfterConfirm}
       />
     </Flex>
   )

@@ -342,12 +342,12 @@ export default class DataEnumManager extends _DataEnumManager {
     }
   }
 
-  private clearGroupList() {
+  clearGroupList() {
     this.groupListCache = undefined
     this.triggerGroupList()
   }
 
-  private async removeGroupFromCache(groupName: string, useApiName?: boolean) {
+  async removeGroupFromCache(groupName: string, useApiName?: boolean) {
     const groupPromise = useApiName
       ? this.enumCache.groupApiNameMap[groupName]
       : this.enumCache.groupMap[groupName]

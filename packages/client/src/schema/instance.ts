@@ -306,12 +306,12 @@ export default class Schema {
     }
   }
 
-  private clearTableList() {
+  clearTableList() {
     this.tableListCache = undefined
     this.triggerTableList()
   }
 
-  private async removeModelFromCache(modelName: string, useApiName?: boolean) {
+  async removeModelFromCache(modelName: string, useApiName?: boolean) {
     const modelPromise = useApiName
       ? this.dataModelCache.apiNameModelMap[modelName]
       : this.dataModelCache.modelMap[modelName]

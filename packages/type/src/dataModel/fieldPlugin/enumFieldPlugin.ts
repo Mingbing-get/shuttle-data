@@ -12,7 +12,9 @@ export default class EnumFieldPlugin implements DataModel.FieldPlugin<'enum'> {
     return baseFieldZod.extend({
       type: z.literal('enum'),
       extra: z.object({
-        groupName: z.string(),
+        groupName: z
+          .string()
+          .describe('Note: this refers to the enum group name, not apiName'),
         multiple: z.boolean().optional().nullable(),
       }),
     })

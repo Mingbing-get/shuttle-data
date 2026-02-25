@@ -12,7 +12,9 @@ export default class LookupFieldPlugin implements DataModel.FieldPlugin<'lookup'
     return baseFieldZod.extend({
       type: z.literal('lookup'),
       extra: z.object({
-        modalName: z.string(),
+        modalName: z
+          .string()
+          .describe('Note: this refers to the modal name, not apiName'),
         multiple: z.boolean().optional().nullable(),
         unique: z.boolean().optional().nullable(),
       }),
