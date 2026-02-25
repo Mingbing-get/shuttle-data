@@ -90,14 +90,14 @@ importers:
   apps/front:
     dependencies:
       '@shuttle-ai/client':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-ai/render-react':
-        specifier: ^0.0.2
-        version: 0.0.2(@types/react@18.3.27)
+        specifier: ^0.0.4
+        version: 0.0.4(@types/react@18.3.27)
       '@shuttle-ai/type':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-data/ai-react':
         specifier: workspace:*
         version: link:../../packages/ai-react
@@ -151,11 +151,11 @@ importers:
         specifier: ^1.2.4
         version: 1.2.7(@langchain/core@1.1.24)
       '@shuttle-ai/agent':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-ai/type':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-data/ai-server':
         specifier: workspace:*
         version: link:../../packages/ai-server
@@ -221,14 +221,14 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0(react-dom@18.3.1)(react@18.3.1)
       '@shuttle-ai/client':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-ai/render-react':
-        specifier: ^0.0.2
-        version: 0.0.2(@types/react@18.3.27)
+        specifier: ^0.0.4
+        version: 0.0.4(@types/react@18.3.27)
       '@shuttle-ai/type':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-data/client':
         specifier: workspace:*
         version: link:../client
@@ -270,11 +270,11 @@ importers:
         specifier: ^1.1.19
         version: 1.1.24
       '@shuttle-ai/agent':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-ai/type':
-        specifier: ^0.0.2
-        version: 0.0.2
+        specifier: ^0.0.4
+        version: 0.0.4
       '@shuttle-data/crud':
         specifier: workspace:*
         version: link:../crud
@@ -397,10 +397,10 @@ importers:
         specifier: workspace:*
         version: link:../type
       knex:
-        specifier: ^3.1.0
+        specifier: '*'
         version: 3.1.0(mysql2@3.16.0)
       zod:
-        specifier: ^4.3.5
+        specifier: '*'
         version: 4.3.5
     devDependencies:
       '@types/node':
@@ -419,7 +419,7 @@ importers:
   packages/type:
     dependencies:
       zod:
-        specifier: ^4.3.5
+        specifier: '*'
         version: 4.3.5
 
 packages:
@@ -3098,12 +3098,12 @@ packages:
       - '@types/node'
     dev: true
 
-  /@shuttle-ai/agent@0.0.2:
-    resolution: {integrity: sha512-kUBPB34OwUDk7PuAORUbLpLlhQvbmyoY8g8M30xwcoN9fMeR0SBY8kJQ8NMcFNjxUVUKvxeTrFXvwwheBjRvyg==}
+  /@shuttle-ai/agent@0.0.4:
+    resolution: {integrity: sha512-ckierkyE8/gvsWv5JQeF/bmsWyBeLIeZ2ji5oJ7kI33NfADGzo4pSIcZjg+MzlMSMVYxtYBA0+kuW1AO/21oxg==}
     dependencies:
       '@langchain/core': 1.1.24
       '@langchain/openai': 1.2.7(@langchain/core@1.1.24)
-      '@shuttle-ai/type': 0.0.2
+      '@shuttle-ai/type': 0.0.4
       langchain: 1.2.23(@langchain/core@1.1.24)
       zod: 4.3.5
     transitivePeerDependencies:
@@ -3117,22 +3117,22 @@ packages:
       - zod-to-json-schema
     dev: false
 
-  /@shuttle-ai/client@0.0.2:
-    resolution: {integrity: sha512-drE6pEgLfLA40yyxfKCpg7KIw93KsVBblMk+9IQnX3RnhLGTjXJ2slbe9hm4vB7TF4VWxR/ozegu1B/lTe85mQ==}
+  /@shuttle-ai/client@0.0.4:
+    resolution: {integrity: sha512-ZvBLx+yYmYCBEkOiWgqwAtcYYmDeSXOPm2gjIAciregrBYLC9RVk49eUQwYreFxyPDHAigljL4KGlKHb/V9j5g==}
     dependencies:
-      '@shuttle-ai/type': 0.0.2
+      '@shuttle-ai/type': 0.0.4
       axios: 1.13.2
       zod: 4.3.5
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /@shuttle-ai/render-react@0.0.2(@types/react@18.3.27):
-    resolution: {integrity: sha512-yU8HCkFg5N6B0EdB42b/+0wzbVKhFE7jQ9BSf/YMpob70DjWqHz53j8/K5svj+mHfT5CZcpfm3qnJWCw86CL5Q==}
+  /@shuttle-ai/render-react@0.0.4(@types/react@18.3.27):
+    resolution: {integrity: sha512-Bt+tSzEiNJJ1BYY/hIw/8//ET6YtrWE3mbrrsG2qfbZFT4tJu6USzTBPgVpvo7hSJYF2yuS6awpz6aty6u8zjQ==}
     dependencies:
       '@ant-design/icons': 6.1.0(react-dom@18.3.1)(react@18.3.1)
-      '@shuttle-ai/client': 0.0.2
-      '@shuttle-ai/type': 0.0.2
+      '@shuttle-ai/client': 0.0.4
+      '@shuttle-ai/type': 0.0.4
       antd: 6.2.1(react-dom@18.3.1)(react@18.3.1)
       classnames: 2.5.1
       github-markdown-css: 5.9.0
@@ -3152,8 +3152,8 @@ packages:
       - supports-color
     dev: false
 
-  /@shuttle-ai/type@0.0.2:
-    resolution: {integrity: sha512-Tg+dtFZ2LoGC7/+wZuwf4ngamGKGLoEIm8TXcynax6gD3RStC4f9V4FRW1r5q4o2LBdyjq8zM4BFtiyqruTIAQ==}
+  /@shuttle-ai/type@0.0.4:
+    resolution: {integrity: sha512-+VVybo5qww6xs9wU6F/eG0h0EhIx2ak0b9Rvn0/klBRDdWatCti+VnDRO5/60s3JqAmt+eEtgX1Yr+k9pu8OSA==}
     dependencies:
       zod: 4.3.5
     dev: false

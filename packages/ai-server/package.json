@@ -29,11 +29,11 @@
     "@shuttle-data/type": "workspace:*",
     "@shuttle-data/schema": "workspace:*",
     "@shuttle-data/crud": "workspace:*",
-    "langchain": "^1.2.17",
-    "@langchain/core": "^1.1.19",
-    "zod": "^4.3.5",
-    "@shuttle-ai/type": "^0.0.2",
-    "@shuttle-ai/agent": "^0.0.2"
+    "langchain": "*",
+    "@langchain/core": "*",
+    "zod": "*",
+    "@shuttle-ai/type": "*",
+    "@shuttle-ai/agent": "*"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

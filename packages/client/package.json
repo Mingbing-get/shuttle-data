@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "@shuttle-data/type": "workspace:*",
-    "zod": "^4.3.5",
-    "axios": "^1.13.2"
+    "zod": "*",
+    "axios": "*"
   },
   "devDependencies": {
     "typescript": "^5.3.3"

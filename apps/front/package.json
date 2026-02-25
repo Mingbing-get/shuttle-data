@@ -28,17 +28,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "classnames": "^2.5.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "antd": "^6.1.1",
     "@shuttle-data/render-react": "workspace:*",
     "@shuttle-data/ai-react": "workspace:*",
     "@shuttle-data/client": "workspace:*",
     "@shuttle-data/type": "workspace:*",
-    "@shuttle-ai/render-react": "^0.0.2",
-    "@shuttle-ai/client": "^0.0.2",
-    "@shuttle-ai/type": "^0.0.2"
+    "classnames": "*",
+    "react": "*",
+    "react-dom": "*",
+    "antd": "*",
+    "@shuttle-ai/render-react": "*",
+    "@shuttle-ai/client": "*",
+    "@shuttle-ai/type": "*"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

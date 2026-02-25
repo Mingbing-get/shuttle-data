@@ -26,9 +26,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "knex": "^3.1.0",
     "@shuttle-data/type": "workspace:*",
-    "zod": "^4.3.5"
+    "knex": "*",
+    "zod": "*"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

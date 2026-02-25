@@ -1,9 +1,11 @@
+import { useMemo } from 'react'
 import { HttpTransporter } from '@shuttle-ai/client'
 import { AgentWorkProvider, AgentWorkRender } from '@shuttle-ai/render-react'
 
 import initAgent from './initAgent'
 import dataModel from './config'
-import { useMemo } from 'react'
+
+import '@shuttle-ai/render-react/style.css'
 
 const transporter = new HttpTransporter({
   baseUrl: 'http://localhost:3100/ai',
