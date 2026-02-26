@@ -15,7 +15,7 @@ export default class LikeConditionPlugin implements DataCondition.Plugin<'like'>
     return z.object({
       op: z.literal(this.op),
       key: z.string(),
-      value: z.string(),
+      value: z.string().describe('The value does not need to contain %, % will be automatically added'),
     })
   }
 }

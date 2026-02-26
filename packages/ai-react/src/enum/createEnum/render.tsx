@@ -56,7 +56,7 @@ export default function CreateEnumToolRender(props: CreateEnumToolRenderProps) {
         }}
         disabled={!!confirmResult}
         manager={dataModel.enumManager}
-        group={args}
+        group={confirmResult?.newArgs || args}
       />
       <ToolConfirmRender
         agent={agent}

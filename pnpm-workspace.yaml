@@ -4,10 +4,10 @@ packages:
 
 pnpm:
   overrides:
-    '@shuttle-ai/type': '^0.0.5'
-    '@shuttle-ai/agent': '^0.0.5'
-    '@shuttle-ai/client': '^0.0.5'
-    '@shuttle-ai/render-react': '^0.0.5'
+    '@shuttle-ai/type': '^0.0.6'
+    '@shuttle-ai/agent': '^0.0.6'
+    '@shuttle-ai/client': '^0.0.6'
+    '@shuttle-ai/render-react': '^0.0.6'
     'zod': '^4.3.5'
     'knex': '^3.1.0'
     'classnames': '^2.5.1'

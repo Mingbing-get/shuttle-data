@@ -59,7 +59,7 @@ export default function CreateTableToolRender(
         disabled={!!confirmResult}
         schema={dataModel.schema}
         enumManager={dataModel.enumManager}
-        table={confirmResult?.newArgs as any || args}
+        table={confirmResult?.newArgs || args}
       />
       <ToolConfirmRender
         agent={agent}

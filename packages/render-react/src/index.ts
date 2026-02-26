@@ -5,4 +5,4 @@ export * from './data'
 export { default as renderFieldPluginManager } from './fieldPlugin'
 export * from './fieldPlugin'
 
-import './type'
+export * from './type'

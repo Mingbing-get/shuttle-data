@@ -5,6 +5,7 @@ import GetEnumListToolRender from './render'
 const getEnumListTool: ShuttleAi.Client.Agent.WithRunTool = {
   name: 'get_enum_group_list',
   description: '获取枚举列表',
+  label: '获取枚举列表',
   run: {
     type: 'render',
     Render: GetEnumListToolRender,

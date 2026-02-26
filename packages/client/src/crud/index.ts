@@ -1,4 +1,4 @@
-import './type'
+export * from './type'
 
 export { default as CRUD } from './instance'
 export { default as CRUDHttpTransporter } from './httpTransporter'

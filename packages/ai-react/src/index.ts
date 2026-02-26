@@ -1,4 +1,4 @@
-import './type'
+export * from './type'
 
 export * from './schema'
 export * from './enum'

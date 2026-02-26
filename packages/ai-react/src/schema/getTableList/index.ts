@@ -4,6 +4,7 @@ import GetTableListToolRender from './render'
 
 const getTableListTool: ShuttleAi.Client.Agent.WithRunTool = {
   name: 'get_table_list',
+  label: '获取数据模型列表',
   description: '获取数据模型列表',
   run: {
     type: 'render',

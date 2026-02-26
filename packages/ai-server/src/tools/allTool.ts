@@ -12,6 +12,17 @@ import {
   getGroupDetailTool,
   getGroupListTool,
 } from './enum'
+import {
+  createRecordTool, 
+  batchCreateRecordsTool, 
+  updateRecordsTool, 
+  conditionUpdateRecordsTool, 
+  findRecordsTool, 
+  recordCountTool,
+  deleteRecordsTool,
+  queryGroupByTool,
+  getConditionDefineTool
+} from './crud'
 
 export default function allTool() {
   return [
@@ -25,5 +36,14 @@ export default function allTool() {
     removeGroupTool,
     getGroupDetailTool,
     getGroupListTool,
+    createRecordTool,
+    batchCreateRecordsTool,
+    updateRecordsTool,
+    conditionUpdateRecordsTool,
+    findRecordsTool,
+    recordCountTool,
+    deleteRecordsTool,
+    queryGroupByTool,
+    getConditionDefineTool
   ]
 }

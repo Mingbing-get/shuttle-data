@@ -5,6 +5,7 @@ import UpdateEnumToolRender from '../createEnum/render'
 const updateEnumTool: ShuttleAi.Client.Agent.WithRunTool = {
   name: 'update_enum_group',
   description: '更新枚举',
+  label: '更新枚举',
   run: {
     type: 'render',
     Render: UpdateEnumToolRender,
