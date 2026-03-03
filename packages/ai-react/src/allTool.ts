@@ -32,6 +32,12 @@ import {
   BatchCreateRecordToolRenderProps,
   createRecordTool,
   CreateRecordToolRenderProps,
+  deleteRecordTool,
+  DeleteRecordToolRenderProps,
+  updateRecordsTool,
+  UpdateRecordToolRenderProps,
+  conditionUpdateRecordsTool,
+  ConditionUpdateRecordToolRenderProps,
 } from './crud'
 
 interface AllToolOptions {
@@ -50,6 +56,9 @@ interface AllToolOptions {
   queryGroupByTool?: DefinePropsRunTool<QueryGroupByToolRenderProps>
   batchCreateRecordsTool?: DefinePropsRunTool<BatchCreateRecordToolRenderProps>
   createRecordTool?: DefinePropsRunTool<CreateRecordToolRenderProps>
+  deleteRecordTool?: DefinePropsRunTool<DeleteRecordToolRenderProps>
+  updateRecordsTool?: DefinePropsRunTool<UpdateRecordToolRenderProps>
+  conditionUpdateRecordsTool?: DefinePropsRunTool<ConditionUpdateRecordToolRenderProps>
 }
 
 export default function allTool(options?: AllToolOptions) {
@@ -69,6 +78,9 @@ export default function allTool(options?: AllToolOptions) {
     deepMerge(queryGroupByTool, options?.queryGroupByTool),
     deepMerge(batchCreateRecordsTool, options?.batchCreateRecordsTool),
     deepMerge(createRecordTool, options?.createRecordTool),
+    deepMerge(deleteRecordTool, options?.deleteRecordTool),
+    deepMerge(updateRecordsTool, options?.updateRecordsTool),
+    deepMerge(conditionUpdateRecordsTool, options?.conditionUpdateRecordsTool),
   ]
 }
 

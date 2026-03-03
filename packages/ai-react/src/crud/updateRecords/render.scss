@@ -1,0 +1,12 @@
+.shuttle-data-tool-update-records {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .shuttle-data-tool-update-item {
+    .shuttle-data-tool-update-item-title {
+      margin: 0 0 1rem 0;
+      text-align: center;
+    }
+  }
+}

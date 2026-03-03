@@ -36,6 +36,7 @@ export interface DataFormProps<Values = Record<string, any>> extends Omit<
   useApiName?: boolean
 
   showAll?: boolean
+  hiddenEmptyValueField?: boolean
   value?: Values | number | string
   fieldConfigs?: Record<string, DataFormFieldConfig>
   footer?: (actions: ExportActions) => React.ReactNode
@@ -55,6 +56,7 @@ export default function DataForm<Values = Record<string, any>>({
   tableName,
   useApiName,
   showAll,
+  hiddenEmptyValueField,
   value,
   fieldConfigs,
   layout = 'vertical',
@@ -147,11 +149,27 @@ export default function DataForm<Values = Record<string, any>>({
         return fields
       }
 
+      if (hiddenEmptyValueField && value && Object.keys(value).length > 0) {
+        return fields.filter((field) => {
+          const key = useApiName ? field.apiName : field.name
+          const fieldValue = (value as any)[key]
+          return fieldValue !== undefined && fieldValue !== null
+        })
+      }
+
       const configFields = Object.keys(fieldConfigs || {})
       if (configFields.length === 0) return fields
 
       return fields.filter((field) => configFields.includes(field.name))
-    }, [showAll, fieldConfigs, useApiName, table, recordId])
+    }, [
+      showAll,
+      fieldConfigs,
+      useApiName,
+      table,
+      recordId,
+      hiddenEmptyValueField,
+      value,
+    ])
 
   const reset = useCallback(async () => {
     form.setFieldsValue(resetValue.current || {})

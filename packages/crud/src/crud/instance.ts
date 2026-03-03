@@ -196,8 +196,6 @@ export default class CRUD<M extends Record<string, any>> {
       const model = await this.getCurrentModel()
       const crud = new CRUD<M>({
         ...this.options,
-        modelName: model.name,
-        useApiName: false,
         onCheckPermission: undefined,
       })
       const beforeUpdateRecords = await crud.find({
@@ -270,8 +268,6 @@ export default class CRUD<M extends Record<string, any>> {
       const model = await this.getCurrentModel()
       const crud = new CRUD<M>({
         ...this.options,
-        modelName: model.name,
-        useApiName: false,
         onCheckPermission: undefined,
       })
       const records = await crud.find({
@@ -342,7 +338,12 @@ export default class CRUD<M extends Record<string, any>> {
           builder.whereNull(CRUD.IS_DELETE).orWhere(CRUD.IS_DELETE, '=', false)
         })
         .andWhere((builder) => {
-          this.createCondition(builder, model, enumInfo, condition)
+          this.createCondition(
+            builder,
+            model,
+            enumInfo,
+            this.createAndCondition(condition, checkpermissionRes.condition),
+          )
         })
       this.createOrder(builder, model, orders)
       if (limit !== undefined) {
@@ -722,12 +723,45 @@ export default class CRUD<M extends Record<string, any>> {
       fieldNames = fields as string[]
     }
 
-    return await onCheckPermission({
+    const res = await onCheckPermission({
       type,
       context: this.options.context,
       modelName: model.name,
       fieldNames,
     })
+
+    if (res && res.condition && this.options.useApiName) {
+      return {
+        ...res,
+        condition: this.toApiNameCondition(res.condition, model),
+      }
+    }
+
+    return res
+  }
+
+  private toApiNameCondition(
+    condition: DataCondition.Define<M>,
+    model: DataModel.Define,
+  ): DataCondition.Define<M> {
+    if (condition.op === 'and' || condition.op === 'or') {
+      return {
+        op: condition.op,
+        subCondition: condition.subCondition.map((sub) =>
+          this.toApiNameCondition(sub, model),
+        ),
+      }
+    }
+
+    const field = model.fields.find((field) => field.name === condition.key)
+    if (!field) {
+      throw new Error(`Field ${condition.key} not found`)
+    }
+
+    return {
+      ...condition,
+      key: field.apiName,
+    }
   }
 
   private omitFields(
