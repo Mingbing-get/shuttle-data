@@ -8,6 +8,7 @@ import { isGroupColumn } from './utils'
 
 interface UseDataOptions {
   dataModel: DataModelInstance
+  defaultData?: Record<string, any>[]
   baseColumns?: TableColumnsType
   showAll?: boolean
   table?: DataModel.Define
@@ -20,6 +21,7 @@ interface UseDataOptions {
 export default function useData({
   dataModel,
   baseColumns,
+  defaultData,
   showAll,
   table,
   useApiName,
@@ -27,7 +29,7 @@ export default function useData({
   condition,
   orders,
 }: UseDataOptions) {
-  const [data, setData] = useState<Record<string, any>[]>([])
+  const [data, setData] = useState<Record<string, any>[]>(defaultData || [])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState({
     current: 1,
@@ -114,8 +116,20 @@ export default function useData({
   }, [needRequestColumns, condition, orders])
 
   useEffect(() => {
-    fetchData(60)()
-  }, [page, table, useApiName, needRequestColumns, condition, orders])
+    if (defaultData) {
+      setData(defaultData)
+    } else {
+      fetchData(60)()
+    }
+  }, [
+    page,
+    table,
+    useApiName,
+    needRequestColumns,
+    condition,
+    orders,
+    defaultData,
+  ])
 
   return {
     showPagination,

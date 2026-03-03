@@ -4,7 +4,7 @@ import {
   DataEnum,
   helper,
 } from '@shuttle-data/type'
-export * from './type'
+import './type'
 
 export default class DataEnumManager extends _DataEnumManager {
   private enumCache: {

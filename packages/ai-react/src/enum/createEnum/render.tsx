@@ -9,6 +9,7 @@ import {
   useWorkContext,
   useTool,
   ToolConfirmRender,
+  CatchResultError,
 } from '@shuttle-ai/render-react'
 import { Flex } from 'antd'
 
@@ -20,7 +21,10 @@ export interface CreateEnumToolRenderProps extends Omit<
 export default function CreateEnumToolRender(props: CreateEnumToolRenderProps) {
   const instanceRef = useRef<DataEnumGroupEditorInstance>(null)
   const { dataModel } = useWorkContext()
-  const { args, confirmResult, agent, toolId } = useTool<DataEnum.Group>()
+  const { args, result, confirmResult, agent, toolId } = useTool<
+    DataEnum.Group,
+    string
+  >()
 
   const getNewArgs = useCallback(async () => {
     if (!instanceRef.current) {
@@ -57,6 +61,10 @@ export default function CreateEnumToolRender(props: CreateEnumToolRenderProps) {
         disabled={!!confirmResult}
         manager={dataModel.enumManager}
         group={confirmResult?.newArgs || args}
+      />
+      <CatchResultError
+        result={result}
+        successRender={(info) => <span>{info}</span>}
       />
       <ToolConfirmRender
         agent={agent}

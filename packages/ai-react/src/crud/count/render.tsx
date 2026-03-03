@@ -9,8 +9,9 @@ import {
   useWorkContext,
   useTool,
   ToolConfirmRender,
+  CatchResultError,
 } from '@shuttle-ai/render-react'
-import { Flex, Spin } from 'antd'
+import { Flex, Spin, Row, Col } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 
 interface CountRecordParams extends DataCRUD.CountOption<any> {
@@ -18,22 +19,27 @@ interface CountRecordParams extends DataCRUD.CountOption<any> {
   useApiName: boolean
 }
 
-export interface CountRenderProps extends Pick<
+export interface CountToolRenderProps extends Pick<
   ConditionRenderProps,
   'style' | 'className'
 > {}
 
-export default function CountRender(props: CountRenderProps) {
+export default function CountToolRender(props: CountToolRenderProps) {
   const { dataModel } = useWorkContext()
-  const { args, confirmResult, agent, toolId } = useTool<CountRecordParams>()
+  const { args, effectArgs, updateArg, confirmResult, result, agent, toolId } =
+    useTool<CountRecordParams, number>()
 
   const { loading, table } = useTable(
     dataModel.schema,
-    args.modelName,
-    args.useApiName,
+    effectArgs.modelName,
+    effectArgs.useApiName,
   )
 
-  const getNewArgs = useCallback(async () => {}, [])
+  const getNewArgs = useCallback(async () => {
+    if (args === effectArgs) return
+
+    return effectArgs
+  }, [args, effectArgs])
 
   return (
     <Spin indicator={<LoadingOutlined spin />} spinning={loading}>
@@ -42,13 +48,28 @@ export default function CountRender(props: CountRenderProps) {
         gap={8}
         style={{ backgroundColor: '#fff', borderRadius: 8, padding: 8 }}
       >
-        <DataCondition
-          {...props}
-          disabled={!!confirmResult}
-          condition={args.condition}
-          dataModel={dataModel}
-          useApiName={args.useApiName}
-          fields={table?.fields || []}
+        <Row align="middle" gutter={8}>
+          <Col style={{ fontWeight: 'bold' }}>数据模型：</Col>
+          <Col flex={1}>{table?.label || effectArgs.modelName}</Col>
+        </Row>
+        <Row align="middle" gutter={8}>
+          <Col style={{ fontWeight: 'bold' }}>查询条件：</Col>
+          <Col flex={1}>
+            <DataCondition
+              {...props}
+              disabled={!!confirmResult}
+              condition={effectArgs.condition}
+              dataModel={dataModel}
+              useApiName={effectArgs.useApiName}
+              fields={table?.fields || []}
+              onChange={(condition) => updateArg(['condition'], condition)}
+            />
+          </Col>
+        </Row>
+        <CatchResultError
+          title="查询结果"
+          result={result}
+          successRender={(content) => <span>{content}条</span>}
         />
         <ToolConfirmRender
           agent={agent}

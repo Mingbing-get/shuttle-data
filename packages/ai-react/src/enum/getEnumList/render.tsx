@@ -19,20 +19,20 @@ export default function GetEnumListToolRender(
   props: GetEnumListToolRenderProps,
 ) {
   const { dataModel } = useWorkContext()
-  const { content, confirmResult, agent, toolId } = useTool()
+  const { result, confirmResult, agent, toolId } = useTool()
 
   const showEnumGroupList: Omit<DataEnum.Group, 'fields'>[] | undefined =
     useMemo(() => {
-      if (!content) return
+      if (!result?.content) return
 
-      if (Array.isArray(content)) {
-        return content
+      if (Array.isArray(result.content)) {
+        return result.content
       }
 
       try {
-        return JSON.parse(content)
+        return JSON.parse(result.content)
       } catch (error) {}
-    }, [content])
+    }, [result])
 
   if (!showEnumGroupList) {
     return (

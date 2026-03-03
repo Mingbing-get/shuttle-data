@@ -1,5 +1,6 @@
 import { Knex } from 'knex'
-export * from '@shuttle-data/type'
+import '@shuttle-data/type'
+
 import Schema from './instance'
 
 declare module '@shuttle-data/type' {

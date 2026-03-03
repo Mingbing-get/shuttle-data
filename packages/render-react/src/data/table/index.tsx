@@ -41,6 +41,7 @@ export interface DataTableProps extends Omit<
 > {
   dataModel: DataModel
   tableName: string
+  data?: Record<string, any>[]
   headerBlock?: (
     context: HeaderBlockContext,
     actionRender: React.ReactNode,
@@ -54,6 +55,7 @@ export default function DataTable({
   headerBlock,
   dataModel,
   tableName,
+  data: defaultData,
   useApiName,
   columns,
   pagination,
@@ -89,6 +91,7 @@ export default function DataTable({
     dataModel,
     baseColumns: columns,
     showAll,
+    defaultData,
     table,
     useApiName,
     pagination,

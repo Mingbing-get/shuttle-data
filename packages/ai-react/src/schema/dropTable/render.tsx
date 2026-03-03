@@ -5,16 +5,20 @@ import {
   useWorkContext,
   useTool,
   ToolConfirmRender,
+  CatchResultError,
 } from '@shuttle-ai/render-react'
 
 export interface DropTableToolRenderProps {}
 
 export default function DropTableToolRender(props: DropTableToolRenderProps) {
   const { dataModel } = useWorkContext()
-  const { args, confirmResult, agent, toolId } = useTool<{
-    tableName: string
-    useApiName?: boolean
-  }>()
+  const { args, result, confirmResult, agent, toolId } = useTool<
+    {
+      tableName: string
+      useApiName?: boolean
+    },
+    string
+  >()
 
   const { loading, table } = useTable(
     dataModel.schema,
@@ -38,6 +42,10 @@ export default function DropTableToolRender(props: DropTableToolRenderProps) {
       <p style={{ margin: '4px 0' }}>
         删除数据模型【{table?.label || table?.apiName || args?.tableName}】
       </p>
+      <CatchResultError
+        result={result}
+        successRender={(info) => <span>{info}</span>}
+      />
       <ToolConfirmRender agent={agent} toolId={toolId} result={confirmResult} />
     </div>
   )

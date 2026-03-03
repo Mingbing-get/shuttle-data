@@ -29,7 +29,14 @@ export default function ConditionProvider({
   >([])
 
   useEffect(() => {
-    setConditionState(condition)
+    setConditionState(
+      condition && condition.op !== 'and' && condition.op !== 'or'
+        ? {
+            op: 'and',
+            subCondition: [condition],
+          }
+        : condition,
+    )
   }, [condition])
 
   useEffect(() => {

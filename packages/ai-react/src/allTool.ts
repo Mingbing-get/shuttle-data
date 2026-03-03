@@ -21,6 +21,12 @@ import {
   CreateEnumToolRenderProps,
   DropEnumToolRenderProps,
 } from './enum'
+import {
+  countTool,
+  findRecordsTool,
+  CountToolRenderProps,
+  FindRecordsToolRenderProps,
+} from './crud'
 
 interface AllToolOptions {
   getTableListTool?: DefinePropsRunTool<GetTableListToolRenderProps>
@@ -33,6 +39,8 @@ interface AllToolOptions {
   createEnumTool?: DefinePropsRunTool<CreateEnumToolRenderProps>
   dropEnumTool?: DefinePropsRunTool<DropEnumToolRenderProps>
   updateEnumTool?: DefinePropsRunTool<CreateEnumToolRenderProps>
+  countTool?: DefinePropsRunTool<CountToolRenderProps>
+  findRecordsTool?: DefinePropsRunTool<FindRecordsToolRenderProps>
 }
 
 export default function allTool(options?: AllToolOptions) {
@@ -47,6 +55,8 @@ export default function allTool(options?: AllToolOptions) {
     deepMerge(createEnumTool, options?.createEnumTool),
     deepMerge(dropEnumTool, options?.dropEnumTool),
     deepMerge(updateEnumTool, options?.updateEnumTool),
+    deepMerge(countTool, options?.countTool),
+    deepMerge(findRecordsTool, options?.findRecordsTool),
   ]
 }
 

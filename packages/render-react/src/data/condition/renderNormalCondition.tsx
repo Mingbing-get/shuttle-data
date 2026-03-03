@@ -68,11 +68,13 @@ export default function RenderNormalCondition({ condition }: Props) {
 
   return (
     <Flex align="center" ref={wrapper}>
-      <DragHandle
-        previewDom={getWrapper}
-        onDragStart={updateStartCondition}
-        onDragEnd={clearDragCondition}
-      />
+      {!disabled && (
+        <DragHandle
+          previewDom={getWrapper}
+          onDragStart={updateStartCondition}
+          onDragEnd={clearDragCondition}
+        />
+      )}
       <Row
         gutter={8}
         align="middle"
@@ -82,6 +84,7 @@ export default function RenderNormalCondition({ condition }: Props) {
           <Select
             style={{ width: '100%' }}
             options={fieldOptions}
+            disabled={disabled}
             value={condition.key}
             onChange={(value) => update(condition, { key: value } as any)}
           />
@@ -90,6 +93,7 @@ export default function RenderNormalCondition({ condition }: Props) {
           <Select
             style={{ width: '100%' }}
             options={opOptions}
+            disabled={disabled}
             value={condition.op}
             onChange={(value) =>
               update(condition, { key: condition.key, op: value } as any)
@@ -116,15 +120,17 @@ export default function RenderNormalCondition({ condition }: Props) {
             />
           </Col>
         )}
-        <div className="shuttle-data-condition-normal-item-actions">
-          <Button
-            danger
-            type="primary"
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => remove(condition)}
-          />
-        </div>
+        {!disabled && (
+          <div className="shuttle-data-condition-normal-item-actions">
+            <Button
+              danger
+              type="primary"
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => remove(condition)}
+            />
+          </div>
+        )}
       </Row>
     </Flex>
   )

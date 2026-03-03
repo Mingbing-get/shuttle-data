@@ -1,0 +1,7 @@
+.shuttle-data-sort-list.ant-list {
+  .ant-list-empty-text {
+    &:empty {
+      display: none;
+    }
+  }
+}

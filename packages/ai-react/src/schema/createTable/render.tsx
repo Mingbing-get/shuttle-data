@@ -9,6 +9,7 @@ import {
   useWorkContext,
   useTool,
   ToolConfirmRender,
+  CatchResultError,
 } from '@shuttle-ai/render-react'
 import { Flex } from 'antd'
 
@@ -22,7 +23,10 @@ export default function CreateTableToolRender(
 ) {
   const instanceRef = useRef<TableEditorInstance>(null)
   const { dataModel } = useWorkContext()
-  const { args, confirmResult, agent, toolId } = useTool<DataModel.Define>()
+  const { args, result, confirmResult, agent, toolId } = useTool<
+    DataModel.Define,
+    string
+  >()
 
   const getNewArgs = useCallback(async () => {
     if (!instanceRef.current) {
@@ -60,6 +64,10 @@ export default function CreateTableToolRender(
         schema={dataModel.schema}
         enumManager={dataModel.enumManager}
         table={confirmResult?.newArgs || args}
+      />
+      <CatchResultError
+        result={result}
+        successRender={(info) => <span>{info}</span>}
       />
       <ToolConfirmRender
         agent={agent}

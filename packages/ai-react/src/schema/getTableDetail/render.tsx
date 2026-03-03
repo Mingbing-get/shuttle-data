@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
 import { TableEditorRender, TableEditorProps } from '@shuttle-data/render-react'
 import { DataModel } from '@shuttle-data/type'
 import {
   useWorkContext,
   useTool,
   ToolConfirmRender,
+  CatchResultError,
 } from '@shuttle-ai/render-react'
 
 export interface GetTableDetailToolRenderProps extends Omit<
@@ -22,22 +22,15 @@ export default function GetTableDetailToolRender(
   props: GetTableDetailToolRenderProps,
 ) {
   const { dataModel } = useWorkContext()
-  const { args, content, confirmResult, agent, toolId } = useTool<{
-    tableName: string
-    useApiName?: boolean
-  }>()
+  const { args, result, confirmResult, agent, toolId } = useTool<
+    {
+      tableName: string
+      useApiName?: boolean
+    },
+    DataModel.Define
+  >()
 
-  const table: DataModel.Define = useMemo(() => {
-    if (!content) return
-
-    try {
-      return JSON.parse(content)
-    } catch (error) {
-      return
-    }
-  }, [content])
-
-  if (!table) {
+  if (!result) {
     return (
       <div>
         <p style={{ margin: '4px 0' }}>
@@ -53,20 +46,26 @@ export default function GetTableDetailToolRender(
   }
 
   return (
-    <TableEditorRender
-      {...props}
-      style={{
-        maxHeight: '60vh',
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 8,
-        ...props.style,
-      }}
-      disabled={true}
-      schema={dataModel.schema}
-      enumManager={dataModel.enumManager}
-      table={table}
-      dataSourceName={table.dataSourceName}
+    <CatchResultError
+      title="查询结果"
+      result={result}
+      successRender={(table) => (
+        <TableEditorRender
+          {...props}
+          style={{
+            maxHeight: '60vh',
+            backgroundColor: '#fff',
+            borderRadius: 8,
+            padding: 8,
+            ...props.style,
+          }}
+          disabled={true}
+          schema={dataModel.schema}
+          enumManager={dataModel.enumManager}
+          table={table}
+          dataSourceName={table?.dataSourceName || ''}
+        />
+      )}
     />
   )
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import classNames from 'classnames'
 import { List, ListProps } from 'antd'
 import {
   SortableContext,
@@ -10,6 +11,8 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 
 import SortableListItem from './item'
 import DragHandle from './handle'
+
+import './index.scss'
 
 export interface RenderItemProps<T extends Record<string, any>> {
   list: T[]
@@ -169,6 +172,7 @@ export default function SortList<
       >
         <List
           {...listProps}
+          className={classNames('shuttle-data-sort-list', listProps.className)}
           header={header}
           footer={footer}
           rowKey={rowKey}

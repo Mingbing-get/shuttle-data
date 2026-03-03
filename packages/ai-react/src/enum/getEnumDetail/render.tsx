@@ -19,20 +19,20 @@ export default function GetEnumDetailToolRender(
   props: GetEnumDetailToolRenderProps,
 ) {
   const { dataModel } = useWorkContext()
-  const { args, content, confirmResult, agent, toolId } = useTool<{
+  const { args, result, confirmResult, agent, toolId } = useTool<{
     groupName: string
     useApiName?: boolean
   }>()
 
   const group: DataEnum.Group = useMemo(() => {
-    if (!content) return
+    if (!result?.content) return
 
     try {
-      return JSON.parse(content)
+      return JSON.parse(result.content)
     } catch (error) {
       return
     }
-  }, [content])
+  }, [result])
 
   if (!group) {
     return (

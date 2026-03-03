@@ -29,6 +29,7 @@ export interface OrderRenderProps extends Omit<
   value?: DataCRUD.OrderBy<any>[]
   fields: NDataModel.Field[]
   useApiName?: boolean
+  disabled?: boolean
   onChange?: (value: DataCRUD.OrderBy<any>[]) => void
   FooterRender?: (props: OrderRenderFooterProps) => React.ReactNode
 }
@@ -37,6 +38,7 @@ export default function OrderRender({
   value,
   fields,
   useApiName,
+  disabled,
   onChange,
   FooterRender,
   ...extraProps
@@ -90,14 +92,16 @@ export default function OrderRender({
             gap: 8,
           }}
         >
-          {dragHandle}
+          {!disabled && dragHandle}
           <Select
+            disabled={disabled}
             style={{ flex: 1 }}
             value={item.key}
             options={leftOptions}
             onChange={(v) => update('key', v)}
           />
           <Radio.Group
+            disabled={disabled}
             optionType="button"
             options={[
               { label: '升序', value: 'asc' },
@@ -106,13 +110,15 @@ export default function OrderRender({
             value={item.desc ? 'desc' : 'asc'}
             onChange={(e) => update('desc', e.target.value === 'desc')}
           />
-          <Tooltip title="删除">
-            <Button danger icon={<DeleteOutlined />} onClick={remove} />
-          </Tooltip>
+          {!disabled && (
+            <Tooltip title="删除">
+              <Button danger icon={<DeleteOutlined />} onClick={remove} />
+            </Tooltip>
+          )}
         </div>
       )
     },
-    [subFields],
+    [disabled, subFields],
   )
 
   const _FooterRender = useCallback(
