@@ -1,5 +1,11 @@
 export { default as countTool } from './count'
 export { default as findRecordsTool } from './findRecords'
+export { default as queryGroupByTool } from './queryGroupBy'
+export { default as batchCreateRecordsTool } from './batchCreateRecords'
+export { default as createRecordTool } from './createRecord'
 
 export type { CountToolRenderProps } from './count/render'
 export type { FindRecordsToolRenderProps } from './findRecords/render'
+export type { QueryGroupByToolRenderProps } from './queryGroupBy/render'
+export type { BatchCreateRecordToolRenderProps } from './batchCreateRecords/render'
+export type { CreateRecordToolRenderProps } from './createRecord/render'

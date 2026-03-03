@@ -1,0 +1,12 @@
+.shuttle-data-tool-batch-create-records {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .shuttle-data-tool-batch-create-item {
+    .shuttle-data-tool-batch-create-item-title {
+      margin: 0 0 1rem 0;
+      text-align: center;
+    }
+  }
+}

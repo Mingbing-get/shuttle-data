@@ -26,6 +26,12 @@ import {
   findRecordsTool,
   CountToolRenderProps,
   FindRecordsToolRenderProps,
+  queryGroupByTool,
+  QueryGroupByToolRenderProps,
+  batchCreateRecordsTool,
+  BatchCreateRecordToolRenderProps,
+  createRecordTool,
+  CreateRecordToolRenderProps,
 } from './crud'
 
 interface AllToolOptions {
@@ -41,6 +47,9 @@ interface AllToolOptions {
   updateEnumTool?: DefinePropsRunTool<CreateEnumToolRenderProps>
   countTool?: DefinePropsRunTool<CountToolRenderProps>
   findRecordsTool?: DefinePropsRunTool<FindRecordsToolRenderProps>
+  queryGroupByTool?: DefinePropsRunTool<QueryGroupByToolRenderProps>
+  batchCreateRecordsTool?: DefinePropsRunTool<BatchCreateRecordToolRenderProps>
+  createRecordTool?: DefinePropsRunTool<CreateRecordToolRenderProps>
 }
 
 export default function allTool(options?: AllToolOptions) {
@@ -57,6 +66,9 @@ export default function allTool(options?: AllToolOptions) {
     deepMerge(updateEnumTool, options?.updateEnumTool),
     deepMerge(countTool, options?.countTool),
     deepMerge(findRecordsTool, options?.findRecordsTool),
+    deepMerge(queryGroupByTool, options?.queryGroupByTool),
+    deepMerge(batchCreateRecordsTool, options?.batchCreateRecordsTool),
+    deepMerge(createRecordTool, options?.createRecordTool),
   ]
 }
 

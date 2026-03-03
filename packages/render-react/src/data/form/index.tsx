@@ -60,6 +60,7 @@ export default function DataForm<Values = Record<string, any>>({
   layout = 'vertical',
   footer = defaultFooter,
   afterSubmit,
+  disabled,
   ...formProps
 }: DataFormProps<Values>) {
   const [form] = Form.useForm()
@@ -182,7 +183,7 @@ export default function DataForm<Values = Record<string, any>>({
 
   return (
     <Spin spinning={schemaLoading || recordLoading}>
-      <Form {...formProps} layout={layout} form={form}>
+      <Form {...formProps} layout={layout} form={form} disabled={disabled}>
         {showFields.map((field) => {
           if (!field.Render) return null
 
@@ -198,7 +199,7 @@ export default function DataForm<Values = Record<string, any>>({
                 dataModel={dataModel}
                 useApiName={useApiName}
                 field={field}
-                disabled={field.disabled}
+                disabled={field.disabled || disabled}
                 value={form.getFieldValue(field.name)}
                 onChange={(value) => {
                   form.setFieldValue(field.name, value)
