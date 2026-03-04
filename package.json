@@ -73,10 +73,10 @@
   },
   "pnpm": {
     "overrides": {
-      "@shuttle-ai/type": "^0.0.8",
-      "@shuttle-ai/agent": "^0.0.8",
-      "@shuttle-ai/client": "^0.0.8",
-      "@shuttle-ai/render-react": "^0.0.8",
+      "@shuttle-ai/type": "^0.0.9",
+      "@shuttle-ai/agent": "^0.0.9",
+      "@shuttle-ai/client": "^0.0.9",
+      "@shuttle-ai/render-react": "^0.0.9",
       "zod": "^4.3.5",
       "knex": "^3.1.0",
       "classnames": "^2.5.1",

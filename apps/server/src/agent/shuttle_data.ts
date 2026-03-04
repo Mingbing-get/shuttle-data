@@ -6,6 +6,7 @@ import {
   updateTableTool,
   addGroupTool,
   updateGroupTool,
+  getConditionDefineTool,
 } from '@shuttle-data/ai-server'
 import { tool } from '@langchain/core/tools'
 import { CreateAgentParams } from 'langchain'
@@ -18,13 +19,14 @@ import updateGroupService from '../service/dataEnum/updateGroup'
 const shuttleDataAgent: ShuttleAi.Cluster.ToolsWithSubAgents &
   Pick<CreateAgentParams, 'systemPrompt'> = {
   systemPrompt: shuttleDataAgentSystemPrompt,
-  tools: [
+  lazyTools: [
     ...allTool().filter((tool) => {
       return ![
         createTableTool.name,
         updateTableTool.name,
         addGroupTool.name,
         updateGroupTool.name,
+        getConditionDefineTool.name,
       ].includes(tool.name)
     }),
     tool(

@@ -1,5 +1,5 @@
 import { tool } from '@langchain/core/tools'
-import { DataCRUD } from '@shuttle-data/type'
+import { conditionPluginManager, DataCRUD } from '@shuttle-data/type'
 import { ShuttleAi } from '@shuttle-ai/type'
 import { z } from 'zod'
 
@@ -41,13 +41,16 @@ const updateRecordTool = tool(
         .describe(
           'Whether to use the API name of the model instead of the model name.',
         ),
-      // condition: conditionPluginManager.getZod().describe('The condition to filter records to update.').optional(),
-      condition: z
-        .object()
-        .catchall(z.any())
-        .describe(
-          'Please call crud_get_condition_define to obtain the condition definition',
-        ),
+      condition: conditionPluginManager
+        .getZod()
+        .describe('The condition to filter records to update.')
+        .optional(),
+      // condition: z
+      //   .object()
+      //   .catchall(z.any())
+      //   .describe(
+      //     'Please call crud_get_condition_define to obtain the condition definition',
+      //   ),
       data: z
         .object()
         .catchall(z.any())

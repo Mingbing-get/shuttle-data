@@ -6,7 +6,7 @@ import '@shuttle-ai/render-react'
 
 const initAgent: Record<string, ShuttleAi.Client.Agent.WithRunToolParams> = {
   shuttle_data_agent: {
-    tools: allTool({
+    lazyTools: allTool({
       getTableDetailTool: {
         run: {
           defaultProps: {
@@ -61,13 +61,13 @@ const getAgentParams = (
   const info = initAgent[agentName]
   if (!info) {
     return {
-      tools: [writeTodosTool],
+      lazyTools: [writeTodosTool],
     }
   }
 
   return {
     ...info,
-    tools: [...(info.tools || []), writeTodosTool],
+    lazyTools: [...(info.lazyTools || []), writeTodosTool],
   }
 }
 export default getAgentParams
