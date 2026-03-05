@@ -1,6 +1,6 @@
 {
   "name": "@shuttle-data/crud",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
   "description": "数据模型 CRUD 操作",
@@ -26,7 +26,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "knex": "*",
+    "knex": "^3.1.0",
     "@shuttle-data/type": "workspace:*",
     "@shuttle-data/schema": "workspace:*"
   },

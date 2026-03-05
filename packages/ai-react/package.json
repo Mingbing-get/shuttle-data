@@ -1,6 +1,6 @@
 {
   "name": "@shuttle-data/ai-react",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
   "description": "web端ai相关的react渲染库",
@@ -30,14 +30,14 @@
     "@shuttle-data/client": "workspace:*",
     "@shuttle-data/type": "workspace:*",
     "@shuttle-data/render-react": "workspace:*",
-    "classnames": "*",
-    "react": "*",
-    "react-dom": "*",
-    "antd": "*",
-    "@ant-design/icons": "*",
-    "@shuttle-ai/type": "*",
-    "@shuttle-ai/client": "*",
-    "@shuttle-ai/render-react": "*"
+    "classnames": "^2.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "antd": "^6.1.1",
+    "@ant-design/icons": "^6.1.0",
+    "@shuttle-ai/type": "^0.0.11",
+    "@shuttle-ai/client": "^0.0.11",
+    "@shuttle-ai/render-react": "^0.0.11"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

@@ -1,6 +1,6 @@
 {
   "name": "@shuttle-data/ai-server",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "author": "Mingbing-get <1508850533@qq.com>",
   "license": "MIT",
   "description": "数据模型相关的AI提示词和工具定义",
@@ -29,11 +29,11 @@
     "@shuttle-data/type": "workspace:*",
     "@shuttle-data/schema": "workspace:*",
     "@shuttle-data/crud": "workspace:*",
-    "langchain": "*",
-    "@langchain/core": "*",
-    "zod": "*",
-    "@shuttle-ai/type": "*",
-    "@shuttle-ai/agent": "*"
+    "langchain": "^1.2.17",
+    "@langchain/core": "^1.1.19",
+    "zod": "^4.3.5",
+    "@shuttle-ai/type": "^0.0.11",
+    "@shuttle-ai/agent": "^0.0.11"
   },
   "devDependencies": {
     "typescript": "^5.3.3",
