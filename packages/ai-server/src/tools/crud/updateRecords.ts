@@ -26,7 +26,8 @@ const updateRecordTool = tool(
   },
   {
     name: 'crud_update_records',
-    description: 'Update records in the specified model.',
+    description:
+      'Update records by ID; multiple records can be updated at once with different values.',
     schema: z.object({
       modelName: z
         .string()

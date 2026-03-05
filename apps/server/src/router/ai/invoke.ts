@@ -64,6 +64,9 @@ const invoke: Middleware = async (ctx) => {
     id: workId,
     hooks: hooks,
     autoRunScope,
+    runnableOptions: {
+      recursionLimit: 10000,
+    },
     // messageCollector: new FileMessageCollector(
     //   resolve(process.cwd(), './agent/messages'),
     // ),
